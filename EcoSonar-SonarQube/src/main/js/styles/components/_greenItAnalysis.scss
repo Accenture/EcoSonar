@@ -1,0 +1,24 @@
+.left-part {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.lighthouse-metric {
+  .centered-score {
+    text-align: center;
+    width: 50%;
+    vertical-align: middle;
+
+    .lightouse-score {
+      padding-left: 3%;
+    }
+  }
+  .image-score {
+    vertical-align: middle;
+    width: 50px;
+  }
+  .url-selector {
+    white-space: nowrap;
+  }
+}

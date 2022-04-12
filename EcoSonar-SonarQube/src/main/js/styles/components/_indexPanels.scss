@@ -1,0 +1,38 @@
+.index-panel {
+  display: flex;
+  flex-direction: column;
+  width: 25%;
+}
+
+.ecoindex-panel {
+  margin-right: 16px;
+  .disclaimer {
+    padding-top: 10%;
+    text-align: justify;
+    font-size: $small-font;
+  }
+}
+.ecoindex-title {
+  text-transform: uppercase;
+  font-weight: $medium-weight;
+  font-size: $small-font;
+  margin-bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+}
+.ecoindex-panel-content {
+  background: $white;
+  border: 1px solid $light-grey;
+}
+.ecoindex-badge {
+  padding: 16px;
+  color: $white;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.ecoindex-badge-title {
+  color: $white;
+  margin-bottom: 16px;
+  font-size: $xxlarge-font;
+}

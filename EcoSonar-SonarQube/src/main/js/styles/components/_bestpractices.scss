@@ -1,0 +1,106 @@
+.page {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 2;
+  padding: 1% 1%;
+}
+.right-arrow {
+  margin-left: auto;
+  margin-right: 2%;
+  height: 1%;
+  width: 6%;
+  transition-duration: 500ms;
+}
+.right-arrow.active {
+  transform: rotate(90deg);
+}
+.accordion-item {
+  list-style: none;
+  background-color: $white;
+  margin-bottom: 1%;
+  .accordion-toggle {
+    cursor: pointer;
+    .accordion-title {
+      display: flex;
+      align-items: center;
+      .right-arrow {
+        margin-left: auto;
+        margin-right: 2%;
+        height: 1%;
+        width: 6%;
+        transition-duration: 500ms;
+      }
+      .accordion-left,
+      .accordion-right {
+        width: 50%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .right-arrow.active {
+          transform: rotate(90deg);
+        }
+      }
+    }
+  }
+  .accordion-content {
+    padding: 1%;
+    .description {
+      border-radius: 5px;
+      background-color: $cream;
+      padding: 1%;
+    }
+    .accordion-descriptions {
+      margin-top: 1%;
+      padding: 1%;
+      background-color: $red-background;
+      border-radius: 5px;
+      overflow: auto;
+      .accordion-descriptions.extend {
+        cursor: pointer;
+      }
+      .accordion-description-extend {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.compliance {
+  width: 15%;
+}
+
+.title {
+  margin: 0 3%;
+}
+
+.important-data {
+  margin: 0;
+}
+
+.contents {
+  margin: 2%;
+}
+
+.header-best-practices {
+  padding: 1%;
+  margin-bottom: 1%;
+}
+
+.title-best-practices {
+  padding: 1%;
+}
+
+.button-pop-up {
+    all :unset;
+    font-size: $small-font;
+    background-color: $white;
+    border-bottom: 1px solid #cae3f2;
+    color: #236a97;
+    cursor: pointer;
+    outline: 0;
+    text-decoration: none;
+    transition: all .2s ease;
+}
+

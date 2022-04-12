@@ -1,0 +1,38 @@
+.modal-content-config{
+    width: 450px;
+    max-height: 500px;
+    overflow-y: auto;
+    margin-left: -225px;
+    top: 18%;
+    opacity: 1;
+    position: fixed;
+    z-index: 6001!important;
+    left: 50%;
+    background-color: #fff;
+    transition: all .2s ease;
+    border-radius: 3px;
+    text-align: left;
+
+.modal-header-config{
+    padding: 32px 32px 0;
+    .modal-title-config{
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: normal;
+        overflow-wrap: break-word;
+        font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    }
+}
+.modal-body-config{    
+    padding: 20px 32px;
+}
+.modal-footer-config{
+    padding: 20px 32px;
+    border-top: 1px solid $medium-grey;
+    background-color: $cream;
+    border-radius: 3px;
+    text-align: right;
+}
+
+}

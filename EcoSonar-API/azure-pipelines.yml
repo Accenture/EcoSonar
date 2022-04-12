@@ -1,0 +1,54 @@
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+- group: sustainability-api
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+    - task: AzureAppServiceManage@0
+      displayName: 'Stop WebApp'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        Action: 'Stop Azure App Service'
+        WebAppName: $(appName)
+    - task: AzureRmWebAppDeployment@4
+      displayName: 'Deploy Azure App Service'
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: '$(azureSubscription)'
+        appType: 'webAppContainer'
+        WebAppName: '$(appName)'
+        DockerNamespace: '$(containerRegistry)'
+        DockerRepository: '$(imageRepository)'
+        DockerImageTag: '$(tag)'
+        AppSettings: '-NODE_ENV $(nodeEnv) -CLOUD_PROVIDER $(cloudProvider) -DB_NAME $(dbName) -USER $(userCosmosDB) -CLUSTER $(clusterCosmosDB) -DB_PORT $(portCosmosDB) -KEY_VAULT_NAME $(keyVaultName) -SECRET_NAME $(secretName)'
+    - task: AzureAppServiceManage@0
+      displayName: 'Start WebApp'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        Action: 'Start Azure App Service'
+        WebAppName: $(appName)
+          

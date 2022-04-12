@@ -1,0 +1,101 @@
+class EnumAudits {}
+EnumAudits.prototype.performanceNamesMetrics = function () {
+  return [
+    'firstContentfulPaint',
+    'largestContentfulPaint',
+    'speedIndex',
+    'totalBlockingTime',
+    'interactive',
+    'cumulativeLayoutShift']
+}
+
+EnumAudits.prototype.performanceNamesAudits = function () {
+  return [
+    'networkRtt',
+    'bootupTime',
+    'domSize',
+    'usesLongCacheTtl',
+    'unminifiedCss',
+    'unminifiedJavascript',
+    'unusedCssRules',
+    'unusedJavascript',
+    'usesOptimizedImages',
+    'modernImageFormats',
+    'usesTextCompression',
+    'efficientAnimatedContent',
+    'duplicatedJavascript',
+    'totalByteWeight',
+    'serverResponseTime',
+    'userTimings',
+    'criticalRequestChains',
+    'mainthreadWorkBreakdown',
+    'usesRelPreload',
+    'fontDisplay',
+    'viewport',
+    'thirdPartySummary',
+    'thirdPartyFacades',
+    'lcpLazyLoaded',
+    'longTasks',
+    'nonCompositedAnimations',
+    'preloadLcpImage',
+    'usesResponsiveImages',
+    'offscreenImages',
+    'usesHttp2',
+    'legacyJavascript',
+    'metrics',
+    'maxPotentialFid',
+    'networkServerLatency',
+    'noDocumentWrite'
+  ]
+}
+EnumAudits.prototype.accessibilityNames = function () {
+  return [
+    'accesskeys',
+    'ariaAllowedAttr',
+    'ariaCommandName',
+    'ariaHiddenBody',
+    'ariaHiddenFocus',
+    'ariaRequiredAttr',
+    'ariaRoles',
+    'ariaValidAttrValue',
+    'ariaValidAttr',
+    'bypass',
+    'colorContrast',
+    'documentTitle',
+    'duplicateIdActive',
+    'duplicateIdAria',
+    'headingOrder',
+    'htmlHasLang',
+    'htmlLangValid',
+    'imageAlt',
+    'label',
+    'linkName',
+    'list',
+    'listitem',
+    'tabindex',
+    'tdHeadersAttr',
+    'validLang',
+    'ariaInputFieldName',
+    'ariaMeterName',
+    'ariaProgressbarName',
+    'ariaRequiredChildren',
+    'ariaRequiredParent',
+    'ariaToggleFieldName',
+    'ariaTooltipName',
+    'ariaTreeitemName',
+    'buttonName',
+    'definitionList',
+    'dlitem',
+    'formFieldMultipleLabels',
+    'frameTitle',
+    'inputImageAlt',
+    'metaRefresh',
+    'metaViewport',
+    'objectAlt',
+    'thHasDataCells',
+    'videoCaption'
+  ]
+}
+
+const enumAudits = new EnumAudits()
+module.exports = enumAudits

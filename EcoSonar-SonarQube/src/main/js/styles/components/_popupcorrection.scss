@@ -1,0 +1,50 @@
+.modal-body-title {
+  margin-left: 1%;
+}
+
+.correction-content {
+  width: 50%;
+  max-height: 50%;
+  overflow-y: auto;
+  top: 25%;
+  opacity: 1;
+  position: fixed;
+  z-index: 6001;
+  background-color: $white;
+  transition: all 0.2s ease;
+  border-radius: 3px;
+  text-align: left;
+}
+
+.correction-title {
+  font-size: $small-font;
+  font-weight: $medium-weight;
+  overflow-wrap: break-word;
+  font-family: $main-font;
+  margin: 0;
+  padding: 1%;
+  color: $white;
+}
+
+.style-correction {
+  padding: 3% 0% 3% 0%;
+
+  .compliance-title {
+    font-size: $large-font;
+    padding: 5% 0 1% 1%;
+  }
+  .compliance-example {
+    padding: 2% 0% 2% 1%;
+    border: 1px solid;
+    border-color: $transparent-light-grey;
+    font-size: $small-font;
+  }
+}
+
+.correction-text {
+  margin-left: 1%;
+}
+
+li {
+  margin-top: 1%;
+}
