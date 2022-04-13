@@ -11,3 +11,4 @@ lighthouse/jsonfile.json
 screenshots
 pgdata
 .env
+package-lock.json

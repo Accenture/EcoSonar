@@ -57,7 +57,7 @@ ngrok http 9000
 
 9. The analysis is launched and you should see the results on the corresponding project page.
 
-## Launch a Sonarqube analysis from Azure Pipelines on a deploed SonarQube server
+## Launch a Sonarqube analysis from Azure Pipelines on a deployed SonarQube server
 
 1. In Azure DevOps, go to project settings, then Service Connections
 
