@@ -144,6 +144,9 @@ The source code related to the EcoSonar API will be in the “EcoSonar-API” fo
 3. In the configuration file "EcoSonar-API/configuration/retrieveDatabasePasswordFromCloudProvider.js", please configure the recovery of the database password according to the chosen vault service. An example is provided for a configuration with an Azure Key Vault.
 4. In the “EcoSonar-API/configuration/database.js” configuration file, two scenarios are represented: a connection with a MongoDB Atlas, a connection with a CosmosDB. If you are in one of these two cases, you can keep only the connection that suits you. Otherwise, based on these two models, you can set up the connection adapted to the chosen service.
 
+#### CORS Configuration
+- Add whitelisted URL authorized to send POST Requests to API in the file “EcoSonar-API/routes/app.js” at line 16 in addition of default localhost url.
+
 #### Build the Docker image:
 It is possible to build the image locally by following the instructions in the Readme corresponding to the “EcoSonar-API” folder. Use of Docker Desktop is subject to a commercial license.
 
