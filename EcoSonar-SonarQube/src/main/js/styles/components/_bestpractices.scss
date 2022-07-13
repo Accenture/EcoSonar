@@ -16,6 +16,10 @@
 .right-arrow.active {
   transform: rotate(90deg);
 }
+.accordion {
+  padding: 0;
+}
+
 .accordion-item {
   list-style: none;
   background-color: $white;
@@ -63,6 +67,13 @@
       .accordion-description-extend {
         text-decoration: underline;
       }
+      .lighthouse-descriptions {
+        max-height: 5vh;
+        padding-bottom: 6vh;
+      }
+      .lighthouse-descriptions-extend {
+        max-height: none;
+      }
     }
   }
 }
@@ -83,6 +94,12 @@
   margin: 2%;
 }
 
+.best-practice-error {
+  border: 1px solid #e6e6e6;
+  border-radius: 2px;
+  background-color: $white;
+  padding: 2% 3%;
+}
 .header-best-practices {
   padding: 1%;
   margin-bottom: 1%;
@@ -93,14 +110,21 @@
 }
 
 .button-pop-up {
-    all :unset;
-    font-size: $small-font;
-    background-color: $white;
-    border-bottom: 1px solid #cae3f2;
-    color: #236a97;
-    cursor: pointer;
-    outline: 0;
-    text-decoration: none;
-    transition: all .2s ease;
+  all: unset;
+  font-size: $small-font;
+  background-color: $white;
+  border-bottom: 1px solid #cae3f2;
+  color: #236a97;
+  cursor: pointer;
+  outline: 0;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
-
+.not-applicable {
+  padding-top: 10vh;
+}
+.title-not-applicable {
+  text-align: center;
+  cursor: grab;
+  text-decoration: underline;
+}

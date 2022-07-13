@@ -3,6 +3,7 @@ rulesManager.registerRule({
   id: 'HttpError',
   errorNumber: 0,
   errors: '',
+  score: 100,
 
   check: function (measures) {
     if (measures.entries.length) {
@@ -14,6 +15,14 @@ rulesManager.registerRule({
           }
         }
       })
+    }
+
+    if (this.errorNumber === 0) {
+      this.score = 100
+    } else if (this.errorNumber <= 1) {
+      this.score = 50
+    } else {
+      this.score = 0
     }
   }
 }, 'harReceived')

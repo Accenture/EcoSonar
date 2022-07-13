@@ -1,10 +1,10 @@
 import classNames from 'classnames'
-import * as React from 'react'
+import React from 'react'
 import LoadingIcon from '../../../images/LoadingIcon.svg'
 import HelpIcon from '../../../images/HelpIcon.svg'
 import { setPanelColor } from './PanelColorSetting'
 
-export default function QualityGatePanel (props) {
+export default function LighthouseAccessibilityPanel (props) {
   const { loading, analysis } = props
   const undefinedStatus = analysis.accessComplianceLevel === undefined
   const panelColor = setPanelColor(analysis.accessComplianceLevel)

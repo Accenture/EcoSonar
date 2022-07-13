@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { getAnalysisUrlConfiguration } from '../../services/ecosonarService'
 import GraphPanelForUrl from './GraphPanel/GraphPanelForUrl'
 import GreenItPanelPerUrl from './GreenItPanel/GreenItPanelPerUrl'
@@ -23,6 +23,12 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
       domUrl: [],
       performanceUrl: [],
       accessibilityUrl: [],
+      cumulativeLayoutShiftUrl: [],
+      firstContentfulPaintUrl: [],
+      largestContentfulPaintUrl: [],
+      interactiveUrl: [],
+      speedIndexUrl: [],
+      totalBlockingTimeUrl: [],
       selectedGraph: '',
       reqSelected: false,
       ecoindexSelected: false,
@@ -44,7 +50,6 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
     if (this.state.foundUrl) {
       this.getAnalysis()
     }
-    this.setState({ selectedGraph: 'ecoindex', ecoindexSelected: true })
   }
 
   getAnalysis = () => {
@@ -65,7 +70,6 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
       interactiveUrl: [],
       speedIndexUrl: [],
       totalBlockingTimeUrl: [],
-
       loading: true
     })
     getAnalysisUrlConfiguration(this.state.projectName, this.state.selectedUrl)
@@ -124,18 +128,16 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
               analysis.dateAnalysis,
               analysis.totalBlockingTime
             ])
-
           })
-        } else {
-          this.setState({
-            error: 'No Analysis found for ' + this.state.selectedUrl,
-            loading: false
-          })
+          if (res.deployments.greenit && res.deployments.greenit.length > 0) {
+            this.setState({ selectedGraph: 'ecoindex', ecoindexSelected: true, performanceSelected: false })
+          } else {
+            this.setState({ selectedGraph: 'performance', performanceSelected: true, ecoindexSelected: false })
+          }
         }
       })
       .catch((result) => {
         if (result instanceof Error) {
-          console.log(result)
           this.setState({ error: result.message, loading: false })
         }
       })
@@ -350,7 +352,34 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
           handleChangeGraphs={this.handleChangeGraphs}
         />
         <GraphPanelForUrl
-          state={this.state}
+          loading={this.state.loading}
+          foundAnalysis={this.state.foundAnalysis}
+          error={this.state.error}
+          selectedGraph={this.state.selectedGraph}
+          ecoUrl={this.state.ecoUrl}
+          reqUrl={this.state.reqUrl}
+          domUrl={this.state.domUrl}
+          pageUrl={this.state.pageUrl}
+          performanceUrl={this.state.performanceUrl}
+          accessibilityUrl={this.state.accessibilityUrl}
+          cumulativeLayoutShiftUrl={this.state.cumulativeLayoutShiftUrl}
+          firstContentfulPaintUrl={this.state.firstContentfulPaintUrl}
+          largestContentfulPaintUrl={this.state.largestContentfulPaintUrl}
+          interactiveUrl={this.state.interactiveUrl}
+          speedIndexUrl={this.state.speedIndexUrl}
+          totalBlockingTimeUrl={this.state.totalBlockingTimeUrl}
+          reqSelected={this.state.reqSelected}
+          domSelected={this.state.domSelected}
+          pageSelected={this.state.pageSelected}
+          ecoindexSelected={this.state.ecoindexSelected}
+          performanceSelected={this.state.performanceSelected}
+          accessibilitySelected={this.state.accessibilitySelected}
+          cumulativeLayoutShiftSelected={this.state.cumulativeLayoutShiftSelected}
+          firstContentfulPaintSelected={this.state.firstContentfulPaintSelected}
+          largestContentfulPaintSelected={this.state.largestContentfulPaintSelected}
+          interactiveSelected={this.state.interactiveSelected}
+          speedIndexSelected={this.state.speedIndexSelected}
+          totalBlockingTimeSelected={this.state.totalBlockingTimeSelected}
           handleChangeGraphs={this.handleChangeGraphs}
         />
       </div>

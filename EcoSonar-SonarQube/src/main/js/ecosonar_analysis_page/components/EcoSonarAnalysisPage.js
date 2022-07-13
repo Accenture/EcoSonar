@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import NoAnalysisWarning from './NoAnalysisWarning'
 import EcoIndexPanel from './IndexPanel/EcoIndexPanel'
 import LighthousePerformancePanel from './IndexPanel/LighthousePerformancePanel'
@@ -43,9 +43,11 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
       interactiveAnalysis: [],
       speedIndexAnalysis: [],
       totalBlockingTimeAnalysis: [],
-      foundAll: false,
       found: false,
-      date: ''
+      date: '',
+      defaultSelectedGraph: 'ecoindex',
+      defaultEcoindexSelected: true,
+      defaultPerformanceSelected: false
     }
   }
 
@@ -58,7 +60,6 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
       projectHasNoAnalysis: false,
       urls: [],
       foundUrl: false,
-      foundAll: false,
       selectedUrl: false,
       errorUrl: '',
       projectName: this.props.project.key
@@ -66,33 +67,36 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
     getAnalysisForProjectConfiguration(this.props.project.key)
       .then((analysis) => {
         if (analysis.deployments !== undefined) {
-          let date = new Date(analysis.lastAnalysis.dateAnalysis)
-          const timeOffsetInMS = date.getTimezoneOffset() / 60
-          date.setTime(date.getTime() + timeOffsetInMS)
-          date = date + ' .'
-          const change = date.split(' ')
+          const dateGreenitLastAnalysis = analysis.lastAnalysis.dateGreenitLastAnalysis
+            ? `${new Date(analysis.lastAnalysis.dateGreenitLastAnalysis).toDateString()} - ${new Date(analysis.lastAnalysis.dateGreenitLastAnalysis).toLocaleTimeString([], { hour12: false })}  `
+            : null
+          const dateLighthouseLastAnalysis = analysis.lastAnalysis.dateLighthouseLastAnalysis
+            ? `${new Date(analysis.lastAnalysis.dateLighthouseLastAnalysis).toDateString()} - ${new Date(analysis.lastAnalysis.dateLighthouseLastAnalysis).toLocaleTimeString([], { hour12: false })}  `
+            : null
+
           this.setState({
             analysisForProjectGreenit: analysis.lastAnalysis.greenit,
             found: true,
-            foundAll: true,
-            date: change[0] + ' ' + change[2] + ' ' + change[1] + ' ' + change[3] + ' - ' + change[4],
+            dateGreenitLastAnalysis: dateGreenitLastAnalysis,
+            dateLighthouseLastAnalysis: dateLighthouseLastAnalysis,
+            defaultSelectedGraph: analysis.lastAnalysis.greenit !== null ? 'ecoindex' : 'performance',
+            defaultEcoindexSelected: analysis.lastAnalysis.greenit !== null,
+            defaultPerformanceSelected: analysis.lastAnalysis.greenit === null,
             reqAnalysis: analysis.deployments.greenit.map((analysis) => [analysis.dateAnalysis, analysis.nbRequest]),
             domAnalysis: analysis.deployments.greenit.map((analysis) => [analysis.dateAnalysis, Math.trunc(analysis.domSize)]),
             pageAnalysis: analysis.deployments.greenit.map((analysis) => [analysis.dateAnalysis, Math.trunc(analysis.responsesSize)]),
-            ecoAnalysis: analysis.deployments.greenit.map((analysis) => [analysis.dateAnalysis, analysis.ecoIndex])
+            ecoAnalysis: analysis.deployments.greenit.map((analysis) => [analysis.dateAnalysis, analysis.ecoIndex]),
+            performanceAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.performanceScore]),
+            accessibilityAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.accessibilityScore]),
+            cumulativeLayoutshiftAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.cumulativeLayoutShift]),
+            firstContentfulPaintAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.firstContentfulPaint]),
+            largestContentfulPaintAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.largestContentfulPaint]),
+            interactiveAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.interactive]),
+            speedIndexAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.speedIndex]),
+            totalBlockingTimeAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.totalBlockingTime])
           })
-          if (analysis.deployments.lighthouse) {
+          if (analysis.lastAnalysis.lighthouse) {
             this.setState({
-
-              performanceAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.performanceScore]),
-              accessibilityAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.accessibilityScore]),
-              cumulativeLayoutshiftAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.cumulativeLayoutShift]),
-              firstContentfulPaintAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.firstContentfulPaint]),
-              largestContentfulPaintAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.largestContentfulPaint]),
-              interactiveAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.interactive]),
-              speedIndexAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.speedIndex]),
-              totalBlockingTimeAnalysis: analysis.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.totalBlockingTime]),
-
               lighthousePerformanceForProject: {
                 perfScore: analysis.lastAnalysis.lighthouse.performance.displayValue,
                 perfComplianceLevel: analysis.lastAnalysis.lighthouse.performance.complianceLevel
@@ -161,6 +165,24 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
       })
   }
 
+  setSelectedGraph = (selectedGraph) => {
+    this.setState({
+      defaultSelectedGraph: selectedGraph
+    })
+  }
+
+  setEcoIndexSelected = (ecoindexSelected) => {
+    this.setState({
+      defaultEcoindexSelected: ecoindexSelected
+    })
+  }
+
+  setPerformanceSelected = (performanceSelected) => {
+    this.setState({
+      defaultPerformanceSelected: performanceSelected
+    })
+  }
+
   render () {
     return (
       <div className='page'>
@@ -176,11 +198,10 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
                 <LighthousePerformancePanel loading={this.state.loading} analysis={this.state.lighthousePerformanceForProject} found={this.state.found} />
                 <LighthouseAccessibilityPanel loading={this.state.loading} analysis={this.state.lighthouseAccessibilityForProject} found={this.state.found} />
                 <DisclaimerPanel/>
-
               </div>
               <AnalysisPanel
                 loading={this.state.loading}
-                analysis={this.state.analysisForProjectGreenit}
+                analysisForProjectGreenit={this.state.analysisForProjectGreenit}
                 lighthouseMetricsForProject={this.state.lighthouseMetrics}
                 lighthousePerformanceForProject={this.state.lighthousePerformanceForProject}
                 lighthouseAccessibilityForProject={this.state.lighthouseAccessibilityForProject}
@@ -205,7 +226,14 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
                 totalBlockingTimeAnalysis={this.state.totalBlockingTimeAnalysis}
                 foundAll={this.state.foundAll}
                 projectName={this.state.projectName}
-                date={this.state.date}
+                dateGreenitLastAnalysis={this.state.dateGreenitLastAnalysis}
+                dateLighthouseLastAnalysis={this.state.dateLighthouseLastAnalysis}
+                defaultSelectedGraph={this.state.defaultSelectedGraph}
+                defaultEcoindexSelected = {this.state.defaultEcoindexSelected}
+                defaultPerformanceSelected = {this.state.defaultPerformanceSelected}
+                setSelectedGraph={this.setSelectedGraph}
+                setEcoIndexSelected={this.setEcoIndexSelected}
+                setPerformanceSelected={this.setPerformanceSelected}
               />
             </div>
               )}

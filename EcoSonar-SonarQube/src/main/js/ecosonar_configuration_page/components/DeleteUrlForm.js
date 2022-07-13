@@ -3,8 +3,9 @@ import LoadingIcon from '../../images/LoadingIcon.svg'
 import { deleteUrlFromProject } from '../../services/configUrlService'
 
 export default function DeleteUrlForm (props) {
-  const { index, projectName, urlList, globalError } = props
+  const { index, projectName, urlList } = props
   const [isSubmitting, setSubmitting] = React.useState(false)
+  const [errorMessageDelete, setErrorMessageDelete] = React.useState('')
 
   useEffect(() => {
     document.body.addEventListener('keydown', closeOnEscapeKeyDown)
@@ -33,7 +34,7 @@ export default function DeleteUrlForm (props) {
       })
       .catch((result) => {
         if (result instanceof Error) {
-          props.errorMessageDelete(result)
+          setErrorMessageDelete(result.message)
         }
       })
     setSubmitting(false)
@@ -70,14 +71,14 @@ export default function DeleteUrlForm (props) {
               <img src={LoadingIcon} alt="Loading icon" />
             </div>
           )}
-          {globalError !== '' && <p className="text-danger">{globalError}</p>}
+          {errorMessageDelete !== '' && <p className="text-danger">{errorMessageDelete}</p>}
           <button
             className="button-red"
             disabled={isSubmitting}
             type="submit"
             onClick={handleSubmit}
           >
-            
+
             Delete
           </button>
           <button
@@ -86,7 +87,7 @@ export default function DeleteUrlForm (props) {
             type="reset"
             onClick={handleCancelClick}
           >
-            
+
             Cancel
           </button>
         </footer>

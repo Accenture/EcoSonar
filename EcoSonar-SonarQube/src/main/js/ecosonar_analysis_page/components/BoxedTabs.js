@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import classNames from 'classnames'
 
 export default function BoxedTabs (props) {
@@ -9,11 +9,11 @@ export default function BoxedTabs (props) {
       {tabs.map(({ key, label }, i) => (
         <button
           className={classNames('tab', { 'tab-active': selected === key, 'tab-inactive': selected !== key })}
-          active={selected === key}
+          active={(selected === key).toString()}
           key={i}
           onClick={() => selected !== key && props.onSelect(key)}
           type="button">
-          <div className={classNames({ 'active-border': selected === key })} active={selected === key} />
+          <div className={classNames({ 'active-border': selected === key })} active={(selected === key).toString()} />
           {label}
         </button>
       ))}

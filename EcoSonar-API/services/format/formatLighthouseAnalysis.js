@@ -1,4 +1,4 @@
-const ecoIndexCalculationService = require('../ecoIndexCalculationService')
+const formatCompliance = require('./formatCompliance')
 class FormatLighthouseAnalysis {}
 
 FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = function (res) {
@@ -88,7 +88,7 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
   }
 
   function setComplianceLevel (score) {
-    return ecoIndexCalculationService.getEcoIndexGrade(score)
+    return formatCompliance.getGrade(score)
   }
 }
 
@@ -116,8 +116,7 @@ FormatLighthouseAnalysis.prototype.lighthouseAnalysisFormattedDeployments = func
 
       j++
     }
-    const formattedDeployment = this.formatDeploymentsForGraphs(deployments)
-    return formattedDeployment
+    return this.formatDeploymentsForGraphs(deployments)
   } catch (err) {
     console.log(err)
     console.log('LIGHTHOUSE - error during the formatting of project analysis')
@@ -181,9 +180,7 @@ FormatLighthouseAnalysis.prototype.formatDeploymentsForGraphs = function (deploy
   }
 
   function compareFullDate (firstDate, secondDate) {
-    if (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear()) {
-      return true
-    } else return false
+    return (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear())
   }
   return finalDeployment
 }

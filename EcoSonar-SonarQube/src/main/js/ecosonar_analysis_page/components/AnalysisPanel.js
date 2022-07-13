@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import BoxedTabs from './BoxedTabs'
 import LoadingIcon from '../../images/LoadingIcon.svg'
 import AnalysisPerUrlPanel from './AnalysisPerUrlPanel'
@@ -8,15 +8,15 @@ const AnalysisPanelTabs = {
   URL: 'URL',
   PROJECT: 'PROJECT'
 }
-
 export default function AnalysisPanel (props) {
   const {
     loading,
-    analysis,
+    analysisForProjectGreenit,
     lighthouseMetricsForProject,
     lighthousePerformanceForProject,
     lighthouseAccessibilityForProject,
-    date,
+    dateLighthouseLastAnalysis,
+    dateGreenitLastAnalysis,
     error,
     projectName,
     found,
@@ -37,8 +37,26 @@ export default function AnalysisPanel (props) {
     foundUrl,
     selectedUrl,
     errorUrl,
-    foundAll
+    defaultSelectedGraph,
+    defaultEcoindexSelected,
+    defaultPerformanceSelected,
+    setSelectedGraph,
+    setEcoIndexSelected,
+    setPerformanceSelected
   } = props
+
+  function compareDates () {
+    if (dateLighthouseLastAnalysis === dateGreenitLastAnalysis) {
+      return `last analysis at ${dateLighthouseLastAnalysis}`
+    } else if (dateLighthouseLastAnalysis === null) {
+      return `GreenIt last analysis ${dateGreenitLastAnalysis} - No date found for Lighthouse analysis`
+    } else if (dateGreenitLastAnalysis === null) {
+      return `Ligthouse last analysis ${dateLighthouseLastAnalysis} - No date found for GreenIt analysis`
+    } else {
+      return `GreenIt last analysis ${dateGreenitLastAnalysis}  - Lighthouse last analysis ${dateLighthouseLastAnalysis}`
+    }
+  }
+
   const [tab, selectTab] = React.useState(AnalysisPanelTabs.PROJECT)
   const isPerUrlTab = tab === AnalysisPanelTabs.URL
   const tabs = [
@@ -63,8 +81,8 @@ export default function AnalysisPanel (props) {
   return (
     <div className='analysis-panel'>
       <div className='analysis-panel-title'>
-        <h2 className='ecoindex-title'>EcoSonar Analysis -</h2>
-        {analysis !== {} && <h6>- last analysis at {date} </h6>}
+        <h2 className='ecoindex-title'>EcoSonar Analysis - &nbsp;</h2>
+        {analysisForProjectGreenit !== {} && <h6>  {compareDates()} </h6>}
       </div>
 
       {loading
@@ -84,7 +102,7 @@ export default function AnalysisPanel (props) {
                 )
               : (
               <AnalysisPerProjectPanel
-                analysis={analysis}
+                analysisForProjectGreenit={analysisForProjectGreenit}
                 lighthouseMetricsForProject={lighthouseMetricsForProject}
                 lighthousePerformanceForProject={lighthousePerformanceForProject}
                 lighthouseAccessibilityForProject={lighthouseAccessibilityForProject}
@@ -102,8 +120,13 @@ export default function AnalysisPanel (props) {
                 interactiveAnalysis={interactiveAnalysis}
                 speedIndexAnalysis={speedIndexAnalysis}
                 totalBlockingTimeAnalysis={totalBlockingTimeAnalysis}
-                foundAll={foundAll}
                 projectName={projectName}
+                selectedGraph = {defaultSelectedGraph}
+                setSelectedGraph={setSelectedGraph}
+                ecoindexSelected = {defaultEcoindexSelected}
+                setEcoIndexSelected={setEcoIndexSelected}
+                performanceSelected = {defaultPerformanceSelected}
+                setPerformanceSelected={setPerformanceSelected}
               />
                 )}
           </div>

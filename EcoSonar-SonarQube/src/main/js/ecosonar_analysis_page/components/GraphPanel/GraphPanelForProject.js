@@ -13,74 +13,107 @@ import SpeedIndexGraph from '../Graphs/SpeedIndexGraph'
 import TotalBlockingTimeGraph from '../Graphs/TotalBlockingTimeGraph'
 
 export default function GraphPanelForProject (props) {
-  const { analysis, state, handleChangeGraphs } = props
+  const {
+    ecoAnalysis,
+    reqAnalysis,
+    domAnalysis,
+    pageAnalysis,
+    performanceAnalysis,
+    accessibilityAnalysis,
+    cumulativeLayoutshiftAnalysis,
+    firstContentfulPaintAnalysis,
+    largestContentfulPaintAnalysis,
+    interactiveAnalysis,
+    speedIndexAnalysis,
+    totalBlockingTimeAnalysis,
+    found,
+    selectedGraph,
+    reqSelected,
+    domSelected,
+    pageSelected,
+    ecoindexSelected,
+    performanceSelected,
+    accessibilitySelected,
+    cumulativeLayoutShiftSelected,
+    firstContentfulPaintSelected,
+    largestContentfulPaintSelected,
+    interactiveSelected,
+    speedIndexSelected,
+    totalBlockingTimeSelected,
+    handleChangeGraphs,
+    error
+  } = props
+
   return (
     <div className='overview-panel'>
       <h2 className='overview-panel-title'>Key Metrics</h2>
       <div className='overview-panel-content'>
+      {!found
+        ? (
+          <p className='text-danger'>{error}</p>)
+        : (
         <div className='display-flex-row'>
           <div className='display-flex-column flex-1'>
             <div aria-hidden='true' className='overview-panel-padded display-flex-column flex-1'>
               <div className='position-relative'>
                 <label htmlFor='graphs'>Select a metric to view its evolution during deployments:</label>
-                <select className='select-button' name='graphs' id='graphs' value={state.selectedGraph} onChange={handleChangeGraphs}>
-                  <option key='ecoindex' value='ecoindex'>
+                <select className='select-button' name='graphs' id='graphs' value={selectedGraph} onChange={handleChangeGraphs}>
+                  {ecoAnalysis.length > 0 && <option key='ecoindex' value='ecoindex'>
                     EcoIndex
-                  </option>
-                  <option key='request' value='request'>
+                  </option>}
+                  {reqAnalysis.length > 0 && <option key='request' value='request'>
                     Number of Requests
-                  </option>
-                  <option key='dom' value='dom'>
+                  </option>}
+                  {domAnalysis.length > 0 && <option key='dom' value='dom'>
                     Size of the Dom
-                  </option>
-                  <option key='page' value='page'>
+                  </option>}
+                  {pageAnalysis.length > 0 && <option key='page' value='page'>
                     Size of the page
-                  </option>
-                  <option key='performance' value='performance'>
+                  </option>}
+                  {performanceAnalysis.length > 0 && <option key='performance' value='performance'>
                     Lighthouse Performance Score
-                  </option>
-                  <option key='accessibility' value='accessibility'>
+                  </option>}
+                  {accessibilityAnalysis.length > 0 && <option key='accessibility' value='accessibility'>
                     Lighthouse Accessibility Score
-                  </option>
-                  <option key='cumulative' value='cumulative'>
+                  </option>}
+                  {cumulativeLayoutshiftAnalysis.length > 0 && <option key='cumulative' value='cumulative'>
                     Cumulative Layout Shift Score
-                  </option>
-                  <option key='firstcontentfulpaint' value='firstcontentfulpaint'>
+                  </option>}
+                  {firstContentfulPaintAnalysis.length > 0 && <option key='firstcontentfulpaint' value='firstcontentfulpaint'>
                     First Contentful Paint Score
-                  </option>
-                  <option key='largestcontentfulpaint' value='largestcontentfulpaint'>
+                  </option>}
+                  {largestContentfulPaintAnalysis.length > 0 && <option key='largestcontentfulpaint' value='largestcontentfulpaint'>
                     Largest Contentful Paint Score
-                  </option>
-                  <option key='interactive' value='interactive'>
+                  </option>}
+                  {interactiveAnalysis.length > 0 && <option key='interactive' value='interactive'>
                     Time to Interactive Score
-                  </option>
-                  <option key='speedindex' value='speedindex'>
+                  </option>}
+                  {speedIndexAnalysis.length > 0 && <option key='speedindex' value='speedindex'>
                     Speed Index Score
-                  </option>
-                  <option key='totalblockingtime' value='totalblockingtime'>
+                  </option>}
+                  {totalBlockingTimeAnalysis.length > 0 && <option key='totalblockingtime' value='totalblockingtime'>
                     Total Blocking Time Score
-                  </option>
+                  </option>}
                 </select>
               </div>
               <div className='activity-graph-container flex-grow display-flex-column display-flex-stretch display-flex-justify-center'>
-                {!analysis.foundAll && <p className='format-error'>An error occured while retrieving evolution of metrics for project {analysis.projectName}, please try again.</p>}
-
-                {state.reqSelected && analysis.foundAll && <RequestGraph reqAnalysis={analysis.reqAnalysis} />}
-                {state.domSelected && analysis.foundAll && <DomGraph domAnalysis={analysis.domAnalysis} />}
-                {state.pageSelected && analysis.foundAll && <PageGraph pageAnalysis={analysis.pageAnalysis} />}
-                {state.ecoindexSelected && analysis.foundAll && <EcoIndexGraph ecoAnalysis={analysis.ecoAnalysis} />}
-                {state.performanceSelected && <PerformanceGraph performanceAnalysis={analysis.performanceAnalysis} />}
-                {state.accessibilitySelected && <AccessibilityGraph accessibilityAnalysis={analysis.accessibilityAnalysis} />}
-                {state.cumulativeLayoutShiftSelected && <CumulativeGraph cumulativeAnalysis={analysis.cumulativeLayoutshiftAnalysis} />}
-                {state.firstContentfulPaintSelected && <FirstContentfulPaintGraph firstContentfulPaintAnalysis={analysis.firstContentfulPaintAnalysis} />}
-                {state.largestContentfulPaintSelected && <LargestContentfulPaintGraph largestContentfulPaintAnalysis={analysis.largestContentfulPaintAnalysis} />}
-                {state.interactiveSelected && <InteractiveGraph interactiveAnalysis={analysis.interactiveAnalysis} />}
-                {state.speedIndexSelected && <SpeedIndexGraph speedIndexAnalysis={analysis.speedIndexAnalysis} />}
-                {state.totalBlockingTimeSelected && <TotalBlockingTimeGraph totalBlockingTimeAnalysis={analysis.totalBlockingTimeAnalysis} />}
-              </div>
+                <div>
+                {reqSelected && <RequestGraph reqAnalysis={reqAnalysis} />}
+                {domSelected && <DomGraph domAnalysis={domAnalysis} />}
+                {pageSelected && <PageGraph pageAnalysis={pageAnalysis} />}
+                {ecoindexSelected && <EcoIndexGraph ecoAnalysis={ecoAnalysis} />}
+                {performanceSelected && <PerformanceGraph performanceAnalysis={performanceAnalysis} />}
+                {accessibilitySelected && <AccessibilityGraph accessibilityAnalysis={accessibilityAnalysis} />}
+                {cumulativeLayoutShiftSelected && <CumulativeGraph cumulativeAnalysis={cumulativeLayoutshiftAnalysis} />}
+                {firstContentfulPaintSelected && <FirstContentfulPaintGraph firstContentfulPaintAnalysis={firstContentfulPaintAnalysis} />}
+                {largestContentfulPaintSelected && <LargestContentfulPaintGraph largestContentfulPaintAnalysis={largestContentfulPaintAnalysis} />}
+                {interactiveSelected && <InteractiveGraph interactiveAnalysis={interactiveAnalysis} />}
+                {speedIndexSelected && <SpeedIndexGraph speedIndexAnalysis={speedIndexAnalysis} />}
+                {totalBlockingTimeSelected && <TotalBlockingTimeGraph totalBlockingTimeAnalysis={totalBlockingTimeAnalysis} />}
+                </div></div>
             </div>
           </div>
-        </div>
+        </div>)}
       </div>
     </div>
   )

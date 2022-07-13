@@ -1,4 +1,6 @@
 import { axiosInstance } from '../config/axiosConfiguration'
+import formatError from '../format/formatError'
+import Errors from '../utils/errors.json'
 
 export function getAnalysisUrlConfiguration (projectName, urlName) {
   return new Promise((resolve, reject) => {
@@ -6,16 +8,16 @@ export function getAnalysisUrlConfiguration (projectName, urlName) {
       projectName: projectName,
       urlName: urlName
     }).then((response) => {
-      console.log('GREENIT SERVICE - POST : analysis retrieved')
+      console.log('ECOSONAR SERVICE - POST : analysis retrieved')
       resolve(response.data)
     })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          console.warn('GREENIT SERVICE - POST : {} has no analysis registered', urlName)
-          reject(new Error('No analysis found for url ' + urlName + ' in ' + projectName))
+          console.warn('ECOSONAR SERVICE - POST : {} has no analysis registered', urlName)
+          reject(new Error(formatError(Errors.noAnalysisFoundForURL, projectName, urlName)))
         } else {
-          console.error('GREENIT SERVICE  - POST : unknown error occured')
-          reject(new Error('An error occured while retrieving analysis for url ' + urlName + ' in ' + projectName + ', please try again.'))
+          console.error('ECOSONAR SERVICE  - POST : unknown error occured')
+          reject(new Error(formatError(Errors.errorRetrievingAnalysisforURL, projectName, urlName)))
         }
       })
   })
@@ -30,11 +32,11 @@ export function getAnalysisForProjectConfiguration (projectName) {
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          console.warn(`GREENIT SERVICE - GET : ${projectName} has no analysis registered`)
+          console.warn('ECOSONAR SERVICE - GET : {} has no analysis registered', projectName)
           resolve({})
         } else {
-          console.error('GREENIT SERVICE  - GET : unknown error occured')
-          reject(new Error(`An error occured while retrieving analysis for project ${projectName}, please try again.`))
+          console.error('ECOSONAR SERVICE  - GET : unknown error occured')
+          reject(new Error(formatError(Errors.errorRetrievingAnalysis, projectName)))
         }
       })
   })

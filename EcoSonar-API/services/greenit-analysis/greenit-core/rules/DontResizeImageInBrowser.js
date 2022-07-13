@@ -3,6 +3,7 @@ rulesManager.registerRule({
   id: 'DontResizeImageInBrowser',
   imagesResizedInBrowserNumber: 0,
   imgAnalysed: '',
+  score: 100,
 
   isRevelant: function (entry) {
     // exclude svg
@@ -27,5 +28,16 @@ rulesManager.registerRule({
         this.imgAnalysed += entry.src + '|'
       }
     })
+
+    if (this.imagesResizedInBrowserNumber === 0) {
+      this.score = 100
+    } else if (this.imagesResizedInBrowserNumber <= 1) {
+      this.score = 35
+    } else if (this.imagesResizedInBrowserNumber <= 3) {
+      this.score = 20
+    } else {
+      this.score = 0
+    }
   }
+
 }, 'frameMeasuresReceived')

@@ -33,8 +33,7 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 /* Classes */
@@ -49,7 +48,7 @@ code {
 
   &:after &:before {
     display: table;
-    content: "";
+    content: '';
     line-height: 0;
   }
 }
@@ -63,7 +62,7 @@ code {
   &:after,
   .page-header:before {
     display: table;
-    content: "";
+    content: '';
     line-height: 0;
   }
 }
@@ -111,8 +110,7 @@ code {
   text-decoration: none;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 
   &:hover {
     display: inline-flex;
@@ -132,8 +130,7 @@ code {
     text-decoration: none;
     cursor: pointer;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease,
-      background-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   }
   &:focus {
     display: inline-flex;
@@ -250,8 +247,12 @@ code {
   font-family: $main-font;
   font-size: $small-font;
 }
+.modal-validation-field input:not(.is-invalid),
+.modal-validation-field .Select:not(.is-invalid) {
+  margin-bottom: 0 !important;
+}
 
-input[type="text"] {
+input[type='text'] {
   margin-right: 8px;
   margin-bottom: 2px;
   width: calc(100% - 54px);
@@ -265,7 +266,7 @@ input[type="text"] {
   transition: border-color 0.2s ease;
 }
 
-input[type="text"].is-invalid {
+input[type='text'].is-invalid {
   border-color: $red-error;
 }
 
@@ -279,10 +280,10 @@ input[type="text"].is-invalid {
 
 .text-danger {
   color: $red-error;
-  font-size: $small-font;
-  line-height: 1.23076923;
   margin: 0;
-  text-align: left;
+  text-align: center;
+  padding: 3% 0 3% 0;
+  font-size: $small-font;
 }
 
 .modal-field-description {
@@ -316,8 +317,7 @@ input[type="text"].is-invalid {
   border-bottom: 1px solid #cae3f2;
   font-weight: $low-weight;
   font-size: $small-font;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease,
-    border-bottom 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, border-bottom 0.2s ease;
   cursor: pointer;
 
   &:disabled {
@@ -335,6 +335,7 @@ input[type="text"].is-invalid {
 }
 
 .input {
+  margin: 3% 0 3% 0;
   display: flex;
 }
 
@@ -351,7 +352,7 @@ input[type="text"].is-invalid {
   thead:after {
     display: block;
     line-height: 5px;
-    content: "\200C";
+    content: '\200C';
   }
 }
 
@@ -389,8 +390,7 @@ input[type="text"].is-invalid {
   text-decoration: none;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease,
-    background-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   border-color: $red-error;
   color: $red-error;
 }
@@ -641,12 +641,6 @@ small {
   opacity: 1;
 }
 
-.format-error {
-  text-align: center;
-  color: $red-error;
-  padding: 5% 0 10% 0;
-}
-
 .select-button {
   border: $white;
   background-color: $cream;
@@ -721,30 +715,4 @@ small {
 .overview-measures-aside {
   flex-basis: 210px;
   box-sizing: border-box;
-}
-
-.spinner {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-
-  :after {
-    content: " ";
-    display: block;
-    width: 64px;
-    height: 64px;
-    margin: 8px;
-    border-radius: 50%;
-    border: 6px solid $light-grey;
-    border-color: $light-grey transparent $light-grey;
-    animation: spinner 1.2s linear infinite;
-  }
-  @keyframes spinner {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
 }

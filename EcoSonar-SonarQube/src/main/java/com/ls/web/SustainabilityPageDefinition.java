@@ -14,7 +14,7 @@ public class SustainabilityPageDefinition implements PageDefinition {
   private static final String CONFIGURATION_PAGE = "ecosonar_configuration_page";
   private static final String CONFIGURATION_PAGE_NAME = "EcoSonar URL Configuration";
   private static final String BESTPRACTICES_PAGE = "ecosonar_bestpractices_page";
-  private static final String BESTPRACTICES_PAGE_NAME = "Best practices GreenIT";
+  private static final String BESTPRACTICES_PAGE_NAME = "EcoSonar Best Practices";
 
 
   @Override

@@ -1,17 +1,17 @@
 {
   "name": "ecosonar-api",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Développement d'un plugin custom ajouté à l'outil d'analyse de code SonarQube permettant l'analyse et le monitoring de paramètres clés d'une application web (en utilisant Green-IT Analysis et Lighthouse). L'objectif est d'aider les développeurs à mettre en place des bonnes pratiques d'éco-conception web en optimisant ces paramètres.",
   "repository": {
     "type": "git",
-    "url": "https://dev.azure.com/natc-ls/Sustainability%20POC/_git/Sustainability-POC-API"
+    "url": "https://github.com/Accenture/EcoSonar"
   },
   "main": "app.js",
   "scripts": {
     "postinstall": "node builder.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node builder.js",
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "lint": "eslint --fix --ext .js ."
   },
   "author": "",
@@ -36,6 +36,7 @@
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.1"
+    "eslint-plugin-promise": "^5.1.1",
+    "nodemon": "^2.0.16"
   }
 }

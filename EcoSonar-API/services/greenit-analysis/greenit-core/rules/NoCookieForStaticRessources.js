@@ -4,6 +4,7 @@ rulesManager.registerRule({
   totalCookiesSize: 0,
   nbRessourcesStaticWithCookie: 0,
   cookies: '',
+  score: 100,
 
   check: function (measures) {
     if (measures.entries.length) {
@@ -15,6 +16,18 @@ rulesManager.registerRule({
           this.cookies += entry.request.url + '|'
         }
       })
+    }
+
+    if (this.totalCookiesSize <= 512) {
+      this.score = 100
+    } else if (this.totalCookiesSize <= 1024) {
+      this.score = 75
+    } else if (this.totalCookiesSize <= 2048) {
+      this.score = 50
+    } else if (this.totalCookiesSize <= 4096) {
+      this.score = 25
+    } else {
+      this.score = 0
     }
   }
 }, 'harReceived')

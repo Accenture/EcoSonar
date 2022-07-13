@@ -1,4 +1,6 @@
 import { axiosInstance } from '../config/axiosConfiguration'
+import Errors from '../utils/errors.json'
+import formatError from '../format/formatError'
 
 export function insertUrlsConfiguration (projectName, urlList) {
   return new Promise((resolve, reject) => {
@@ -11,11 +13,11 @@ export function insertUrlsConfiguration (projectName, urlList) {
     })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          console.warn('CONFIG URL SERVICE - INSERT : error occured when inserting urls : validation or duplication errors')
+          console.error('CONFIG URL SERVICE - INSERT : error occured when inserting urls : validation or duplication errors')
           reject(error.response.data.error)
         } else {
-          console.error('CONFIG URL SERVICE  - INSERT : unknown error occured')
-          reject(new Error('An error occured while retrieving URLs for project ' + projectName + ', please try again.'))
+          console.error(`CONFIG URL SERVICE  - INSERT : An error occured while inserting URLs for project ${projectName}, please try again.`)
+          reject(new Error(formatError(Errors.insertionError, projectName)))
         }
       })
   })
@@ -30,11 +32,11 @@ export function getUrlsConfiguration (projectName) {
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          console.warn('CONFIG URL SERVICE - GET : {} has no url registered', projectName)
-          resolve([])
+          console.error('CONFIG URL SERVICE - GET : {} has no url registered', projectName)
+          reject(new Error(Errors.noUrlAssigned))
         } else {
-          console.error('CONFIG URL SERVICE  - GET : unknown error occured')
-          reject(new Error('An error occured while retrieving URLs for project ' + projectName + ', please try again.'))
+          console.error('CONFIG URL SERVICE  - GET : An error occured while retrieving URLs for project ' + projectName)
+          reject(new Error(formatError(Errors.errorRetrievingURL, projectName)))
         }
       })
   })
@@ -54,11 +56,11 @@ export function deleteUrlFromProject (projectName, urlName) {
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          console.warn('CONFIG URL SERVICE - DELETE : {} could not be deleted', urlName)
-          reject(new Error(error.response.data.error))
+          console.warn(`CONFIG URL SERVICE - DELETE : ${urlName} in project ${projectName} not found`)
+          reject(new Error(formatError(Errors.urlNotFound, projectName, urlName)))
         } else {
           console.error('CONFIG URL SERVICE  - DELETE : unknown error occured')
-          reject(new Error('An error occured while deleting URL for project ' + projectName + ', please try again.'))
+          reject(new Error(formatError(Errors.deletingError, projectName)))
         }
       })
   })

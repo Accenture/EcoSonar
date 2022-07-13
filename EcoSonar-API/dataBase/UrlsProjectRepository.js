@@ -68,8 +68,8 @@ const UrlsProjectRepository = function () {
         await lighthouses.deleteMany({ idUrlLighthouse: idKey[0].idKey })
         await urlsprojects.deleteOne({ projectName: projectNameReq, urlName: urlNameReq })
       }
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
       errDelete = true
     }
     return new Promise((resolve, reject) => {
@@ -100,8 +100,8 @@ const UrlsProjectRepository = function () {
           res = urlsprojects.find({ projectName: projectNameReq }, { urlName: 1 })
         }
         resolve(res)
-      } catch (err) {
-        console.log(err)
+      } catch (error) {
+        console.error('\x1b[31m%s\x1b[0m', error)
         const systemError = new SystemError()
         reject(systemError)
       }

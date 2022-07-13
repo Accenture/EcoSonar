@@ -4,7 +4,7 @@ const path = require('path')
 const sizes = require('./sizes.js')
 
 // Analyse a webpage
-async function analyseURL (browser, url, options) {
+async function analyseURL (browser, url, options, autoscroll) {
   let result = {}
 
   const TAB_ID = options.tabId
@@ -25,6 +25,7 @@ async function analyseURL (browser, url, options) {
     try {
       // go to url
       await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
+      if (autoscroll) await autoScroll(page)
       const harObj = await pptrHar.stop()
       // get ressources
       const client = await page.target().createCDPSession()
@@ -38,8 +39,8 @@ async function analyseURL (browser, url, options) {
           })
           resource.content = contentScript.content
         } catch (error) {
-          console.log(resource.url)
-          console.log(error)
+          console.error('\x1b[33m%s\x1b[0m', resource.url)
+          console.error('\x1b[33m%s\x1b[0m', error.message)
         }
         return resource
       }))
@@ -47,6 +48,7 @@ async function analyseURL (browser, url, options) {
 
       // get rid of chrome.i18n.getMessage not declared
       await page.evaluate(x => (chrome = { i18n: { getMessage: function () { return undefined } } }))
+
       // add script, get run, then remove it to not interfere with the analysis
       const script = await page.addScriptTag({ path: path.join(__dirname, './dist/bundle.js') })
       await script.evaluate(x => (x.remove()))
@@ -55,16 +57,17 @@ async function analyseURL (browser, url, options) {
       await page.evaluate(x => (resources = x), ressourceTree.frameTree.resources)
       // launch analyse
       console.log('Launch GreenIT analysis for url ' + url)
+
       result = await page.evaluate(() => (launchAnalyse()))
       console.log('GreenIT analysis ended for url ' + url)
       page.close()
       result.success = true
     } catch (error) {
-      console.log(error)
+      console.error('\x1b[31m%s\x1b[0m', error)
       result.success = false
     }
   } catch (error) {
-    console.log(error)
+    console.error('\x1b[31m%s\x1b[0m', error)
     result.success = false
   } finally {
     result.url = url
@@ -74,7 +77,7 @@ async function analyseURL (browser, url, options) {
   return result
 }
 
-async function createGreenITReports (browser, urlList) {
+async function createGreenITReports (browser, urlList, autoscroll) {
   // Timeout for an analysis
   const TIMEOUT = 880000
   // Concurent tab
@@ -101,7 +104,7 @@ async function createGreenITReports (browser, urlList) {
       device: DEVICE,
       timeout: TIMEOUT,
       tabId: i
-    }))
+    }, autoscroll))
     index++
   }
 
@@ -113,7 +116,7 @@ async function createGreenITReports (browser, urlList) {
         timeout: TIMEOUT,
         tabId: results.tabId,
         tryNb: results.tryNb + 1
-      })) // convert is NEEDED, variable size array
+      }, autoscroll)) // convert is NEEDED, variable size array
     } else {
       reports.push(results)
       if (index === (urlList.length)) {
@@ -126,12 +129,35 @@ async function createGreenITReports (browser, urlList) {
           device: DEVICE,
           timeout: TIMEOUT,
           tabId: results.tabId
-        })) // No need for convert, fixed size array
+        }, autoscroll)) // No need for convert, fixed size array
         index++
       }
     }
   }
   return reports
+}
+
+async function autoScroll (page) {
+  console.log('AUTOSCROLL - autoscroll has started')
+  await page.evaluate(async () => {
+    await new Promise((resolve, reject) => {
+      let totalHeight = 0
+      const distance = 100
+      const timer = setInterval(() => {
+        const scrollHeight = document.body.scrollHeight
+        window.scrollBy(0, distance)
+        totalHeight += distance
+
+        if (totalHeight >= scrollHeight - window.innerHeight) {
+          clearInterval(timer)
+          setTimeout(() => {
+            resolve()
+          }, 15000)
+        }
+      }, 100)
+    })
+  })
+  console.log('AUTOSCROLL - Autoscroll has ended ')
 }
 
 module.exports = {

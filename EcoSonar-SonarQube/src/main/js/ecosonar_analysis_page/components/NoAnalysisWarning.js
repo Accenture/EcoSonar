@@ -1,12 +1,11 @@
-import * as React from 'react'
+import React from 'react'
+import Errors from '../../utils/errors.json'
+import formatError from '../../format/formatError'
 
 export default function NoAnalysisWarning (props) {
-  const { projectName } = props
   return (
-        <div className="boxed-group">
-            <p>
-                No Analysis has been launched for project {projectName}
-            </p>
-        </div>
+    <div className='boxed-group'>
+      <p className='text-danger'>{formatError(Errors.noAnalysisLaunched, props.projectName)}</p>
+    </div>
   )
 }

@@ -1,7 +1,7 @@
-const greenItRepository = require('../dataBase/GreenItRepository')
+const greenItRepository = require('../dataBase/greenItRepository')
 const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
-const urlsProjectRepository = require('../dataBase/UrlsProjectRepository')
-const lighthouseRepository = require('../dataBase/LighthouseRepository')
+const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
+const lighthouseRepository = require('../dataBase/lighthouseRepository')
 const lighthouseAnalysis = require('./lighthouse/lighthouse')
 const formatLighthouseMetrics = require('./format/formatLighthouseMetrics')
 const uniqid = require('uniqid')
@@ -9,10 +9,16 @@ const greenItAnalysis = require('./greenit-analysis/analyseService')
 const formatLighthouseAnalysis = require('./format/formatLighthouseAnalysis')
 const SystemError = require('../utils/SystemError')
 const formatGreenItAnalysis = require('./format/formatGreenItAnalysis')
+const formatLighthouseBestPractices = require('./format/formatLighthouseBestPractices')
 
 class AnalysisService {}
 
-AnalysisService.prototype.insert = async function (projectName) {
+/**
+ * Insert a new analysis into database
+ * @param {string} projectName
+ * @param {boolean} autoscroll is used to enable autoscrolling for each tab opened during analysis
+ */
+AnalysisService.prototype.insert = async function (projectName, autoscroll) {
   let urlProjectList = []
   try {
     urlProjectList = await urlsProjectRepository.findAll(projectName, true)
@@ -28,7 +34,7 @@ AnalysisService.prototype.insert = async function (projectName) {
     urlIdList = urlProjectList.map((url) => url.idKey)
     urlList = urlProjectList.map((url) => url.urlName)
     try {
-      reportsGreenit = await greenItAnalysis.analyse(urlList)
+      reportsGreenit = await greenItAnalysis.analyse(urlList, autoscroll)
     } catch (error) {
       console.log(error)
     }
@@ -39,85 +45,43 @@ AnalysisService.prototype.insert = async function (projectName) {
     }
   }
   const urlIdListGreenit = Object.values(urlIdList)
-  const urlIdListBestPracticesEchec = []
-  let i = 0
-  let j
-  let find = false
-  while (i < urlIdListGreenit.length) {
-    j = 0
-    while (!reportsGreenit[i].success && !find) {
-      if (reportsGreenit[i].url === urlList[j]) {
-        find = true
-        urlIdListBestPracticesEchec.push(urlIdListGreenit[j])
-        urlList[j] = null
-        urlIdListGreenit[j] = null
-      } else {
-        j++
-      }
-    }
-    find = false
-    i++
-  }
 
   const tabLighthouse = []
-  i = 0
-  let nb,
-    perf,
-    access,
-    string,
-    largestContentfulPaint,
-    cumulativeLayoutShift,
-    firstContentfulPaint,
-    speedIndex,
-    totalBlockingTime,
-    interactive
+  let i = 0
   const date = Date.now()
   while (i < urlIdList.length) {
-    if (
-      reportsLighthouse[i] &&
-      reportsLighthouse[i].runtimeError === undefined
-    ) {
-      nb = uniqid()
-      perf = formatLighthouseMetrics.formatPerf(reportsLighthouse[i])
-      access = formatLighthouseMetrics.formatAccess(reportsLighthouse[i])
-      largestContentfulPaint =
-        formatLighthouseMetrics.formatLargestContentfulPaint(
-          reportsLighthouse[i]
-        )
-      cumulativeLayoutShift =
-        formatLighthouseMetrics.formatCumulativeLayoutShift(
-          reportsLighthouse[i]
-        )
-      firstContentfulPaint = formatLighthouseMetrics.formatFirstContentfulPaint(
-        reportsLighthouse[i]
-      )
-      speedIndex = formatLighthouseMetrics.formatSpeedIndex(
-        reportsLighthouse[i]
-      )
-      totalBlockingTime = formatLighthouseMetrics.formatTotalBlockingTime(
-        reportsLighthouse[i]
-      )
-      interactive = formatLighthouseMetrics.formatInteractive(
-        reportsLighthouse[i]
-      )
-
-      string = {
+    if (reportsLighthouse[i] && reportsLighthouse[i].runtimeError === undefined) {
+      const nb = uniqid()
+      const formattedLighthouseMetrics = formatLighthouseMetrics.formatLighthouseMetrics(reportsLighthouse[i])
+      const lighthouseAudit = {
         idLighthouseAnalysis: nb,
         idUrlLighthouse: urlIdList[i],
         dateLighthouseAnalysis: date,
-        performance: perf,
-        accessibility: access,
-        largestContentfulPaint: largestContentfulPaint,
-        cumulativeLayoutShift: cumulativeLayoutShift,
-        firstContentfulPaint: firstContentfulPaint,
-        speedIndex: speedIndex,
-        totalBlockingTime: totalBlockingTime,
-        interactive: interactive
+        performance: formattedLighthouseMetrics.performance,
+        accessibility: formattedLighthouseMetrics.accessibility,
+        largestContentfulPaint: formattedLighthouseMetrics.largestContentfulPaint,
+        cumulativeLayoutShift: formattedLighthouseMetrics.cumulativeLayoutShift,
+        firstContentfulPaint: formattedLighthouseMetrics.firstContentfulPaint,
+        speedIndex: formattedLighthouseMetrics.speedIndex,
+        totalBlockingTime: formattedLighthouseMetrics.totalBlockingTime,
+        interactive: formattedLighthouseMetrics.interactive
       }
-      tabLighthouse.push(string)
+      tabLighthouse.push(lighthouseAudit)
     }
     i++
   }
+
+  let j = 0
+  const lighthousePerformanceBestPractices = []
+  const lighthouseAccessibilityBestPractices = []
+  while (j < urlIdList.length) {
+    if (reportsLighthouse[j] && reportsLighthouse[j].runtimeError === undefined) {
+      lighthousePerformanceBestPractices[j] = formatLighthouseBestPractices.formatPerformance(reportsLighthouse[j])
+      lighthouseAccessibilityBestPractices[j] = formatLighthouseBestPractices.formatAccessibility(reportsLighthouse[j])
+    }
+    j++
+  }
+
   if (urlProjectList.length !== 0) {
     greenItRepository
       .insertAll(reportsGreenit, urlIdListGreenit, urlList)
@@ -136,83 +100,53 @@ AnalysisService.prototype.insert = async function (projectName) {
         console.log('LIGHTHOUSE INSERT - lighthouse insertion failed')
       })
 
-    let bestPracticesList = []
-    try {
-      bestPracticesList = await bestPracticesRepository.findAll(projectName)
-    } catch (error) {
-      console.log(
-        'BEST PRACTICES UDPATE - can not retrieved existing best practices'
-      )
-    }
-    let update = false
-    if (bestPracticesList.length > 0) {
-      update = true
-      await bestPracticesRepository
-        .delete(projectName, urlIdListBestPracticesEchec)
-        .catch(() => {
-          console.log('BEST PRACTICES UDPATE - delete failed')
-        })
-    }
     bestPracticesRepository
-      .insertAll(reportsGreenit, urlIdListGreenit, urlList)
+      .insertBestPractices(reportsGreenit, lighthousePerformanceBestPractices, lighthouseAccessibilityBestPractices, urlIdListGreenit, projectName)
       .then(() => {
-        if (update) {
-          console.log(
-            'BEST PRACTICES UPDATE - Best practices have been updated'
-          )
-        } else {
-          console.log(
-            'BEST PRACTICES INSERT - Best practices have been inserted'
-          )
-        }
+        console.log('BEST PRACTICES INSERT - best practices have been inserted')
       })
-      .catch(() => {
-        console.log('BEST PRACTICES UPDATE : update failed')
+      .catch((err) => {
+        console.info(err)
+        console.log('BEST PRACTICES INSERT : best practice insertion failed')
       })
   } else {
     console.log('No url found for project : ' + projectName)
   }
 }
 
-AnalysisService.prototype.getUrlAnalysis = async function (
-  projectName,
-  urlName
-) {
+/**
+ * Get an analysis (GreenIt & Lighthouse) from a given project and URL
+ * @param {string} projectName
+ * @param {string} urlName
+ * @returns {Object} Returns a formatted analysis
+ */
+
+AnalysisService.prototype.getUrlAnalysis = async function (projectName, urlName) {
   let greenitAnalysis = null
   let lighthouseResult = null
   let errorRetrievedGreenItAnalysis = null
   let errorRetrievedLighthouseAnalysis = null
   await greenItRepository
     .findAnalysisUrl(projectName, urlName)
-    .then((resultat) => {
-      greenitAnalysis = resultat
+    .then((result) => {
+      greenitAnalysis = result
     })
     .catch((err) => {
       errorRetrievedGreenItAnalysis = err
     })
   await lighthouseRepository
     .findAnalysisUrl(projectName, urlName)
-    .then((resultat) => {
-      lighthouseResult = resultat
+    .then((result) => {
+      lighthouseResult = result
     })
     .catch((err) => {
       errorRetrievedLighthouseAnalysis = err
     })
   return new Promise((resolve, reject) => {
     let date = null
-    if (
-      errorRetrievedGreenItAnalysis === null &&
-      errorRetrievedLighthouseAnalysis === null
-    ) {
-      if (
-        greenitAnalysis.deployments[
-          greenitAnalysis.deployments.length - 1
-        ].dateAnalysis.getTime() <
-        lighthouseResult.lastAnalysis.dateLighthouseAnalysis.getTime()
-      ) {
-        date =
-          greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1]
-            .dateGreenAnalysis
+    if (errorRetrievedGreenItAnalysis === null && errorRetrievedLighthouseAnalysis === null) {
+      if (greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1].dateAnalysis.getTime() < lighthouseResult.lastAnalysis.dateLighthouseAnalysis.getTime()) {
+        date = greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1].dateGreenAnalysis
       } else {
         date = lighthouseResult.lastAnalysis.dateLighthouseAnalysis
       }
@@ -224,20 +158,18 @@ AnalysisService.prototype.getUrlAnalysis = async function (
         },
         lastAnalysis: {
           dateAnalysis: date,
-          greenit: greenitAnalysis.lastAnalysis,
+          greenit: formatGreenItAnalysis.greenItUrlAnalysisFormatted(greenitAnalysis.lastAnalysis),
           lighthouse: lighthouseResult.lastAnalysis
         }
       }
       resolve(analysis)
     } else if (errorRetrievedGreenItAnalysis === null) {
-      date =
-        greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1]
-          .dateGreenAnalysis
+      date = greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1].dateGreenAnalysis
       const analysis = {
         deployments: { greenit: greenitAnalysis.deployments, lighthouse: [] },
         lastAnalysis: {
           dateAnalysis: date,
-          greenit: greenitAnalysis.lastAnalysis,
+          greenit: formatGreenItAnalysis.greenItUrlAnalysisFormatted(greenitAnalysis.lastAnalysis),
           lighthouse: null
         }
       }
@@ -258,38 +190,32 @@ AnalysisService.prototype.getUrlAnalysis = async function (
       }
       resolve(analysis)
     } else {
-      if (
-        errorRetrievedGreenItAnalysis instanceof SystemError ||
-        errorRetrievedLighthouseAnalysis instanceof SystemError
-      ) {
+      if (errorRetrievedGreenItAnalysis instanceof SystemError || errorRetrievedLighthouseAnalysis instanceof SystemError) {
         reject(new SystemError())
-      } else if (
-        errorRetrievedGreenItAnalysis === errorRetrievedLighthouseAnalysis
-      ) {
+      } else if (errorRetrievedGreenItAnalysis === errorRetrievedLighthouseAnalysis) {
         reject(errorRetrievedGreenItAnalysis)
       } else {
-        reject(
-          new Error(
-            'No lighthouse and greenit analysis found for url ' +
-              urlName +
-              ' in project ' +
-              projectName
-          )
-        )
+        reject(new Error('No lighthouse and greenit analysis found for url ' + urlName + ' in project ' + projectName))
       }
     }
   })
 }
 
+/**
+ * Get an analysis (GreenIt & Lighthouse) from a given project
+ * @param {string} projectName
+ * @returns {Object} Returns the formatted values with average score for the given project
+ */
+
 AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
   let greenitAnalysisDeployments = []
-  let greenitLastAnalysis
+  let greenitLastAnalysis, lighthouseProjectLastAnalysis, dateLighthouseLastAnalysis, dateGreenitLastAnalysis
   let lighthouseAnalysisDeployments = []
-  let lighthouseProjectLastAnalysis
   let catchLighthouse = null
   let catchGreenit = null
   let errRetrievedAnalysisGreenit = null
   let errRetrievedLighthouseAnalysis = null
+
   await greenItRepository
     .findAnalysisProject(projectName)
     .then((res) => {
@@ -299,8 +225,7 @@ AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
       } else {
         greenitLastAnalysis = null
         greenitAnalysisDeployments = []
-        errRetrievedAnalysisGreenit =
-          'No greenit analysis found for project ' + projectName
+        errRetrievedAnalysisGreenit = 'No greenit analysis found for project ' + projectName
       }
     })
     .catch((err) => {
@@ -311,19 +236,12 @@ AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
     .then((res) => {
       if (res.deployments.length !== 0) {
         // deployments
-        lighthouseAnalysisDeployments =
-          formatLighthouseAnalysis.lighthouseAnalysisFormattedDeployments(
-            res.deployments
-          )
+        lighthouseAnalysisDeployments = formatLighthouseAnalysis.lighthouseAnalysisFormattedDeployments(res.deployments)
 
         // lastAnalysis
-        lighthouseProjectLastAnalysis =
-          formatLighthouseAnalysis.lighthouseProjectLastAnalysisFormatted(
-            res.lastAnalysis
-          )
+        lighthouseProjectLastAnalysis = formatLighthouseAnalysis.lighthouseProjectLastAnalysisFormatted(res.lastAnalysis)
       } else {
-        errRetrievedLighthouseAnalysis =
-          'No lighthouse Analysis found for project ' + projectName
+        errRetrievedLighthouseAnalysis = 'No lighthouse Analysis found for project ' + projectName
         lighthouseAnalysisDeployments = []
         lighthouseProjectLastAnalysis = null
       }
@@ -331,54 +249,36 @@ AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
     .catch((err) => {
       catchLighthouse = err
     })
-
   return new Promise((resolve, reject) => {
-    if (
-      catchGreenit instanceof SystemError ||
-      catchLighthouse instanceof SystemError
-    ) {
+    if (catchGreenit instanceof SystemError || catchLighthouse instanceof SystemError) {
       reject(new SystemError())
     } else if (catchGreenit !== null || catchLighthouse !== null) {
-      reject(
-        new Error('error during generation of ' + projectName + ' analysis')
-      )
+      reject(new Error('error during generation of ' + projectName + ' analysis'))
     }
 
-    let dateLastAnalysis
-    if (
-      errRetrievedLighthouseAnalysis === null &&
-      errRetrievedAnalysisGreenit === null
-    ) {
-      if (
-        greenitAnalysisDeployments[
-          greenitAnalysisDeployments.length - 1
-        ].dateAnalysis.getTime() < lighthouseProjectLastAnalysis.dateAnalysis.getTime()
-      ) {
-        dateLastAnalysis =
-          greenitAnalysisDeployments[greenitAnalysisDeployments.length - 1]
-            .dateAnalysis
-      } else {
-        dateLastAnalysis = lighthouseProjectLastAnalysis.dateAnalysis
-      }
-      delete lighthouseProjectLastAnalysis.dateAnalysis
-    } else if (errRetrievedLighthouseAnalysis === null) {
-      dateLastAnalysis = lighthouseProjectLastAnalysis.dateAnalysis
-      delete lighthouseProjectLastAnalysis.dateAnalysis
-    } else if (errRetrievedAnalysisGreenit === null) {
-      dateLastAnalysis =
-        greenitAnalysisDeployments[greenitAnalysisDeployments.length - 1]
-          .dateAnalysis
+    // Setting the analysis date
+    if (errRetrievedLighthouseAnalysis === null && errRetrievedAnalysisGreenit === null) {
+      dateGreenitLastAnalysis = greenitLastAnalysis.dateAnalysis
+      dateLighthouseLastAnalysis = lighthouseProjectLastAnalysis.dateAnalysis
+    } else if (errRetrievedLighthouseAnalysis != null && errRetrievedAnalysisGreenit === null) {
+      dateGreenitLastAnalysis = greenitLastAnalysis.dateAnalysis
+      dateLighthouseLastAnalysis = null
+    } else if (errRetrievedAnalysisGreenit != null && errRetrievedLighthouseAnalysis === null) {
+      dateGreenitLastAnalysis = null
+      dateLighthouseLastAnalysis = lighthouseProjectLastAnalysis.dateAnalysis
     } else {
       reject(new Error('No Analysis found for project ' + projectName))
     }
 
+    // Creating the response content
     const allAnalysis = {
       deployments: {
         greenit: greenitAnalysisDeployments,
         lighthouse: lighthouseAnalysisDeployments
       },
       lastAnalysis: {
-        dateAnalysis: dateLastAnalysis,
+        dateGreenitLastAnalysis: dateGreenitLastAnalysis,
+        dateLighthouseLastAnalysis: dateLighthouseLastAnalysis,
         greenit: greenitLastAnalysis,
         lighthouse: lighthouseProjectLastAnalysis
       }

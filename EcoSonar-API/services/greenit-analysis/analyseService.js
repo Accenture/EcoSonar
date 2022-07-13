@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const createGreenITReports = require('./greenit-analysis.js').createGreenITReports
 
-async function analyse (urlList) {
+async function analyse (urlList, autoscroll) {
   const browserArgs = [
     '--no-sandbox', // can't run inside docker without
     '--disable-setuid-sandbox' // but security issues
@@ -20,7 +20,7 @@ async function analyse (urlList) {
   let reports
   try {
     // analyse each page
-    reports = await createGreenITReports(browser, urlList)
+    reports = await createGreenITReports(browser, urlList, autoscroll)
   } finally {
     // close browser
     const pages = await browser.pages()
@@ -30,7 +30,7 @@ async function analyse (urlList) {
       } else {
         return Promise.resolve()
       }
-    })).catch((error) => console.log(error))
+    })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error))
     await browser.close()
   }
   return reports

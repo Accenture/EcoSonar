@@ -28,7 +28,7 @@ function computeEcoIndexMeasures (measures) {
   measures.ecoIndex = computeEcoIndex(measures.domSize, measures.nbRequest, Math.round(measures.responsesSize / 1000))
   measures.waterConsumption = computeWaterConsumptionfromEcoIndex(measures.ecoIndex)
   measures.greenhouseGasesEmission = computeGreenhouseGasesEmissionfromEcoIndex(measures.ecoIndex)
-  measures.grade = getEcoIndexGrade(measures.ecoIndex)
+  measures.grade = getGrade(measures.ecoIndex)
 }
 
 function launchAnalyse () {

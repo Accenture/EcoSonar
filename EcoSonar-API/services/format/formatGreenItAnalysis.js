@@ -1,6 +1,26 @@
 const ecoIndexCalculationService = require('../ecoIndexCalculationService')
+const formatCompliance = require('./formatCompliance')
 
 class FormatGreenItAnalysis {}
+
+FormatGreenItAnalysis.prototype.greenItUrlAnalysisFormatted = function (analysis) {
+  let formattedAnalysis
+  try {
+    formattedAnalysis = {
+      domSize: { displayValue: analysis.domSize, complianceLevel: ecoIndexCalculationService.setScoreLetter('domSize', analysis.domSize) },
+      nbRequest: { displayValue: analysis.nbRequest, complianceLevel: ecoIndexCalculationService.setScoreLetter('nbRequest', analysis.nbRequest) },
+      responsesSize: { displayValue: analysis.responsesSize, complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', analysis.responsesSize) },
+      ecoIndex: analysis.ecoIndex,
+      grade: analysis.grade,
+      waterConsumption: analysis.waterConsumption,
+      greenhouseGasesEmission: analysis.greenhouseGasesEmission
+    }
+  } catch (err) {
+    console.log(err)
+    console.log('LIGHTHOUSE - error during the formatting of project analysis')
+  }
+  return formattedAnalysis
+}
 
 FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (res) {
   let analysis
@@ -31,13 +51,13 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
       j++
     }
     analysis = {
-      domSize: Math.ceil(domSize / count),
-      nbRequest: nbRequest,
+      domSize: { displayValue: Math.ceil(domSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('domSize', Math.ceil(domSize / count)) },
+      nbRequest: { displayValue: Math.ceil(nbRequest / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('nbRequest', nbRequest / count) },
       dateAnalysis: dateAnalysis,
-      responsesSize: Math.ceil(responsesSize / count),
+      responsesSize: { displayValue: Math.ceil(responsesSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', Math.ceil(responsesSize / count)) },
       responsesSizeUncompress: Math.ceil(responsesSizeUncompress / count),
       ecoIndex: Math.ceil(ecoIndex / count),
-      grade: ecoIndexCalculationService.getEcoIndexGrade(ecoIndex / count),
+      grade: formatCompliance.getGrade(ecoIndex / count),
       waterConsumption: (waterConsumption / count).toFixed(2),
       greenhouseGasesEmission: (greenhouseGasesEmission / count).toFixed(2)
     }
@@ -47,6 +67,7 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
     console.log('LIGHTHOUSE - error during the formatting of project analysis')
   }
 }
+
 FormatGreenItAnalysis.prototype.formatDeploymentsForGraphs = function (deployments) {
   const duplicatedDeployments = []
   for (const i of deployments) {
@@ -89,9 +110,7 @@ FormatGreenItAnalysis.prototype.formatDeploymentsForGraphs = function (deploymen
   }
 
   function compareFullDate (firstDate, secondDate) {
-    if (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear()) {
-      return true
-    } else return false
+    return (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear())
   }
   return finalDeployment
 }

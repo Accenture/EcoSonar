@@ -21,8 +21,8 @@ const LighthouseRepository = function () {
             resolve()
           })
           .catch((err) => {
-            console.log('LIGHTHOUSE - error during insertion of analysis')
-            console.log(err)
+            console.error('\x1b[31m%s\x1b[0m', 'LIGHTHOUSE - error during insertion of analysis')
+            console.error('\x1b[31m%s\x1b[0m', err.message)
             const systemError = new SystemError()
             reject(systemError)
           })
@@ -77,10 +77,11 @@ const LighthouseRepository = function () {
           .sort({ dateLighthouseAnalysis: 1 })
         if (allAnalysis.length === 0) {
           stringErr = 'no lighthouse analysis found for ' + urlNameReq
+          console.log(stringErr)
         }
       }
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
       console.log('An error occured while retrieving lighthouse analysis')
       systemError = new SystemError()
     }
@@ -204,11 +205,12 @@ const LighthouseRepository = function () {
             lastAnalysis: lastDeployment
           }
         } else {
+          console.log('no lighthouse analysis found for ' + projectNameReq)
           resultats = { deployments: [], lastAnalysis: null }
         }
       }
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
       console.log(
         'error during generation of ' + projectNameReq + ' lighthouse analysis'
       )

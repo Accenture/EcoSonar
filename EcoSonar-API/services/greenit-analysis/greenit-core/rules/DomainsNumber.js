@@ -4,6 +4,7 @@ rulesManager.registerRule({
   id: 'DomainsNumber',
   domains: '',
   domainsNumber: 0,
+  score: 100,
 
   check: function (measures) {
     const domainsToAdd = []
@@ -16,6 +17,22 @@ rulesManager.registerRule({
           this.domainsNumber++
         }
       })
+    }
+
+    if (this.domainsNumber <= 2) {
+      this.score = 100
+    } else if (this.domainsNumber <= 3) {
+      this.score = 75
+    } else if (this.domainsNumber <= 4) {
+      this.score = 65
+    } else if (this.domainsNumber <= 5.5) {
+      this.score = 50
+    } else if (this.domainsNumber <= 6) {
+      this.score = 35
+    } else if (this.domainsNumber <= 7) {
+      this.score = 20
+    } else {
+      this.score = 0
     }
   }
 }, 'harReceived')

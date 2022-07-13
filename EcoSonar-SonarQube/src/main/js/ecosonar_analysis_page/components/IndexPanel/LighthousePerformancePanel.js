@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import LoadingIcon from '../../../images/LoadingIcon.svg'
 import HelpIcon from '../../../images/HelpIcon.svg'
 import classNames from 'classnames'

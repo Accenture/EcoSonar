@@ -3,6 +3,7 @@ rulesManager.registerRule({
   id: 'ImageDownloadedNotDisplayed',
   imgAnalysed: '',
   imageDownloadedNotDisplayedNumber: 0,
+  score: 100,
 
   isRevelant: function (entry) {
     // Very small images could be download even if not display  as it may be icons
@@ -20,5 +21,15 @@ rulesManager.registerRule({
         this.imgAnalysed += entry.src + '|'
       }
     })
+
+    if (this.imageDownloadedNotDisplayedNumber === 0) {
+      this.score = 100
+    } else if (this.imageDownloadedNotDisplayedNumber <= 4) {
+      this.score = 50
+    } else if (this.imageDownloadedNotDisplayedNumber <= 6) {
+      this.score = 25
+    } else {
+      this.score = 0
+    }
   }
 }, 'frameMeasuresReceived')

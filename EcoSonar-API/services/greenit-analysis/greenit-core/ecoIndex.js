@@ -38,7 +38,7 @@ function computeQuantile (quantiles, value) {
   return quantiles.length
 }
 
-function getEcoIndexGrade (ecoIndex) {
+function getGrade (ecoIndex) {
   if (ecoIndex > 75) return 'A'
   if (ecoIndex > 65) return 'B'
   if (ecoIndex > 50) return 'C'

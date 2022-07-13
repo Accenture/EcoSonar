@@ -5,7 +5,7 @@ const config = require('./config.js')
 module.exports = {
   lighthouseAnalysis: async function (urlList) {
     const chrome = await chromeLauncher.launch({ chromeFlags: ['--disable-dev-shm-usage', '--headless', '--disable-gpu', '--no-sandbox'] })
-    const options = { logLevel: 'info', output: 'json', onlyCategories: ['performance', 'accessibility'], port: chrome.port }
+    const options = { logLevel: 'error', output: 'json', onlyCategories: ['performance', 'accessibility'], port: chrome.port }
     let i = 0
     const results = []
     let runnerResult

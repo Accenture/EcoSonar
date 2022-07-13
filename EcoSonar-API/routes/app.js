@@ -13,7 +13,7 @@ app.disable('x-powered-by')
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-const whitelist = ['http://localhost:3001', 'http://localhost:9000'] // you need to add the URL of your Sonarqube instance as well in the whitelist
+const whitelist = ['http://localhost:3001', 'http://localhost:9000', '<SONARQUBE_SERVER_URL>']
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || whitelist.indexOf(origin) !== -1) {
@@ -56,7 +56,7 @@ app.post('/api/insert', asyncMiddleware(async (req, res, next) => {
   urlConfigurationService.insert(projectName, urlsList)
     .then(() => {
       console.log('INSERT URLS PROJECT - insert succeeded')
-      return res.status(201).send()
+      return res.status(200).send()
     })
     .catch((error) => {
       if (error instanceof SystemError) {

@@ -5,6 +5,7 @@ rulesManager.registerRule({
   staticResourcesWithETagsSize: 0,
   eTagsRatio: 'N.A',
   eTags: '',
+  score: 100,
 
   check: function (measures) {
     this.staticResourcesSize = 0
@@ -20,6 +21,16 @@ rulesManager.registerRule({
     }
     if (this.staticResourcesSize > 0) {
       this.eTagsRatio = this.staticResourcesWithETagsSize / this.staticResourcesSize * 100
+
+      if (this.eTagsRatio === 100) {
+        this.score = 100
+      } else if (this.eTagsRatio >= 95) {
+        this.score = 75
+      } else if (this.eTagsRatio > 90) {
+        this.score = 50
+      } else {
+        this.score = 0
+      }
     }
   }
 }, 'harReceived')

@@ -6,14 +6,14 @@ const formatGreenItAnalysis = require('../services/format/formatGreenItAnalysis'
 
 const GreenItRepository = function () {
   /**
-   * insertion of one or more analysis on the table greenit :OK
+   * insertion of one or more analysis on the arrayToInsertle greenit :OK
    * @param {analysis of url} reports
    * @param {list of id of urls} urlIdList
    * @param {list of urls} urlList
    * @returns
    */
   this.insertAll = async function (reports, urlIdList, urlList) {
-    const tab = []
+    let arrayToInsert = []
     let i = 0
     let nb
     const date = Date.now()
@@ -49,18 +49,21 @@ const GreenItRepository = function () {
           waterConsumption: reports[j].waterConsumption,
           greenhouseGasesEmission: reports[j].greenhouseGasesEmission
         }
-        tab.push(string)
+        arrayToInsert.push(string)
       }
       i++
     }
+    if (arrayToInsert.length > 0) { arrayToInsert = await checkValues(arrayToInsert) }
+
     return new Promise((resolve, reject) => {
-      if (tab.length > 0) {
-        greenits.insertMany(tab)
+      if (arrayToInsert.length > 0) {
+        greenits
+          .insertMany(arrayToInsert)
           .then(() => {
             resolve()
           })
           .catch((error) => {
-            console.log(error)
+            console.error('\x1b[31m%s\x1b[0m', error)
             console.log('GREENIT - error during insertion of analysis')
             const systemError = new SystemError()
             reject(systemError)
@@ -88,13 +91,16 @@ const GreenItRepository = function () {
       if (res.length === 0) {
         stringErr = 'url : ' + urlNameReq + ' or project : ' + projectNameReq + ' not found'
       } else {
-        allAnalysis = await greenits.find({ idUrlGreen: res[0].idKey }, { domSize: 1, nbRequest: 1, responsesSize: 1, dateGreenAnalysis: 1, greenhouseGasesEmission: 1, waterConsumption: 1, ecoIndex: 1, grade: 1 }).sort({ dateGreenAnalysis: 1 })
+        allAnalysis = await greenits
+          .find({ idUrlGreen: res[0].idKey }, { domSize: 1, nbRequest: 1, responsesSize: 1, dateGreenAnalysis: 1, greenhouseGasesEmission: 1, waterConsumption: 1, ecoIndex: 1, grade: 1 })
+          .sort({ dateGreenAnalysis: 1 })
         if (allAnalysis.length === 0) {
           stringErr = 'no greenit analysis found for ' + urlNameReq
+          console.log(stringErr)
         }
       }
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
       console.log('An error occured while retrieving analysis')
       systemError = new SystemError()
     }
@@ -161,11 +167,12 @@ const GreenItRepository = function () {
           lastAnalysis = await greenits.find({ idUrlGreen: listIdKey, dateGreenAnalysis: deployments[deployments.length - 1].dateGreenAnalysis })
           resultats = { deployments: deployments, lastAnalysis: lastAnalysis }
         } else {
+          console.log('no greenit analysis found for ' + projectNameReq)
           resultats = { deployments: [], lastAnalysis: null }
         }
       }
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
       console.log('error during generation of ' + projectNameReq + ' analysis')
       systemError = new SystemError()
     }
@@ -180,5 +187,24 @@ const GreenItRepository = function () {
     })
   }
 }
+
+/**
+ *
+ * @param {Array} arrayToInsert
+ * @returns an array cleaned of analysis containing undefined and NaN to avoid mongoose rejecting every GreenIt analysis insertion
+ */
+async function checkValues (arrayToInsert) {
+  const arrayToInsertSanitized = []
+  for (const analysis of arrayToInsert) {
+    if (!Object.values(analysis).includes(undefined) || !Object.values(analysis).includes(NaN)) {
+      arrayToInsertSanitized.push(analysis)
+    } else {
+      const urlInfos = await urlsprojects.find({ idKey: analysis.idUrlGreen })
+      console.log(`GREENIT INSERT - Url  ${urlInfos[0].urlName} cannot be inserted due to presence of NaN or undefined values`)
+    }
+  }
+  return arrayToInsertSanitized
+}
+
 const greenItRepository = new GreenItRepository()
 module.exports = greenItRepository

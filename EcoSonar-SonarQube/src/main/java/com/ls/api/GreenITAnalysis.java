@@ -17,8 +17,7 @@ public class GreenITAnalysis implements ProjectSensor{
 
     private static final Logger logger = Logger.getLogger(GreenITAnalysis.class.getName());
 
-    //  private String baseUrlLocal = "http://localhost:3000";
-    private String baseUrlHosted = "https://sustainability-ecosonar-api.azurewebsites.net";
+    private String baseUrlHosted = "<BASE_URL_OF_ECOSONAR_API>";
     private String route = "/api/greenit/insert";
 
     @Override
@@ -29,7 +28,6 @@ public class GreenITAnalysis implements ProjectSensor{
     @Override
     public void execute(SensorContext context) {
         String projectKey = context.config().get("sonar.projectKey").orElse("");
-        //implement switch environment variables according to local or Azure
         String uri = baseUrlHosted + route;
         String body = "{\"projectName\":\"" + projectKey + "\"}";
 

@@ -1,6 +1,7 @@
 import React from 'react'
 import AlertErrorIcon from '../../images/AlertErrorIcon.svg'
 import DeleteIcon from '../../images/DeleteIcon.svg'
+import errors from '../../utils/errors.json'
 
 export default function UrlField (props) {
   const { index, url, isSubmitting, error } = props
@@ -18,7 +19,7 @@ export default function UrlField (props) {
       <div className="input">
         <input
           disabled={isSubmitting}
-          error={error}
+          error={errors.duplicatedOrSyntaxError}
           name="url"
           onChange={(value) => changeValue(value.currentTarget.value)}
           type="text"

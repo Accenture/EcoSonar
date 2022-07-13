@@ -1,15 +1,18 @@
 import React from 'react'
 import UrlItem from './UrlItem'
+import error from '../../utils/errors.json'
 
 export default function UrlList (props) {
-  if (props.urlList.length === 0) {
+  if (props.error && props.urlList.length === 0) {
     return (
       <div>
-        {props.error !== '' && <p className="text-danger">{props.error}</p>}
-        <p>
-          Your project has no url assigned into EcoSonar. You must at least add
-          one url if you want to analyse ecodesign practices.
-        </p>
+      <p className='text-danger'>{props.error}</p>
+      </div>
+    )
+  } else if (props.urlList.length === 0) {
+    return (
+      <div>
+      <p className='text-danger'>{error.noUrlAssigned}</p>
       </div>
     )
   }

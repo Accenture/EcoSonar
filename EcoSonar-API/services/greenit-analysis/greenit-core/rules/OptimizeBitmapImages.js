@@ -4,6 +4,7 @@ rulesManager.registerRule({
   nbImagesToOptimize: 0,
   totalMinGains: 0,
   img: '',
+  score: 100,
 
   check: function (measures) {
     if (measures.entries) {
@@ -28,6 +29,18 @@ rulesManager.registerRule({
           }
         }
       })
+    }
+
+    if (this.totalMinGains <= 0) {
+      this.score = 100
+    } else if (this.totalMinGains <= 25000) {
+      this.score = 75
+    } else if (this.totalMinGains <= 50000) {
+      this.score = 50
+    } else if (this.totalMinGains <= 75000) {
+      this.score = 25
+    } else {
+      this.score = 0
     }
   }
 }, 'harReceived')

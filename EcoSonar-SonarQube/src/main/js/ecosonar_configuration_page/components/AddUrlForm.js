@@ -144,7 +144,7 @@ export default function AddUrlForm (props) {
             type="button"
             onClick={addANewUrl}
           >
-            
+
             Add a new URL
           </button>
         </div>
@@ -161,7 +161,7 @@ export default function AddUrlForm (props) {
             type="submit"
             onClick={handleSubmit}
           >
-            
+
             Confirm
           </button>
           <button
@@ -170,7 +170,7 @@ export default function AddUrlForm (props) {
             type="reset"
             onClick={handleCancelClick}
           >
-            
+
             Cancel
           </button>
         </footer>

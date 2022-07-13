@@ -1,0 +1,13 @@
+
+["Avoids document.write()",
+"Ensure text remains visible during webfont load" ,
+"Has a Viewport meta tag",
+"Does not use passive listeners to improve scrolling performance",
+"Don't lazy load Largest Contentful Paint image",
+"The document does not use `<meta http-equiv=\"refresh\">`",
+"ARIA `treeitem` elements have accessible names",
+"ARIA `tooltip` elements have accessible names",
+"ARIA toggle fields have accessible names",
+"Background and foreground colors do not have a sufficient contrast ratio.",
+"The page contains a heading, skip link, or landmark region"
+]

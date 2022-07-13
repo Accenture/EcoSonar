@@ -1,5 +1,5 @@
-import * as React from 'react'
-import format from '../../../utils/format'
+import React from 'react'
+import format from '../../../format/format'
 import A from '../../../images/A.svg'
 import B from '../../../images/B.svg'
 import C from '../../../images/C.svg'
@@ -10,6 +10,7 @@ import G from '../../../images/G.svg'
 import NA from '../../../images/NA.svg'
 import RightArrow from '../../../images/RightArrow.svg'
 import PopUpCorrection from '../PopUpCorrection/PopUpCorrection'
+import booleanMetrics from '../../../utils/booleanMetrics.json'
 
 function getCorrespondingImg (compliance) {
   if (compliance === 'A') {
@@ -31,19 +32,17 @@ function getCorrespondingImg (compliance) {
   }
 }
 export default function AccordionTitle (props) {
-  const { compliance, title, staticTitleData, titleData, isActive, correction } = props
+  const { compliance, title, staticTitleData, staticTitleDataSuccess, auditedMetric, isActive, correction, score } = props
   const [correctionPage, setCorrectionPage] = React.useState(false)
-
   const CorrectionPageOpen = (e) => {
     e.stopPropagation()
     setCorrectionPage(true)
   }
-
   return (
     <div className="accordion-title">
       <div className="accordion-left">
         { getCorrespondingImg(compliance) }
-        <span className='title'>{ title }</span>
+       <span className='title'>{ title }</span>
         <button className="button-pop-up" onClick = { (e) => CorrectionPageOpen(e) }>How to solve it?</button>
         {correctionPage && (
             <PopUpCorrection
@@ -55,8 +54,14 @@ export default function AccordionTitle (props) {
 
       </div>
       <div className="accordion-right">
-        {
-          !!titleData && <span className='important-data'>{ format(staticTitleData, titleData) }</span>
+      {
+          (booleanMetrics.includes(title) && score === 100)
+            ? <span className='important-data'>{ format(staticTitleDataSuccess, 0) }</span>
+            : (
+                (auditedMetric !== null && auditedMetric !== undefined && auditedMetric !== 'N.A')
+                  ? <span className='important-data'>{ format(staticTitleData, auditedMetric) }</span>
+                  : <span className='important-data'>{ format(staticTitleData, 0) }</span>
+              )
         }
         <img src={RightArrow} alt="arrow" className={isActive ? 'active right-arrow' : 'right-arrow'}/>
 

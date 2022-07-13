@@ -1,13 +1,13 @@
 import classNames from 'classnames'
-import * as React from 'react'
+import React from 'react'
 import LoadingIcon from '../../../images/LoadingIcon.svg'
 import HelpIcon from '../../../images/HelpIcon.svg'
 
-export default function QualityGatePanel (props) {
+export default function EcoIndexPanel (props) {
   const { loading, analysis, found } = props
 
   let grade, ecoindex
-  if (found) {
+  if (found && analysis !== null) {
     grade = analysis.grade
     ecoindex = analysis.ecoIndex
   } else {

@@ -4,6 +4,7 @@ rulesManager.registerRule({
   id: 'CompressHttp',
   requests: '',
   compressRatio: 'N.A',
+  score: 100,
 
   check: function (measures) {
     let compressibleResourcesSize = 0
@@ -20,6 +21,21 @@ rulesManager.registerRule({
     }
     if (compressibleResourcesSize > 0) {
       this.compressRatio = compressibleResourcesCompressedSize / compressibleResourcesSize * 100
+      if (this.compressRatio > 100) {
+        this.score = 100
+      } else if (this.compressRatio >= 99.38) {
+        this.score = 75
+      } else if (this.compressRatio >= 95.32) {
+        this.score = 65
+      } else if (this.compressRatio >= 94) {
+        this.score = 50
+      } else if (this.compressRatio >= 92.45) {
+        this.score = 35
+      } else if (this.compressRatio >= 89.06) {
+        this.score = 20
+      } else {
+        this.score = 0
+      }
     }
   }
 }, 'harReceived')

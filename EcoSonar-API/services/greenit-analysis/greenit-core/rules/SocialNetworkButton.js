@@ -3,6 +3,7 @@ rulesManager.registerRule({
   id: 'SocialNetworkButton',
   nbSocialNetworkButton: 0,
   socialNetworks: '',
+  score: 100,
 
   check: function (measures) {
     const socialNetworksToAdd = []
@@ -17,6 +18,16 @@ rulesManager.registerRule({
           }
         }
       })
+    }
+
+    if (this.nbSocialNetworkButton === 0) {
+      this.score = 100
+    } else if (this.nbSocialNetworkButton <= 1) {
+      this.score = 35
+    } else if (this.nbSocialNetworkButton <= 2) {
+      this.score = 20
+    } else {
+      this.score = 0
     }
   }
 }, 'harReceived')
