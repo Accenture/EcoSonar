@@ -105,8 +105,7 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
       .then(() => {
         console.log('BEST PRACTICES INSERT - best practices have been inserted')
       })
-      .catch((err) => {
-        console.info(err)
+      .catch(() => {
         console.log('BEST PRACTICES INSERT : best practice insertion failed')
       })
   } else {

@@ -150,52 +150,53 @@ const bestPracticesSchema = new Schema({
   lighthousePerformanceBestPractices: {
     viewport: {
       score: { type: Number },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     serverResponseTime: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     criticalRequestChains: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     mainthreadWorkBreakdown: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     bootupTime: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     usesRelPreload: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     fontDisplay: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
-    NetworkRtt: {
+    networkRtt: {
       score: { type: Number, default: 0 },
       scoreDisplayMode: { type: String, default: '' },
       auditedMetric: { type: Number, default: 0 },
       description: { type: Array, default: [] }
     },
-    NetworkServerLatency: {
+    networkServerLatency: {
       score: { type: Number, default: 0 },
       scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
@@ -203,157 +204,157 @@ const bestPracticesSchema = new Schema({
     },
     thirdPartySummary: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     thirdPartyFacades: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     lcpLazyLoaded: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     longTasks: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     nonCompositedAnimations: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     preloadLcpImage: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     domSize: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     usesLongCacheTtl: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     usesResponsiveImages: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     offscreenImages: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     unminifiedCss: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     unminifiedJavascript: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     unusedCssRules: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     unusedJavascript: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     usesOptimizedImages: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     modernImageFormats: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     usesTextCompression: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     usesHttp2: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     efficientAnimatedContent: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     duplicatedJavascript: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     legacyJavascript: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     totalByteWeight: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     noDocumentWrite: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     redirects: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     layoutShiftElements: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     usesPassiveEventListeners: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     }
@@ -362,268 +363,268 @@ const bestPracticesSchema = new Schema({
   lighthouseAccessibilityBestPractices: {
     ariaAllowedAttr: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
 
     },
     ariaCommandName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
 
     },
     ariaHiddenBody: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
 
     },
     ariaHiddenFocus: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaRequiredAttr: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaRoles: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaValidAttrValue: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaValidAttr: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     bypass: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     colorContrast: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     documentTitle: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     duplicateIdActive: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     duplicateIdAria: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     headingOrder: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     htmlHasLang: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     htmlLangValid: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     imageAlt: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     label: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     linkName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     list: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     listItem: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     tabIndex: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     tdHeadersAttr: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     validLang: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaInputFieldName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaMeterName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaProgressbarName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaRequiredChildren: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaRequiredParent: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaToggleFieldName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaTooltipName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     ariaTreeitemName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     buttonName: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     definitionList: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     dlItem: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     formFieldMultipleLabels: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     frameTitle: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     inputImageAlt: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     metaRefresh: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     metaViewport: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     objectAlt: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     thHasDataCells: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     videoCaption: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     },
     accessKeys: {
       score: { type: Number },
-      scoreDisplayMode: { type: String },
+      scoreDisplayMode: { type: String, default: '' },
       description: { type: Array, default: [] },
       auditedMetric: { type: Number, default: 0 }
     }

@@ -46,7 +46,7 @@ The last page in the EcoSonar tool is the Best Practices.
 
 ![EcoSonar Best Practices Page Access](./images/ecosonar-best-practices-access.PNG)
 
- It is a list of ecodesign best practices sorted by level of implementation. For each practices, you will find a description with the key metric analysed with the score you need to reach to get an A-Score. Below, you will find details of the analysis and what can be corrected. To help developers to implement the best practice, we have added a solution guide with solution examples as well as documentations to learn about it.
+EcoSonar lists now audits from ecodesign and accessibility best practices coming from both audit tools Green-IT Analysis and Google Lighthouse. Each list of best practices is sorted by level of implementation, a score from 0 to 100 that we convert into a compliance letter from A to G. For each practices, you will find a description with the key metric analysed with the score you need to reach to get an A Score. Below, you will find details of the analysis and what can be corrected. To help developers to implement the best practice, we have added a solution guide with solution examples as well as documentations to learn about it. We are currently updating the documentation to add redirection to official ecodesign and accessibility guidelines.
 
 ![EcoSonar Best Practices Page](./images/ecosonar-best-practices.PNG)
 
@@ -112,7 +112,7 @@ Launch the following command in the source folder “EcoSonar-SonarQube”:
 mvn clean package
 ```
 
-The executable will be the following file “EcoSonar-SonarQube/target/ecosonar-1.0-SNAPSHOT.jar”.
+The executable will be the following file “EcoSonar-SonarQube/target/ecosonar-2.0-SNAPSHOT.jar”.
 
 #### Added JAR executable to SonarQube configuration files:
 
