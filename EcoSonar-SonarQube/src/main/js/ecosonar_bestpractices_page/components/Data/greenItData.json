@@ -110,7 +110,7 @@
   "plugins": {
     "title": "Do not use plugins",
     "description": "You should use no plugin in your web application if possible.",
-    "correction": "<div class='correction-text'>Popup correction:    Avoid using plugins (Flash Player, Java and Silverlight virtual machines, etc.) because they can be a heavy drain on resources (CPU and RAM).<br><br>This is especially true with Adobe’s Flash Player, to such an extent that Apple decided to not install the technology on its mobile devices to maximize battery life. Favor standard technology such as HTML5 and ECMAScript.<br><br> See : <br><a target='_blank' href='http://www.ecometer.org/rules/limit-plugins.html'>Limit plugins</a>  </div>",
+    "correction": "<div class='correction-text'>Avoid using plugins (Flash Player, Java and Silverlight virtual machines, etc.) because they can be a heavy drain on resources (CPU and RAM).<br><br>This is especially true with Adobe’s Flash Player, to such an extent that Apple decided to not install the technology on its mobile devices to maximize battery life. Favor standard technology such as HTML5 and ECMAScript.<br><br> See : <br><a target='_blank' href='http://www.ecometer.org/rules/limit-plugins.html'>Limit plugins</a>  </div>",
     "titleData": "{0} plugin found in the whole project"
   },
   "printStyleSheet": {
