@@ -25,14 +25,14 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-app.use((req, res, next) => {
+app.use((_req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
   next()
 })
 
 // API CRUD UrlsProject
-app.get('/api/all', asyncMiddleware(async (req, res, next) => {
+app.get('/api/all', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('GET URLS PROJECT - retrieve all urls from project ' + projectName)
   urlConfigurationService.getAll(projectName)
@@ -49,7 +49,7 @@ app.get('/api/all', asyncMiddleware(async (req, res, next) => {
     })
 }))
 
-app.post('/api/insert', asyncMiddleware(async (req, res, next) => {
+app.post('/api/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlsList = req.body.urlName
   console.log('INSERT URLS PROJECT - insert urls into project ' + projectName)
@@ -63,11 +63,11 @@ app.post('/api/insert', asyncMiddleware(async (req, res, next) => {
         return res.status(500).send()
       }
       console.log('INSERT URLS PROJECT - Validation failed')
-      return res.status(400).json({ error: error })
+      return res.status(400).json({ error })
     })
 }))
 
-app.delete('/api/delete', asyncMiddleware(async (req, res, next) => {
+app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlName = req.body.urlName
   console.log('DELETE URLS PROJECT - delete url ' + urlName + ' from project ' + projectName)
@@ -87,7 +87,7 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, next) => {
 
 // API CRUD GreenIT X Lighthouse
 // insert an analysis
-app.post('/api/greenit/insert', asyncMiddleware(async (req, res, next) => {
+app.post('/api/greenit/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   console.log('INSERT ANALYSIS - launch greenit and lighthouse analysis for project ' + projectName)
   analyseService.insert(projectName)
@@ -95,7 +95,7 @@ app.post('/api/greenit/insert', asyncMiddleware(async (req, res, next) => {
 }))
 
 // get analysis for an url
-app.post('/api/greenit/url', asyncMiddleware(async (req, res, next) => {
+app.post('/api/greenit/url', asyncMiddleware(async (req, res, _next) => {
   const projectNameReq = req.body.projectName
   const urlNameReq = req.body.urlName
   console.log('GET ANALYSIS URL - retrieve analysis for url ' + urlNameReq + ' in project ' + projectNameReq)
@@ -114,7 +114,7 @@ app.post('/api/greenit/url', asyncMiddleware(async (req, res, next) => {
 }))
 
 // get analysis for all urls of a project at one date
-app.get('/api/greenit/project', asyncMiddleware(async (req, res, next) => {
+app.get('/api/greenit/project', asyncMiddleware(async (req, res, _next) => {
   const projectNameReq = req.query.projectName
   console.log('GET ANALYSIS PROJECT - retrieve analysis for project ' + projectNameReq)
   analyseService.getProjectAnalysis(projectNameReq)
@@ -132,7 +132,7 @@ app.get('/api/greenit/project', asyncMiddleware(async (req, res, next) => {
 
 // API CRUD BestPractices
 // retrieve all best practices for a project
-app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, next) => {
+app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) => {
   const projectNameReq = req.query.projectName
   console.log('GET BEST PRACTICES PROJECT - retrieve best practices analysis for project ' + projectNameReq)
   retrieveBestPracticesService.getProjectAnalysis(projectNameReq)

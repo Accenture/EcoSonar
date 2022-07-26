@@ -6,7 +6,7 @@ rulesManager.registerRule({
   img: '',
   score: 100,
 
-  check: function (measures, resourceContent) {
+  check: function (_measures, resourceContent) {
     if ((resourceContent.type.toUpperCase() === 'IMAGE') && isSvgUrl(resourceContent.url)) {
       if (!isSvgOptimized(window.atob(resourceContent.content))) {
         this.img += `${resourceContent.url} ${String(Math.round(resourceContent.content.length / 100) / 10)}|`

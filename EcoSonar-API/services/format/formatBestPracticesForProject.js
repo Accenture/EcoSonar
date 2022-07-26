@@ -1,24 +1,24 @@
 
-const formatCompliance = require('./formatCompliance')
+const formatCompliance = require('../../services/format/formatCompliance')
 
 class FormatBestPracticesForProject { }
 
 FormatBestPracticesForProject.prototype.addScores = function (totalScore, score, numberOfValues) {
   if (score || score === 0) {
     totalScore += score
-    return { totalScore: totalScore, numberOfValues: numberOfValues + 1 }
+    return { totalScore, numberOfValues: numberOfValues + 1 }
   }
   // If score is undefined we don't count it as a value for the averaging
-  return { totalScore: totalScore, numberOfValues: numberOfValues }
+  return { totalScore, numberOfValues }
 }
 
 FormatBestPracticesForProject.prototype.addDisplayValues = function (totalDisplayValue, displayValue, numberOfDisplayValues) {
   if (displayValue || displayValue === 0) {
     totalDisplayValue += displayValue
-    return { totalDisplayValue: totalDisplayValue, numberOfDisplayValues: numberOfDisplayValues + 1 }
+    return { totalDisplayValue, numberOfDisplayValues: numberOfDisplayValues + 1 }
   }
   // If score is undefined we don't count it as a value for the averaging
-  return { totalDisplayValue: totalDisplayValue, numberOfDisplayValues: numberOfDisplayValues }
+  return { totalDisplayValue, numberOfDisplayValues }
 }
 
 FormatBestPracticesForProject.prototype.calculateAverageScore = function (totalScore, numberOfValues) {
@@ -51,7 +51,7 @@ FormatBestPracticesForProject.prototype.sortByScore = function (formattedReport)
       withScoreValues.push(value)
     }
   }
-  const sortedWithScoreValues = withScoreValues.sort((a, b) => a[1].averageScore - b[1].averageScore)
+  const sortedWithScoreValues = [...withScoreValues].sort((a, b) => a[1].averageScore - b[1].averageScore)
   const sortedReport = {}
   for (const value of sortedWithScoreValues) {
     sortedReport[value[0]] = value[1]

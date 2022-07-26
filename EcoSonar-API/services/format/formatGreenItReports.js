@@ -1,6 +1,6 @@
 
 const formatGreenItBestPractices = require('./formatGreenItBestPractices')
-const formatBestPracticesForProject = require('./formatBestPracticesForProject')
+const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
 
 class FormatGreenItReports {}
 

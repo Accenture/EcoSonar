@@ -16,36 +16,108 @@ const lighthouseSchema = new Schema({
     required: true
   },
   performance: {
-    type: JSON,
-    required: true
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   },
   accessibility: {
-    type: JSON,
-    required: true
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   },
   largestContentfulPaint: {
-    type: JSON,
-    required: true
+    displayValue: {
+      type: Number,
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   },
   cumulativeLayoutShift: {
-    type: JSON,
-    required: true
+    displayValue: {
+      type: Number,
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   },
   firstContentfulPaint: {
-    type: JSON,
-    required: true
+    displayValue: {
+      type: Number,
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   },
   speedIndex: {
-    type: JSON,
-    required: true
+    displayValue: {
+      type: Number,
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   },
   totalBlockingTime: {
-    type: JSON,
-    required: true
+    displayValue: {
+      type: Number,
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   },
   interactive: {
-    type: JSON,
-    required: true
+    displayValue: {
+      type: Number,
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    complianceLevel: {
+      type: String,
+      required: true
+    }
   }
 })
 

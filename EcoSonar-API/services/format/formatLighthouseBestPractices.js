@@ -1,5 +1,5 @@
 const enumAudits = require('../../utils/enumAudits')
-const formatBestPracticesForProject = require('./formatBestPracticesForProject')
+const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
 const metricsCalculate = require('../../utils/metricsCalculate')
 
 class FormatLighthouseBestPractices { }
@@ -31,7 +31,7 @@ FormatLighthouseBestPractices.prototype.formatAccessibility = function (reports)
     } else if (displayValue === undefined) {
       displayValue = 0
     }
-    formattedReports[element] = { score: score * 100, scoreDisplayMode: scoreDisplayMode, description: items, auditedMetric: displayValue }
+    formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
   }
   return formattedReports
 }
@@ -61,7 +61,7 @@ FormatLighthouseBestPractices.prototype.formatPerformance = function (reports) {
     } else {
       displayValue = 0
     }
-    formattedReports[element] = { score: score * 100, scoreDisplayMode: scoreDisplayMode, description: items, auditedMetric: displayValue }
+    formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
   }
   return formattedReports
 }
@@ -134,7 +134,7 @@ FormatLighthouseBestPractices.prototype.returnFormattedPerformance = function (r
       averageScore: formattedResponse.averageScore,
       description: formattedResponse.description,
       compliance: formattedResponse.compliance,
-      isApplicableOrInformative: isApplicableOrInformative
+      isApplicableOrInformative
     }
   }
 
@@ -211,7 +211,7 @@ FormatLighthouseBestPractices.prototype.returnFormattedAccessibility = function 
       averageScore: formattedResponse.averageScore,
       description: formattedResponse.description,
       compliance: formattedResponse.compliance,
-      isApplicableOrInformative: isApplicableOrInformative
+      isApplicableOrInformative
     }
   }
   // For each BP, we merge the description [] of every URL analyzed in a single array

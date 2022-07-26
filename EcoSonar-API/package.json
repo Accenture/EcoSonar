@@ -1,6 +1,6 @@
 {
   "name": "ecosonar-api",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Développement d'un plugin custom ajouté à l'outil d'analyse de code SonarQube permettant l'analyse et le monitoring de paramètres clés d'une application web (en utilisant Green-IT Analysis et Lighthouse). L'objectif est d'aider les développeurs à mettre en place des bonnes pratiques d'éco-conception web en optimisant ces paramètres.",
   "repository": {
     "type": "git",

@@ -1,6 +1,36 @@
 const formatCompliance = require('./formatCompliance')
 class FormatLighthouseAnalysis {}
 
+FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (analysis) {
+  let formattedAnalysis
+  try {
+    formattedAnalysis = {
+      performance: { displayValue: analysis.performance.score, complianceLevel: setComplianceLevel(analysis.performance.score) },
+      accessibility: { displayValue: analysis.accessibility.score, complianceLevel: setComplianceLevel(analysis.accessibility.score) },
+      dateAnalysis: analysis.dateLighthouseAnalysis,
+      largestContentfulPaint: {
+        displayValue: analysis.largestContentfulPaint.displayValue.toFixed(1) + ' s',
+        complianceLevel: setComplianceLevel(analysis.largestContentfulPaint.score)
+      },
+      cumulativeLayoutShift: {
+        displayValue: analysis.cumulativeLayoutShift.displayValue.toFixed(3),
+        complianceLevel: setComplianceLevel(analysis.cumulativeLayoutShift.score)
+      },
+      firstContentfulPaint: {
+        displayValue: analysis.firstContentfulPaint.displayValue.toFixed(1) + ' s',
+        complianceLevel: setComplianceLevel(analysis.firstContentfulPaint.score)
+      },
+      speedIndex: { displayValue: analysis.speedIndex.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.speedIndex.score) },
+      totalBlockingTime: { displayValue: analysis.totalBlockingTime.displayValue.toFixed(0) + ' ms', complianceLevel: setComplianceLevel(analysis.totalBlockingTime.score) },
+      interactive: { displayValue: analysis.interactive.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.interactive.score) }
+    }
+  } catch (err) {
+    console.log(err)
+    console.log('LIGHTHOUSE - error during the formatting of project analysis')
+  }
+  return formattedAnalysis
+}
+
 FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = function (res) {
   let analysis
   let indexAnalysis = 0
@@ -40,32 +70,32 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
       while (j < res.length && dateAnalysis.getTime() === res[j].dateLighthouseAnalysis.getTime()) {
         performance.score += res[j].performance.score
         accessibility.score += res[j].accessibility.score
-        largestContentfulPaint.displayValue += parseFloat(res[j].largestContentfulPaint.displayValue.replace(',', '.'))
+        largestContentfulPaint.displayValue += res[j].largestContentfulPaint.displayValue
         largestContentfulPaint.score += res[j].largestContentfulPaint.score
-        cumulativeLayoutShift.displayValue += parseFloat(res[j].cumulativeLayoutShift.displayValue.replace(',', '.'))
+        cumulativeLayoutShift.displayValue += res[j].cumulativeLayoutShift.displayValue
         cumulativeLayoutShift.score += res[j].cumulativeLayoutShift.score
-        firstContentfulPaint.displayValue += parseFloat(res[j].firstContentfulPaint.displayValue.replace(',', '.'))
+        firstContentfulPaint.displayValue += res[j].firstContentfulPaint.displayValue
         firstContentfulPaint.score += res[j].firstContentfulPaint.score
-        speedIndex.displayValue += parseFloat(res[j].speedIndex.displayValue.replace(',', '.'))
+        speedIndex.displayValue += res[j].speedIndex.displayValue
         speedIndex.score += res[j].speedIndex.score
-        totalBlockingTime.displayValue += parseFloat(res[j].totalBlockingTime.displayValue.replace(',', ''))
+        totalBlockingTime.displayValue += res[j].totalBlockingTime.displayValue
         totalBlockingTime.score += res[j].totalBlockingTime.score
-        interactive.displayValue += parseFloat(res[j].interactive.displayValue.replace(',', '.'))
+        interactive.displayValue += res[j].interactive.displayValue
         interactive.score += res[j].interactive.score
         count++
         j++
       }
 
       analysis = {
-        performance: { displayValue: Math.trunc(calculateAverageScore(performance.score)), complianceLevel: setComplianceLevel(calculateAverageScore(performance.score)) },
-        accessibility: { displayValue: Math.trunc(calculateAverageScore(accessibility.score)), complianceLevel: setComplianceLevel(calculateAverageScore(accessibility.score)) },
-        dateAnalysis: dateAnalysis,
+        performance: { displayValue: Math.trunc(parseFloat(calculateAverageScore(performance.score))), complianceLevel: setComplianceLevel(calculateAverageScore(performance.score)) },
+        accessibility: { displayValue: Math.trunc(parseFloat(calculateAverageScore(accessibility.score))), complianceLevel: setComplianceLevel(calculateAverageScore(accessibility.score)) },
+        dateAnalysis,
         largestContentfulPaint: {
           displayValue: calculateAverageScore(largestContentfulPaint.displayValue, 1) + ' s',
           complianceLevel: setComplianceLevel(calculateAverageScore(largestContentfulPaint.score))
         },
         cumulativeLayoutShift: {
-          displayValue: calculateAverageScore(cumulativeLayoutShift.displayValue, 3) + ' s',
+          displayValue: calculateAverageScore(cumulativeLayoutShift.displayValue, 3),
           complianceLevel: setComplianceLevel(calculateAverageScore(cumulativeLayoutShift.score))
         },
         firstContentfulPaint: {
@@ -86,10 +116,10 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
   function calculateAverageScore (score, toFixParam) {
     return (score / count).toFixed(toFixParam)
   }
+}
 
-  function setComplianceLevel (score) {
-    return formatCompliance.getGrade(score)
-  }
+function setComplianceLevel (score) {
+  return formatCompliance.getGrade(score)
 }
 
 FormatLighthouseAnalysis.prototype.lighthouseAnalysisFormattedDeployments = function (res) {
@@ -155,7 +185,6 @@ FormatLighthouseAnalysis.prototype.formatDeploymentsForGraphs = function (deploy
       sumElement.numberOfValues++
     })
 
-    // On doit créer un nouveau tableau que l'on renverra
     duplicatedDeployments.push(sumElement)
   }
 

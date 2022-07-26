@@ -14,9 +14,7 @@ rulesManager.registerRule({
     if (entry.naturalHeight - entry.clientHeight < 2) return false
 
     // If picture is 0x0 it meens it's not visible on the ui , see imageDownloadedNotDisplayed
-    if (entry.clientWidth === 0) return false
-
-    return true
+    return entry.clientWidth !== 0
   },
 
   check: function (measures) {

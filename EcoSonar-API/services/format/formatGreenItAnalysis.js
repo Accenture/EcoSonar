@@ -17,7 +17,7 @@ FormatGreenItAnalysis.prototype.greenItUrlAnalysisFormatted = function (analysis
     }
   } catch (err) {
     console.log(err)
-    console.log('LIGHTHOUSE - error during the formatting of project analysis')
+    console.log('GREENIT - error during the formatting of project analysis')
   }
   return formattedAnalysis
 }
@@ -53,7 +53,7 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
     analysis = {
       domSize: { displayValue: Math.ceil(domSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('domSize', Math.ceil(domSize / count)) },
       nbRequest: { displayValue: Math.ceil(nbRequest / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('nbRequest', nbRequest / count) },
-      dateAnalysis: dateAnalysis,
+      dateAnalysis,
       responsesSize: { displayValue: Math.ceil(responsesSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', Math.ceil(responsesSize / count)) },
       responsesSizeUncompress: Math.ceil(responsesSizeUncompress / count),
       ecoIndex: Math.ceil(ecoIndex / count),
@@ -64,7 +64,7 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
     return analysis
   } catch (err) {
     console.log(err)
-    console.log('LIGHTHOUSE - error during the formatting of project analysis')
+    console.log('GREENIT - error during the formatting of project analysis')
   }
 }
 

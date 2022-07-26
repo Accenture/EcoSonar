@@ -6,10 +6,9 @@ rulesManager.registerRule({
   score: 100,
 
   isRevelant: function (entry) {
-    // Very small images could be download even if not display  as it may be icons
+    // Very small images could be download even if not display as it may be icons
     if (entry.naturalWidth * entry.naturalHeight < 10000) return false
-    if (entry.clientWidth === 0 && entry.clientHeight === 0) return true
-    return false
+    return (entry.clientWidth === 0 && entry.clientHeight === 0)
   },
 
   check: function (measures) {

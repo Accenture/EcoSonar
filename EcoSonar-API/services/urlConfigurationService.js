@@ -28,7 +28,7 @@ UrlConfigurationService.prototype.getAll = function (projectName) {
 
 UrlConfigurationService.prototype.insert = async function (projectName, urlsList) {
   // Retrieving URLs in database for project
-  const formattedArray = await urlsProjectRepository.findAll(projectName, true).then((res) => res.map((res) => res.urlName))
+  const formattedArray = await urlsProjectRepository.findAll(projectName, true).then((urlList) => urlList.map((res) => res.urlName))
 
   // Initializing parameters
   const values = []

@@ -7,7 +7,7 @@ rulesManager.registerRule({
   contents: '',
   score: 100,
 
-  check: function (measures, resourceContent) {
+  check: function (_measures, resourceContent) {
     if (resourceContent.type.toUpperCase() === 'STYLESHEET') {
       this.totalCssSize += resourceContent.content.length
       if (isMinified(resourceContent.content)) {

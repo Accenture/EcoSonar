@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+---
+## Version 2.1 , 26/07/2022
+
+### Added
+
+- Add Authentication functionality to audit intranet pages (all urls registered in the project requires authentication to be access)
+
+### Removed
+
+
+### Changed
+- we have updated the way to register Lighthouse analysis : /!\ new version is not compatible with previous one, you should delete all your analysis before adding this new version.
+
 ---
 ## Version 2.0 , 13/07/2022
 

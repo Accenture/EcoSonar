@@ -206,8 +206,7 @@ function isResourceCompressed (resource) {
 // utils for ETags rule
 function isRessourceUsingETag (resource) {
   const eTag = getResponseHeaderFromResource(resource, 'ETag')
-  if (eTag === '') return false
-  return true
+  return eTag !== ''
 }
 
 function getDomainFromUrl (url) {
@@ -312,15 +311,11 @@ function getMinOptimisationGainsForImage (pixelsNumber, imageSize, imageType) {
 }
 
 function isSvgUrl (url) {
-  if (url.endsWith('.svg')) return true
-  if (url.includes('.svg?')) return true
-  return false
+  return (url.endsWith('.svg') || url.includes('.svg?'))
 }
 
 function isSvgOptimized (svgImage) {
-  if (svgImage.length < 1000) return true // do not consider image < 1KB
-  if (svgImage.search(' <') === -1) return true
-  return false
+  return (svgImage.length < 1000 || svgImage.search(' <') === -1)
 }
 
 function getOfficialSocialButtonFormUrl (url) {

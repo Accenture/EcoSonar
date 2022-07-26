@@ -15,9 +15,9 @@ const GreenItRepository = function () {
   this.insertAll = async function (reports, urlIdList, urlList) {
     let arrayToInsert = []
     let i = 0
-    let nb
+    let idGreenAnalysis
     const date = Date.now()
-    let string
+    let greenAnalysis
     let size
     let sizeUncompress
     let j = 0
@@ -33,11 +33,11 @@ const GreenItRepository = function () {
           }
         }
         find = false
-        nb = uniqid()
+        idGreenAnalysis = uniqid()
         size = Math.round(reports[j].responsesSize / 1000)
         sizeUncompress = Math.round(reports[j].responsesSizeUncompress / 1000)
-        string = {
-          idGreenAnalysis: nb,
+        greenAnalysis = {
+          idGreenAnalysis,
           idUrlGreen: urlIdList[i],
           dateGreenAnalysis: date,
           domSize: reports[j].domSize,
@@ -49,7 +49,7 @@ const GreenItRepository = function () {
           waterConsumption: reports[j].waterConsumption,
           greenhouseGasesEmission: reports[j].greenhouseGasesEmission
         }
-        arrayToInsert.push(string)
+        arrayToInsert.push(greenAnalysis)
       }
       i++
     }
@@ -134,7 +134,7 @@ const GreenItRepository = function () {
           i++
         }
         const formattedDeployments = formatGreenItAnalysis.formatDeploymentsForGraphs(deployments)
-        const analysis = { deployments: formattedDeployments, lastAnalysis: lastAnalysis }
+        const analysis = { deployments: formattedDeployments, lastAnalysis }
         resolve(analysis)
       }
     })
@@ -165,7 +165,7 @@ const GreenItRepository = function () {
         deployments = await greenits.find({ idUrlGreen: listIdKey }, { ecoIndex: 1, nbRequest: 1, domSize: 1, responsesSize: 1, dateGreenAnalysis: 1 }).sort({ dateGreenAnalysis: 1 })
         if (deployments.length !== 0) {
           lastAnalysis = await greenits.find({ idUrlGreen: listIdKey, dateGreenAnalysis: deployments[deployments.length - 1].dateGreenAnalysis })
-          resultats = { deployments: deployments, lastAnalysis: lastAnalysis }
+          resultats = { deployments, lastAnalysis }
         } else {
           console.log('no greenit analysis found for ' + projectNameReq)
           resultats = { deployments: [], lastAnalysis: null }

@@ -22,7 +22,7 @@ DataBase.prototype.connection = async function () {
     mongoose.connect(connectionString,
       { useNewUrlParser: true, useUnifiedTopology: true }
     ).then(() => console.log('Connection to MongoDB Atlas successful'))
-      .catch((reason) => console.log('Unable to connect to the mongodb instance. Error: ', reason))
+      .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
   } else {
     // connection to dataBase Azure CosmosDB for MongoDB API
     cluster = process.env.CLUSTER || ''
@@ -34,14 +34,14 @@ DataBase.prototype.connection = async function () {
     mongoose.connect(connectionString, {
       auth: {
         username: user,
-        password: password
+        password
       },
       useNewUrlParser: true,
       useUnifiedTopology: true,
       retryWrites: false
     })
       .then(() => console.log('Connection to CosmosDB successful'))
-      .catch((err) => console.error(err))
+      .catch((err) => console.error('\x1b[31m%s\x1b[0m', err))
   }
 }
 

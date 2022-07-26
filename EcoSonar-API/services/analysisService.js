@@ -51,10 +51,10 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
   const date = Date.now()
   while (i < urlIdList.length) {
     if (reportsLighthouse[i] && reportsLighthouse[i].runtimeError === undefined) {
-      const nb = uniqid()
+      const idLighthouseAnalysis = uniqid()
       const formattedLighthouseMetrics = formatLighthouseMetrics.formatLighthouseMetrics(reportsLighthouse[i])
       const lighthouseAudit = {
-        idLighthouseAnalysis: nb,
+        idLighthouseAnalysis,
         idUrlLighthouse: urlIdList[i],
         dateLighthouseAnalysis: date,
         performance: formattedLighthouseMetrics.performance,
@@ -158,7 +158,7 @@ AnalysisService.prototype.getUrlAnalysis = async function (projectName, urlName)
         lastAnalysis: {
           dateAnalysis: date,
           greenit: formatGreenItAnalysis.greenItUrlAnalysisFormatted(greenitAnalysis.lastAnalysis),
-          lighthouse: lighthouseResult.lastAnalysis
+          lighthouse: formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(lighthouseResult.lastAnalysis)
         }
       }
       resolve(analysis)
@@ -184,7 +184,7 @@ AnalysisService.prototype.getUrlAnalysis = async function (projectName, urlName)
         lastAnalysis: {
           dateAnalysis: date,
           greenit: null,
-          lighthouse: lighthouseResult.lastAnalysis
+          lighthouse: formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(lighthouseResult.lastAnalysis)
         }
       }
       resolve(analysis)
@@ -276,8 +276,8 @@ AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
         lighthouse: lighthouseAnalysisDeployments
       },
       lastAnalysis: {
-        dateGreenitLastAnalysis: dateGreenitLastAnalysis,
-        dateLighthouseLastAnalysis: dateLighthouseLastAnalysis,
+        dateGreenitLastAnalysis,
+        dateLighthouseLastAnalysis,
         greenit: greenitLastAnalysis,
         lighthouse: lighthouseProjectLastAnalysis
       }

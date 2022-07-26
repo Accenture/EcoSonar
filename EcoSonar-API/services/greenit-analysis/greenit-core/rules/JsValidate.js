@@ -6,7 +6,7 @@ rulesManager.registerRule({
   totalJsSize: 0,
   score: 100,
 
-  check: function (measures, resourceContent) {
+  check: function (_measures, resourceContent) {
     if (resourceContent.type.toUpperCase() === 'SCRIPT') {
       const errorNumber = computeNumberOfErrorsInJSCode(resourceContent.content, resourceContent.url)
       if (errorNumber > 0) {

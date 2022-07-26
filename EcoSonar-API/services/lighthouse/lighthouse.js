@@ -1,22 +1,43 @@
 const lighthouse = require('lighthouse')
-const chromeLauncher = require('chrome-launcher')
 const config = require('./config.js')
+const puppeteer = require('puppeteer')
+const loginIfNeeded = require('../authenticationService')
 
 module.exports = {
   lighthouseAnalysis: async function (urlList) {
-    const chrome = await chromeLauncher.launch({ chromeFlags: ['--disable-dev-shm-usage', '--headless', '--disable-gpu', '--no-sandbox'] })
-    const options = { logLevel: 'error', output: 'json', onlyCategories: ['performance', 'accessibility'], port: chrome.port }
-    let i = 0
+    const browserArgs = [
+      '--no-sandbox', // can't run inside docker without
+      '--disable-setuid-sandbox' // but security issues
+    ]
+
+    // start browser
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: browserArgs,
+      // Keep gpu horsepower in headless
+      ignoreDefaultArgs: [
+        '--disable-gpu'
+      ]
+    })
+
     const results = []
-    let runnerResult
-    while (i < urlList.length) {
-      console.log('Lighthouse Analysis launched for url ' + urlList[i])
-      runnerResult = await lighthouse(urlList[i], options, config)
-      console.log('Lighthouse Analysis ended for url ' + urlList[i])
-      results[i] = runnerResult.lhr
-      i++
+    try {
+      const options = { logLevel: 'error', output: 'json', onlyCategories: ['performance', 'accessibility'], port: (new URL(browser.wsEndpoint())).port }
+      let i = 0
+      let runnerResult
+      const loginSucceeded = await loginIfNeeded(browser, urlList[0])
+      if (loginSucceeded) {
+        while (i < urlList.length) {
+          console.log('Lighthouse Analysis launched for url ' + urlList[i])
+          runnerResult = await lighthouse(urlList[i], options, config)
+          console.log('Lighthouse Analysis ended for url ' + urlList[i])
+          results[i] = runnerResult.lhr
+          i++
+        }
+      }
+    } finally {
+      await browser.close()
     }
-    await chrome.kill()
     return results
   }
 }

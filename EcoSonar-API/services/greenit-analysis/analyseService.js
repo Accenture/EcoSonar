@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer')
 const createGreenITReports = require('./greenit-analysis.js').createGreenITReports
+const loginIfNeeded = require('../authenticationService')
 
 async function analyse (urlList, autoscroll) {
   const browserArgs = [
@@ -17,10 +18,14 @@ async function analyse (urlList, autoscroll) {
     ]
   })
 
+  const loginSucceeded = await loginIfNeeded(browser, urlList[0])
+
   let reports
   try {
-    // analyse each page
-    reports = await createGreenITReports(browser, urlList, autoscroll)
+    if (loginSucceeded) {
+      // analyse each page
+      reports = await createGreenITReports(browser, urlList, autoscroll)
+    }
   } finally {
     // close browser
     const pages = await browser.pages()

@@ -13,7 +13,7 @@ const BestPracticesRepository = function () {
   this.insertBestPractices = async function (reports, lighthousePerformanceBestPractices, lighthouseAccessibilityBestPractices, urlIdList, projectName) {
     const arrayToInsert = []
     let i = 0
-    let nb, string
+    let idAnalysisBestPractices, string
     const date = Date.now()
     if (reports.length > 0) {
       const sanitizedValues = await checkValues(reports, urlIdList, projectName)
@@ -22,12 +22,12 @@ const BestPracticesRepository = function () {
     }
 
     while (i < reports.length) {
-      nb = uniqid()
+      idAnalysisBestPractices = uniqid()
       const bestPracticesFormatted = Object.fromEntries(
         Object.entries(reports[i].bestPractices).map(([key, value]) => [key.charAt(0).toLowerCase() + key.slice(1), value])
       )
       string = {
-        idAnalysisBestPractices: nb,
+        idAnalysisBestPractices,
         idUrl: urlIdList[i],
         dateAnalysisBestPractices: date,
         bestPractices: bestPracticesFormatted,
@@ -150,13 +150,13 @@ const BestPracticesRepository = function () {
     for (const analysis of arrayToInsert) {
       if (analysis.bestPractices) {
         arrayToInsertSanitized.push(analysis)
-        const urlInfos = await urlsprojects.find({ projectName: projectName, urlName: analysis.url })
+        const urlInfos = await urlsprojects.find({ projectName, urlName: analysis.url })
         urlIdListSanitized.push(urlIdList.find(element => element === urlInfos[0].idKey))
       } else {
         console.log(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
       }
     }
-    return { arrayToInsertSanitized: arrayToInsertSanitized, urlIdListSanitized: urlIdListSanitized }
+    return { arrayToInsertSanitized, urlIdListSanitized }
   }
 }
 

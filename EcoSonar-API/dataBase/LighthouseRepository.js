@@ -5,18 +5,15 @@ const formatLighthouseAnalysis = require('../services/format/formatLighthouseAna
 
 const LighthouseRepository = function () {
   /**
-   * insertion of one or more analysis on the table lighthouse :OK
-   * @param {analysis of url} reports
-   * @param {list of id of urls} urlIdList
-   * @param {list of urls} urlList
+   * insertion of one or more analysis on the table lighthouses
+   * @param {list of url analysis} lighthouseMetricsReports
    * @returns
    */
-  this.insertAll = function (tab) {
+  this.insertAll = function (lighthouseMetricsReports) {
     return new Promise((resolve, reject) => {
-      if (tab.length > 0) {
+      if (lighthouseMetricsReports.length > 0) {
         lighthouses
-          .insertMany(tab)
-
+          .insertMany(lighthouseMetricsReports)
           .then(() => {
             resolve()
           })
@@ -36,22 +33,22 @@ const LighthouseRepository = function () {
   }
 
   /**
-   * find analysis for one url
+   * find analysis for one url in a project
    * @param {project Name} projectNameReq
    * @param {url Name} urlNameReq
    * @returns
    */
   this.findAnalysisUrl = async function (projectNameReq, urlNameReq) {
-    let res
+    let urlMatching
     let allAnalysis
     let stringErr = null
     let systemError = null
     try {
-      res = await urlsprojects.find(
+      urlMatching = await urlsprojects.find(
         { projectName: projectNameReq, urlName: urlNameReq },
         { idKey: 1 }
       )
-      if (res.length === 0) {
+      if (urlMatching.length === 0) {
         stringErr =
           'url : ' +
           urlNameReq +
@@ -61,7 +58,7 @@ const LighthouseRepository = function () {
       } else {
         allAnalysis = await lighthouses
           .find(
-            { idUrlLighthouse: res[0].idKey },
+            { idUrlLighthouse: urlMatching[0].idKey },
             {
               dateLighthouseAnalysis: 1,
               performance: 1,
@@ -92,8 +89,7 @@ const LighthouseRepository = function () {
         reject(new Error(stringErr))
       } else {
         const lastAnalysis = {
-          dateLighthouseAnalysis:
-            allAnalysis[allAnalysis.length - 1].dateLighthouseAnalysis,
+          dateLighthouseAnalysis: allAnalysis[allAnalysis.length - 1].dateLighthouseAnalysis,
           performance: allAnalysis[allAnalysis.length - 1].performance,
           accessibility: allAnalysis[allAnalysis.length - 1].accessibility,
           cumulativeLayoutShift: allAnalysis[allAnalysis.length - 1].cumulativeLayoutShift,
@@ -103,8 +99,6 @@ const LighthouseRepository = function () {
           totalBlockingTime: allAnalysis[allAnalysis.length - 1].totalBlockingTime,
           interactive: allAnalysis[allAnalysis.length - 1].interactive
         }
-
-        replaceComma(lastAnalysis)
 
         let i = 0
         let element
@@ -127,32 +121,15 @@ const LighthouseRepository = function () {
 
         const formattedDeployments = formatLighthouseAnalysis.formatDeploymentsForGraphs(deployments)
 
-        const analysis = { deployments: formattedDeployments, lastAnalysis: lastAnalysis }
+        const analysis = { deployments: formattedDeployments, lastAnalysis }
         resolve(analysis)
       }
     })
-    function replaceComma (JSON) {
-      let j = 0
-      while (j < Object.values(JSON).length) {
-        if (!JSON.totalBlockingTime) {
-          if (Object.values(JSON)[j].displayValue) {
-            Object.values(JSON)[j].displayValue = Object.values(JSON)[j].displayValue.replace(',', '.')
-          }
-        } else {
-          if (Object.values(JSON)[j].displayValue) {
-            Object.values(JSON)[j].displayValue = Object.values(JSON)[j].displayValue.replace(',', '')
-          }
-        }
-
-        j++
-      }
-    }
   }
 
   /**
    * find analysis for one Project
    * @param {project Name} projectNameReq
-   * @param {all deployment = true} alldeployment
    * @returns
    */
   this.findAnalysisProject = async function (projectNameReq) {
@@ -201,7 +178,7 @@ const LighthouseRepository = function () {
               dateLastAnalysis.getTime()
           )
           resultats = {
-            deployments: deployments,
+            deployments,
             lastAnalysis: lastDeployment
           }
         } else {

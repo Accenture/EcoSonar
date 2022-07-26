@@ -30,16 +30,16 @@ function startAnalyseCore () {
   const imagesResizedInBrowser = getImagesResizedInBrowser()
 
   return {
-    analyseStartingTime: analyseStartingTime,
+    analyseStartingTime,
     url: document.URL,
-    domSize: domSize,
-    pluginsNumber: pluginsNumber,
-    printStyleSheetsNumber: printStyleSheetsNumber,
-    inlineStyleSheetsNumber: inlineStyleSheetsNumber,
-    emptySrcTagNumber: emptySrcTagNumber,
-    inlineJsScript: inlineJsScript,
-    inlineJsScriptsNumber: inlineJsScriptsNumber,
-    imagesResizedInBrowser: imagesResizedInBrowser
+    domSize,
+    pluginsNumber,
+    printStyleSheetsNumber,
+    inlineStyleSheetsNumber,
+    emptySrcTagNumber,
+    inlineJsScript,
+    inlineJsScriptsNumber,
+    imagesResizedInBrowser
   }
 }
 
