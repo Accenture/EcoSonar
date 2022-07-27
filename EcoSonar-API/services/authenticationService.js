@@ -2,12 +2,14 @@ const path = require('path')
 const fs = require('fs')
 const YAML = require('js-yaml')
 
-async function loginIfNeeded (browser, url) {
+class AuthenticationService {}
+
+AuthenticationService.prototype.loginIfNeeded = async function (browser) {
   const loginInformations = await getLoginInformations()
   if (loginInformations) {
     // Go to login url
     const [page] = await browser.pages()
-    await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
+    await page.goto(loginInformations.authentication_url, { timeout: 0, waitUntil: 'networkidle2' })
     // Fill login fields
     if (loginInformations.usernameSelector) {
       await page.type(loginInformations.usernameSelector, loginInformations.password)
@@ -45,4 +47,5 @@ async function getLoginInformations () {
   }
 }
 
-module.exports = loginIfNeeded
+const authenticationService = new AuthenticationService()
+module.exports = authenticationService

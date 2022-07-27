@@ -1,7 +1,7 @@
 const lighthouse = require('lighthouse')
 const config = require('./config.js')
 const puppeteer = require('puppeteer')
-const loginIfNeeded = require('../authenticationService')
+const authenticationService = require('../authenticationService')
 
 module.exports = {
   lighthouseAnalysis: async function (urlList) {
@@ -25,7 +25,7 @@ module.exports = {
       const options = { logLevel: 'error', output: 'json', onlyCategories: ['performance', 'accessibility'], port: (new URL(browser.wsEndpoint())).port }
       let i = 0
       let runnerResult
-      const loginSucceeded = await loginIfNeeded(browser, urlList[0])
+      const loginSucceeded = await authenticationService.loginIfNeeded(browser)
       if (loginSucceeded) {
         while (i < urlList.length) {
           console.log('Lighthouse Analysis launched for url ' + urlList[i])
