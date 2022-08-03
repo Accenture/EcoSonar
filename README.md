@@ -1,4 +1,4 @@
-![Logo](./images/ecosonar-logo.jpg)
+![Logo](./images/ecosonar-logo.webp)
 
 # EcoSonar, the eco-design audit tool
 
