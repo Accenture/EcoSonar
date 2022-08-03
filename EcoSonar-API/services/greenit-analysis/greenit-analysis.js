@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 const PuppeteerHar = require('puppeteer-har')
 const path = require('path')
-const sizes = require('./sizes.js')
+const userJourneyService = require('../userJourneyService')
 
 // Analyse a webpage
 async function analyseURL (browser, url, options, autoscroll) {
@@ -9,11 +9,15 @@ async function analyseURL (browser, url, options, autoscroll) {
 
   const TAB_ID = options.tabId
   const TRY_NB = options.tryNb || 1
-  const DEVICE = options.device || 'desktop'
 
   try {
     const page = await browser.newPage()
-    await page.setViewport(sizes[DEVICE])
+
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+      isMobile: false
+    })
 
     // disabling cache
     await page.setCacheEnabled(false)
@@ -23,6 +27,7 @@ async function analyseURL (browser, url, options, autoscroll) {
     await pptrHar.start()
 
     try {
+      await userJourneyService.playUserJourney(url, browser)
       // go to url
       await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
       if (autoscroll) await autoScroll(page)
@@ -84,8 +89,6 @@ async function createGreenITReports (browser, urlList, autoscroll) {
   const MAX_TAB = 40
   // Nb of retry before dropping analysis
   const RETRY = 2
-  // Device to emulate
-  const DEVICE = 'desktop'
 
   const asyncFunctions = []
   let results
@@ -101,7 +104,6 @@ async function createGreenITReports (browser, urlList, autoscroll) {
   // Asynchronous analysis with MAX_TAB open simultaneously to json
   for (let i = 0; i < MAX_TAB && index < urlList.length; i++) {
     asyncFunctions.push(analyseURL(browser, urlList[index], {
-      device: DEVICE,
       timeout: TIMEOUT,
       tabId: i
     }, autoscroll))
@@ -112,7 +114,6 @@ async function createGreenITReports (browser, urlList, autoscroll) {
     results = await Promise.race(asyncFunctions)
     if (!results.success && results.tryNb <= RETRY) {
       asyncFunctions.splice(convert[results.tabId], 1, analyseURL(browser, results.url, {
-        device: DEVICE,
         timeout: TIMEOUT,
         tabId: results.tabId,
         tryNb: results.tryNb + 1
@@ -126,7 +127,6 @@ async function createGreenITReports (browser, urlList, autoscroll) {
         }
       } else {
         asyncFunctions.splice(results.tabId, 1, analyseURL(browser, urlList[index], {
-          device: DEVICE,
           timeout: TIMEOUT,
           tabId: results.tabId
         }, autoscroll)) // No need for convert, fixed size array
@@ -140,7 +140,7 @@ async function createGreenITReports (browser, urlList, autoscroll) {
 async function autoScroll (page) {
   console.log('AUTOSCROLL - autoscroll has started')
   await page.evaluate(async () => {
-    await new Promise((resolve, reject) => {
+    await new Promise((resolve, _reject) => {
       let totalHeight = 0
       const distance = 100
       const timer = setInterval(() => {

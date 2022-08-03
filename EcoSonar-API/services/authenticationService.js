@@ -32,7 +32,6 @@ AuthenticationService.prototype.loginIfNeeded = async function (browser) {
       }
     }
     await page.waitForNavigation()
-    await page.close()
     return true
   }
   return true
@@ -41,6 +40,24 @@ AuthenticationService.prototype.loginIfNeeded = async function (browser) {
 async function getLoginInformations () {
   try {
     const ymlFile = fs.readFileSync(path.join(__dirname, '../login.yaml'), 'utf8')
+    return YAML.load(ymlFile)
+  } catch {
+    return false
+  }
+}
+
+AuthenticationService.prototype.useProxyIfNeeded = async function (projectName) {
+  const proxyInformations = await getProxyInformations()
+  if (proxyInformations && ((proxyInformations.projectName === undefined) || (proxyInformations.projectName && proxyInformations.projectName.includes(projectName)))) {
+    return '--proxy-server=' + proxyInformations.ipaddress + ':' + proxyInformations.port
+  } else {
+    return false
+  }
+}
+
+async function getProxyInformations () {
+  try {
+    const ymlFile = fs.readFileSync(path.join(__dirname, '../proxy.yaml'), 'utf8')
     return YAML.load(ymlFile)
   } catch {
     return false

@@ -2,26 +2,32 @@ const puppeteer = require('puppeteer')
 const createGreenITReports = require('./greenit-analysis.js').createGreenITReports
 const authenticationService = require('../authenticationService')
 
-async function analyse (urlList, autoscroll) {
+async function analyse (urlList, autoscroll, projectName) {
   const browserArgs = [
     '--no-sandbox', // can't run inside docker without
-    '--disable-setuid-sandbox' // but security issues
+    '--disable-setuid-sandbox', // but security issues
+    '--ignore-certificate-errors'
   ]
+
+  const proxyConfiguration = await authenticationService.useProxyIfNeeded(projectName)
+  if (proxyConfiguration) {
+    browserArgs.push(proxyConfiguration)
+  }
 
   // start browser
   const browser = await puppeteer.launch({
     headless: true,
     args: browserArgs,
+    ignoreHTTPSErrors: true,
     // Keep gpu horsepower in headless
     ignoreDefaultArgs: [
       '--disable-gpu'
     ]
   })
 
-  const loginSucceeded = await authenticationService.loginIfNeeded(browser)
-
   let reports
   try {
+    const loginSucceeded = await authenticationService.loginIfNeeded(browser)
     if (loginSucceeded) {
       // analyse each page
       reports = await createGreenITReports(browser, urlList, autoscroll)

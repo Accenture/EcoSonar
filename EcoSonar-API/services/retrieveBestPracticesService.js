@@ -26,7 +26,7 @@ RetrieveBestPracticesService.prototype.getProjectAnalysis = function (projectNam
           const latestReport = reports.filter(element => element.dateAnalysisBestPractices.getTime() === latestDate.getTime())
           res.greenItBestPractices = formatGreenItReports.returnFormattedGreenIt(latestReport)
           res.lighthousePerformanceBestPractices = formatLighthouseBestPractices.returnFormattedPerformance(latestReport)
-          res.lighthouseAccesssibilityBestPractices = formatLighthouseBestPractices.returnFormattedAccessibility(latestReport)
+          res.lighthouseAccessibilityBestPractices = formatLighthouseBestPractices.returnFormattedAccessibility(latestReport)
           res.dateAnalysisBestPractices = latestDate
           resolve(res)
         }

@@ -34,12 +34,12 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
     urlIdList = urlProjectList.map((url) => url.idKey)
     urlList = urlProjectList.map((url) => url.urlName)
     try {
-      reportsGreenit = await greenItAnalysis.analyse(urlList, autoscroll)
+      reportsGreenit = await greenItAnalysis.analyse(urlList, autoscroll, projectName)
     } catch (error) {
       console.log(error)
     }
     try {
-      reportsLighthouse = await lighthouseAnalysis.lighthouseAnalysis(urlList)
+      reportsLighthouse = await lighthouseAnalysis.lighthouseAnalysis(urlList, projectName)
     } catch (error) {
       console.log(error)
     }
