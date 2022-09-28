@@ -1,0 +1,348 @@
+$green: #27834c;
+$light-green: #aaed75;
+$dark-green: #2b5333;
+$light-grey: #f9f9f9;
+$dark-gray: #272827;
+$black: black;
+$white: white;
+
+$bold: bold;
+$medium-weight: 400;
+$main-font: Arial;
+
+$xx-small-font: 0.625em;
+$x-small-font: 0.75em;
+$small-font: 1em;
+$medium-font: 1.125em;
+$large-font: 1.5em;
+$x-large-font: 1.75em;
+$xx-large-font: 2em;
+$line-height: 2.125em;
+$small-line-height: 1.625em;
+
+html {
+  font-size: $small-font;
+  -webkit-tap-highlight-color: $white;
+  font-family: $main-font;
+}
+
+::-webkit-scrollbar {
+  width: 10vw;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $black;
+}
+
+body {
+  overflow-x: hidden;
+  font-family: $main-font;
+  background-color: $white;
+  color: $black;
+  font-size: $small-font;
+  margin: 0;
+  line-height: $small-line-height;
+}
+
+body::-webkit-scrollbar {
+  width: 0vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+p {
+  font-size: $small-font;
+  text-align: justify;
+  line-height: $small-line-height;
+}
+
+a {
+  text-decoration: none;
+}
+
+.arrow-btn-acc {
+  margin-right: 2vw;
+  margin-top: 1vh;
+  border-color: $white;
+  background-color: transparent;
+  border-style: none;
+}
+
+.icon-acc {
+  height: 30px;
+  width: 30px;
+}
+
+.title-pages {
+  background: $green;
+  color: $white;
+  padding: 1.5vh 5vh 1.5vh;
+  width: auto;
+  height: auto;
+  margin-bottom: 0;
+  margin-top: 0;
+  font-size: $large-font;
+  font-weight: $medium-weight;
+  line-height: $line-height;
+}
+
+.page-content {
+  padding: 14vh 7vw 7vh 7vw;
+}
+
+.title {
+  color: $green;
+  font-size: $large-font;
+  line-height: $small-line-height;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.banner {
+  font-family: $main-font;
+  font-style: normal;
+  color: $light-green;
+}
+
+.banner-title {
+  font-weight: 700;
+  font-size: 4em;
+}
+
+.banner-subtitle {
+  font-weight: 400;
+  font-size: $x-large-font;
+  margin-right: 10px;
+  color: $white;
+}
+
+.banner-flex-title {
+  display: flex;
+}
+
+.green-container {
+  width: 100%;
+  background-color: $light-green;
+
+  .content-green-container {
+    padding: 2vh 7vw;
+  }
+}
+
+.audits-img {
+  width: 3vw;
+  height: auto;
+}
+
+.accordion {
+  border-radius: 10px;
+  background-color: $white;
+  width: 90vw;
+  margin-bottom: 2vh;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+  .title-part {
+    width: 100%;
+  }
+
+  .accordion-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    padding-right: 2vw;
+
+    .accordion-first-div {
+      display: flex;
+      justify-content: flex-start;
+
+      .correction {
+        margin-left: 2vw;
+        margin-top: auto;
+        margin-bottom: auto;
+        background-color: $white;
+        border: 0ch;
+      }
+
+      .correction:hover {
+        color: $green;
+        text-decoration: underline;
+      }
+
+      .audits-img {
+        margin-left: 2vh;
+      }
+
+      .audits-title {
+        margin-left: 2vw;
+        margin-top: auto;
+        margin-bottom: auto;
+        font-weight: $bold;
+        font-size: $medium-font;
+        line-height: 20px;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+      }
+    }
+
+    .arrow-btn {
+      margin-right: 2vw;
+      margin-top: 1vh;
+      border-color: $white;
+      background-color: transparent;
+      border-style: none;
+    }
+  }
+
+  .accordion-title.open {
+    padding-left: 7vw;
+  }
+
+  .accordion-title.close {
+    padding-left: 7vw;
+  }
+
+  .content {
+    color: $green;
+    padding: 0 4vw 4vh 6vw;
+    justify-content: left;
+    text-align: left;
+    font-size: $small-font;
+  }
+
+  .accordion-practice-number {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .number {
+      color: $light-green;
+      font-size: 6em;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .category {
+      font-size: $medium-font;
+      text-align: center;
+    }
+  }
+}
+
+.practice-accordion {
+  display: flex;
+}
+
+.home-logo {
+  max-height: 50px;
+  margin-left: 4vw;
+}
+
+.max-width {
+  max-width: 80vw;
+}
+
+.link {
+  color: $green;
+}
+
+.link:hover {
+  color: $green;
+  text-decoration: underline;
+}
+
+.container-fluid {
+  margin-left: 0;
+  margin-right: 5em;
+  padding-left: 0;
+  padding-right: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.nav {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.no-space-up-down {
+  margin: 0;
+}
+
+.left {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 12px 8px;
+  gap: 10px;
+  background: $white;
+  color: $green;
+  border-radius: 3px;
+  border-color: transparent;
+  flex: none;
+  order: 2;
+  flex-grow: 0;
+  font-size: $medium-font;
+  font-weight: $bold;
+  height: 34px;
+  margin: 5px;
+}
+
+button:hover {
+  filter: saturate(150%) brightness(92%);
+  cursor: pointer;
+}
+
+button.contained {
+  background-color: $light-green;
+  color: $dark-green;
+}
+
+button.contained.primary {
+  background-color: $green;
+  color: $white;
+}
+
+button.contained.primary:hover {
+  background-color: $white;
+  color: $green;
+}
+
+button.outlined {
+  border: 1px solid $green;
+}
+
+@media print {
+  
+  nav, footer {
+    display: none !important;
+  }
+
+  img {
+    display: none;
+  }
+
+  .page-content {
+    padding: 0;
+  }
+} 
