@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/EcoSonar/static/css/main.a2bc14b8.css",
-    "main.js": "/EcoSonar/static/js/main.086747e0.js",
+    "main.js": "/EcoSonar/static/js/main.dc7f0e91.js",
     "static/media/EcoSonarLogo2.svg": "/EcoSonar/static/media/EcoSonarLogo2.c3ad736cf58bd014cb2b53bf7a473b30.svg",
     "static/media/LighthouseLogo.svg": "/EcoSonar/static/media/LighthouseLogo.2d9d0e9ca0eecf2f40b39ff23231ba16.svg",
     "static/media/HomeBackground.svg": "/EcoSonar/static/media/HomeBackground.f0bec07d04f48418e825.svg",
@@ -32,10 +32,10 @@
     "static/media/ArrowBtnClose.svg": "/EcoSonar/static/media/ArrowBtnClose.37e4170575a8021278691ff87def467b.svg",
     "static/media/ArrowBtnOpen.svg": "/EcoSonar/static/media/ArrowBtnOpen.82a4df20a445f6c2a21faaf0cfe37589.svg",
     "main.a2bc14b8.css.map": "/EcoSonar/static/css/main.a2bc14b8.css.map",
-    "main.086747e0.js.map": "/EcoSonar/static/js/main.086747e0.js.map"
+    "main.dc7f0e91.js.map": "/EcoSonar/static/js/main.dc7f0e91.js.map"
   },
   "entrypoints": [
     "static/css/main.a2bc14b8.css",
-    "static/js/main.086747e0.js"
+    "static/js/main.dc7f0e91.js"
   ]
 }
