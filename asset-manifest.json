@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.95d4e26e.css",
-    "main.js": "/static/js/main.3183661d.js",
+    "main.js": "/static/js/main.d16247aa.js",
     "static/media/EcoSonarLogo2.svg": "/static/media/EcoSonarLogo2.c3ad736cf58bd014cb2b53bf7a473b30.svg",
     "static/media/LighthouseLogo.svg": "/static/media/LighthouseLogo.2d9d0e9ca0eecf2f40b39ff23231ba16.svg",
     "static/media/HomeBackground.svg": "/static/media/HomeBackground.f0bec07d04f48418e825.svg",
@@ -32,10 +32,10 @@
     "static/media/ArrowBtnClose.svg": "/static/media/ArrowBtnClose.37e4170575a8021278691ff87def467b.svg",
     "static/media/ArrowBtnOpen.svg": "/static/media/ArrowBtnOpen.82a4df20a445f6c2a21faaf0cfe37589.svg",
     "main.95d4e26e.css.map": "/static/css/main.95d4e26e.css.map",
-    "main.3183661d.js.map": "/static/js/main.3183661d.js.map"
+    "main.d16247aa.js.map": "/static/js/main.d16247aa.js.map"
   },
   "entrypoints": [
     "static/css/main.95d4e26e.css",
-    "static/js/main.3183661d.js"
+    "static/js/main.d16247aa.js"
   ]
 }
