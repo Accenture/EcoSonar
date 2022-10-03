@@ -1,50 +1,51 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import Logo from '../images/Logo/EcoSonarLogo.svg'
 
-class NavBar extends React.Component {
-  constructor () {
-    super()
-    this.state = {
-      selectedPage: ''
-    }
-  }
+export default function NavBar () {
+  const location = useLocation()
+  const [selectedPage, setSelectedPage] = useState(location.pathname.replace('/', ''))
 
-  componentDidMount () {
-    const url = window.location.pathname
-    const tab = url.split('/')
-    if (tab[1] === '') {
-      this.setState({ selectedPage: 'home' })
+  useEffect(() => {
+    const urlTab = location.pathname.replace('/', '')
+    if (urlTab === '') {
+      setSelectedPage('home')
     } else {
-      this.setState({ selectedPage: tab[1] })
+      setSelectedPage(urlTab)
+    }
+  }, [location])
+
+  function selectePageClass (pageName) {
+    if (selectedPage === pageName) {
+      return 'active-tab'
+    } else {
+      return 'navigation'
     }
   }
 
-  render () {
-    return (
-      <div>
-        <nav className='navbar'>
-          <div className='container-fluid'>
-            <div >
-              <a href='/'><img src={Logo} className='home-logo' alt='go to home page'/></a>
-            </div>
-            <ul className='nav navbar-nav navbar-right margin-right row'>
-              <li>
-                <a className={`${this.state.selectedPage === 'home' ? 'active-tab' : 'navigation'} column`} href='/'>Home</a>
-              </li>
-              <li>
-                <a className={`${this.state.selectedPage === 'how-it-works' ? 'active-tab' : 'navigation'} column`} href='how-it-works'>How it works</a>
-              </li>
-              <li>
-                <a className={`${this.state.selectedPage === 'best-practices' ? 'active-tab' : 'navigation'} column`} href='best-practices'>Best practices</a>
-              </li>
-              <li>
-                <a className={`${this.state.selectedPage === 'who-are-we' ? 'active-tab' : 'navigation'} column`} href='who-are-we'>Who are we?</a>
-              </li>
-            </ul>
+  return (
+    <div>
+      <nav className='navbar'>
+        <div className='container-fluid'>
+          <div >
+            <a href='/'><img src={Logo} className='home-logo' alt='go to home page' /></a>
           </div>
-        </nav>
-      </div>
-    )
-  }
+          <ul className='nav navbar-nav navbar-right margin-right row'>
+            <li>
+              <Link className={`${selectePageClass('home')} column`} to='/'>Home</Link>
+            </li>
+            <li>
+              <Link className={`${selectePageClass('how-it-works')} column`} to='how-it-works'>How it works</Link>
+            </li>
+            <li>
+              <Link className={`${selectePageClass('best-practices')} column`} to='best-practices'>Best practices</Link>
+            </li>
+            <li>
+              <Link className={`${selectePageClass('who-are-we')} column`} to='who-are-we'>Who are we?</Link>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  )
 }
-export default NavBar

@@ -20,7 +20,7 @@ export default function App () {
         <Route path='how-it-works' element={<HowItWorks />} />
         <Route path='who-are-we' element={<WhoAreWe />} />
         <Route path='best-practices' element={<BestPractices />} />
-        <Route path='legal-issues' element={<LegalIssues/>}/>
+        <Route path='legal-issues' element={<LegalIssues />} />
       </Routes>
       <Footer />
     </BrowserRouter>
