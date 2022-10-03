@@ -1,6 +1,6 @@
 # EcoSonar API
 
-This application is based on the GreenIT-Analysis CLI (https://github.com/cnumr/GreenIT-Analysis-cli) and the npm package Google Lighthouse (https://github.com/GoogleChrome/lighthouse/blob/HEAD/docs/readme.md#using-programmatically). Once your API is called, it will trigger both analysis and store them into a MongoDB Database. Then they can be returned to any frontend or our home-made Sonarque plugin 'EcoSonar'.
+This application is based on the GreenIT-Analysis CLI (https://github.com/cnumr/GreenIT-Analysis-cli) and the npm package Google Lighthouse (https://github.com/GoogleChrome/lighthouse/blob/HEAD/docs/readme.md#using-programmatically). Once your API is called, it will trigger both analysis and store them into a MongoDB Database. Then they can be returned to any frontend or our home-made Sonarqube plugin 'EcoSonar'.
 
 # Summary
 - [Tool Usecase](#tool-usecase)
@@ -73,13 +73,31 @@ If not, go to the next step.
     - version 4.0 or later
     - close
 
-### Add local connection to MongoDB Cloud (in local environment only)
-1. Add an .env file to the root of the project, this will contain the local environment variables of the project
-2. Add the following environment variables:
-  - USER (username created during the installation of the MongoDB)
-  - PASSWORD (password created during the installation of the MongoDB)
-  - CLUSTER (cluster created)
-  - DB_NAME (database name: 'EcoSonar')
+### Add Connection to your MongoDB Database
+
+#### On a deployed environment
+Add the following environment variables in your Application Configuration:
+  - ECOSONAR_ENV_DB_TYPE : MongoDB Type Chosen to store EcoSonar audits. ECOSONAR_ENV_DB_TYPE can take two attributes by default : `MongoDB_Atlas` and `CosmosDB`.
+  - ECOSONAR_ENV_USER (user created when initalizing MongoDB database)
+  - ECOSONAR_ENV_CLUSTER (cluster name of your MongoDB database)
+  - ECOSONAR_ENV_DB_NAME (database name: 'EcoSonar' for example)
+  - ECOSONAR_ENV_CLOUD_PROVIDER : Cloud Provider used to deploy EcoSonar API. By default, this parameter can take two values : `AZURE` or `local`. It will be used to retrieve database Password.
+  - ECOSONAR_ENV_DB_PORT (port used by your MongoDB database)
+  - ECOSONAR_ENV_SONARQUBE_SERVER_URL (url of the Sonarqube Server instantiated and that will send requests to the EcoSonar API)
+
+##### Password Configuration:
+
+1. if `local` was chosen as cloud provider :
+  - ECOSONAR_ENV_PASSWORD (password created during the installation of the MongoDB Atlas)
+
+2. if `AZURE` was chosen as cloud provider :
+  - ECOSONAR_ENV_KEY_VAULT_NAME : If using Azure as cloud provider to deploy EcoSonar API, you can store your secrets (such as the database password) into a KeyVault and set tu with this environment variable to store the KeyVault name.
+  - ECOSONAR_ENV_SECRET_NAME : If using Azure as cloud provider to deploy EcoSonar API, you can set up this environment variable to store the name of your secret for your database password.
+
+#### Locally
+Add an .env file at the root of the project, it will contain the local environment variables of the project.
+Then choose among the variables below the ones required and add it into .env file.
+
 
 ## Node.js
 
