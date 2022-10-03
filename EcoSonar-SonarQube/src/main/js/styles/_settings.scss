@@ -29,14 +29,14 @@ $strong-weight: 700;
 
 $main-font: Helvetica Neue, Helvetica, Arial, sans-serif;
 
-body {
-}
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 /* Classes */
+body {
+  background-color: #f3f3f3;
+}
 
 .page {
   max-width: 1280px;
@@ -92,9 +92,12 @@ code {
   margin-top: 6px;
 }
 
-.create-url-button {
+.basic-button {
   display: inline-flex;
   align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   justify-content: center;
   vertical-align: middle;
   height: 24px;
@@ -153,7 +156,7 @@ code {
   }
 
   &:disabled {
-    color: $light-grey;
+    color: $grey;
     border-color: $grey;
     background: $white;
     cursor: not-allowed;
@@ -282,7 +285,7 @@ input[type='text'].is-invalid {
   color: $red-error;
   margin: 0;
   text-align: center;
-  padding: 3% 0 3% 0;
+  padding: 1% 0 1% 0;
   font-size: $small-font;
 }
 
@@ -335,8 +338,8 @@ input[type='text'].is-invalid {
 }
 
 .input {
-  margin: 3% 0 3% 0;
   display: flex;
+  margin: 3% 0 3% 0;
 }
 
 .delete-url-button {
@@ -704,8 +707,6 @@ small {
 
 .overview-panel {
   min-height: 100%;
-}
-.big-spacer-top {
 }
 
 .big-spacer-right {

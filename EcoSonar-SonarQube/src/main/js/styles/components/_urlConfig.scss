@@ -1,38 +1,107 @@
-.modal-content-config{
-    width: 450px;
-    max-height: 500px;
-    overflow-y: auto;
-    margin-left: -225px;
-    top: 18%;
-    opacity: 1;
-    position: fixed;
-    z-index: 6001!important;
-    left: 50%;
-    background-color: #fff;
-    transition: all .2s ease;
-    border-radius: 3px;
-    text-align: left;
+.modal-content-config {
+  width: 450px;
+  max-height: 500px;
+  overflow-y: auto;
+  margin-left: -225px;
+  top: 18%;
+  opacity: 1;
+  position: fixed;
+  z-index: 6001 !important;
+  left: 50%;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  border-radius: 3px;
+  text-align: left;
+  margin-top: 8vh;
 
-.modal-header-config{
+  .modal-header-config {
     padding: 32px 32px 0;
-    .modal-title-config{
-        margin: 0;
-        font-size: 16px;
-        font-weight: 700;
-        line-height: normal;
-        overflow-wrap: break-word;
-        font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    .modal-title-config {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: normal;
+      overflow-wrap: break-word;
+      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     }
-}
-.modal-body-config{    
+  }
+  .modal-body-config {
     padding: 20px 32px;
-}
-.modal-footer-config{
+  }
+  .modal-footer-config {
     padding: 20px 32px;
     border-top: 1px solid $medium-grey;
     background-color: $cream;
     border-radius: 3px;
     text-align: right;
+  }
 }
 
+.crawler-input {
+  display: flex;
+  align-items: center;
+
+  .crawler-message {
+    font-size: $small-font;
+    margin-right: 2%;
+    margin-bottom: 1%;
+  }
+  .input {
+    max-width: 30%;
+    margin-right: 2%;
+    margin-bottom: 4%;
+  }
+  .basic-button {
+    margin-bottom: 1%;
+  }
+}
+.crawler-loading {
+  text-align: center;
+}
+.crawled-url-list {
+  display: flex;
+  flex-direction: column;
+  .basic-button {
+    max-width: 10%;
+    margin-top: 3%;
+    margin-left: auto;
+    margin-right: 5%;
+    text-align: right;
+    span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+  .crawler-message {
+    margin-bottom: 1%;
+    span {
+      text-decoration: underline;
+    }
+  }
+}
+
+.crawler-message-no-more-url {
+  text-align: center;
+}
+.crawler-input-no-url-assigned {
+  display: flex;
+  justify-content: space-around;
+}
+
+.url-list-button {
+  display: flex;
+  align-items: center;
+  .basic-button {
+    margin-left: 3%;
+  }
+}
+
+.crawler-buttons {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 1%;
+  .basic-button {
+    margin-left: 5%;
+  }
 }

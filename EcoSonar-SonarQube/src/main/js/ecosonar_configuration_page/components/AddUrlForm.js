@@ -1,17 +1,18 @@
-import React, { useEffect } from 'react'
+/* eslint-disable react/no-unknown-property */
+import FocusTrap from 'focus-trap-react'
+import React, { useEffect, useState } from 'react'
 import LoadingIcon from '../../images/LoadingIcon.svg'
-import UrlField from './UrlField'
 import { insertUrlsConfiguration } from '../../services/configUrlService'
+import UrlField from './UrlField'
 
 export default function AddUrlForm (props) {
-  const { isDisplayed, projectName } = props
-  const [urlList, setUrlList] = React.useState([''])
-  const [isSubmitting, setSubmitting] = React.useState(false)
-  const [errors, setErrors] = React.useState([''])
-  const [hasErrors, setHasErrors] = React.useState(false)
-  const [globalError, setGlobalError] = React.useState('')
-  const description =
-    'URL corresponds to one of your application page composed of the application base URL and route used by your page : http://my_server/foo'
+  const { isDisplayed, projectName, openCreate } = props
+  const [urlList, setUrlList] = useState([''])
+  const [isSubmitting, setSubmitting] = useState(false)
+  const [errors, setErrors] = useState([''])
+  const [hasErrors, setHasErrors] = useState(false)
+  const [globalError, setGlobalError] = useState('')
+  const description = 'URL corresponds to one of your application page composed of the application base URL and route used by your page : http://my_server/foo'
 
   useEffect(() => {
     document.body.addEventListener('keydown', closeOnEscapeKeyDown)
@@ -91,90 +92,64 @@ export default function AddUrlForm (props) {
 
   return (
     <div
-      className="modal"
+      className='modal'
       onClick={handleCancelClick}
-      id="dialog"
-      role="dialog"
-      aria-labelledby="Add new URLs to your project"
-      aria-describedby="Add new URLs to your project"
-      aria-modal="true"
+      id='dialog'
+      role='dialog'
+      aria-labelledby='Add new URLs to your project'
+      aria-describedby='You can add URL that corresponds to one of your application page composed of the application base URL and route used by your page : http://my_server/foo'
+      aria-modal='true'
       aria-hidden={!isDisplayed}
-      tabIndex="-1"
     >
-      <div
-        className="modal-content-config"
-        onClick={(e) => e.stopPropagation()}
-        role="document"
-      >
-        <div className="modal-header-config">
-          <h2 className="modal-title-config">Add new URLs to your project</h2>
-        </div>
-        <div className="modal-body-config">
-          <div aria-hidden={true} className="mandatory-text">
-            All fields marked with <em className="mandatory">*</em> are required
+      <FocusTrap active={openCreate}>
+        <div className='modal-content-config' onClick={(e) => e.stopPropagation()} role='document'>
+          <div className='modal-header-config'>
+            <h2 className='modal-title-config'>Add new URLs to your project</h2>
           </div>
-          <div className="modal-validation-field">
-            <label htmlFor="webhook-url">
-              URL
-              <em
-                aria-label="This field is required"
-                className="mandatory little-spacer-left"
-              >
-                *
-              </em>
-            </label>
-            <div className="modal-field-description">{description}</div>
-            {urlList.map((url, index) => {
-              return (
-                <UrlField
-                  key={'url-' + index}
-                  index={index}
-                  url={url}
-                  isSubmitting={isSubmitting}
-                  error={errors[index]}
-                  handleChange={handleChange}
-                  deleteUrl={deleteUrl}
-                />
-              )
-            })}
-          </div>
-          <button
-            className="create-url-button"
-            disabled={props.isSubmitting}
-            type="button"
-            onClick={addANewUrl}
-          >
-
-            Add a new URL
-          </button>
-        </div>
-        <footer className="modal-footer-config">
-          {isSubmitting && (
-            <div className="loading">
-              <img src={LoadingIcon} alt="Loading icon" />
+          <div className='modal-body-config'>
+            <div className='modal-field-description'>
+              <p>{description}</p>
             </div>
-          )}
-          {globalError !== '' && <p className="text-danger">{globalError}</p>}
-          <button
-            className="create-url-button"
-            disabled={isSubmitting || hasErrors}
-            type="submit"
-            onClick={handleSubmit}
-          >
-
-            Confirm
-          </button>
-          <button
-            className="cancel-button"
-            disabled={isSubmitting}
-            type="reset"
-            onClick={handleCancelClick}
-          >
-
-            Cancel
-          </button>
-        </footer>
-      </div>
+            <div className='modal-validation-field'>
+              <label htmlFor='webhook-url'>
+                URL
+                <em aria-label='This field is required' className='mandatory little-spacer-left'>
+                  *
+                </em>
+              </label>
+              {urlList.map((url, index) => {
+                return <UrlField key={'url-' + index} index={index} url={url} id='webhook-url' isSubmitting={isSubmitting} error={errors[index]} handleChange={handleChange} deleteUrl={deleteUrl} />
+              })}
+              <div aria-hidden={true} className='mandatory-text'>
+                <p>
+                  All fields marked with <em className='mandatory'>*</em> are required
+                </p>
+              </div>
+            </div>
+            <button className='basic-button' disabled={props.isSubmitting} type='button' onClick={addANewUrl} aria-label='add a new url'>
+              Add a new URL
+            </button>
+          </div>
+          <footer className='modal-footer-config'>
+            {isSubmitting && (
+              <div className='loading'>
+                <img src={LoadingIcon} alt='Loading icon' />
+              </div>
+            )}
+            {globalError !== '' && (
+              <p className='text-danger' role='alert'>
+                {globalError}
+              </p>
+            )}
+            <button className='basic-button' disabled={isSubmitting || hasErrors} type='submit' onClick={handleSubmit} arial-label='confirm urls to add' >
+              Confirm
+            </button>
+            <button className='cancel-button' disabled={isSubmitting} type='reset' onClick={handleCancelClick} aria-label='cancel'>
+              Cancel
+            </button>
+          </footer>
+        </div>
+      </FocusTrap>
     </div>
   )
 }

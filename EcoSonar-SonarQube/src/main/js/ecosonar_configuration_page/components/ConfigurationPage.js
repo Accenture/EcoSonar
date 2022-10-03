@@ -1,9 +1,11 @@
 import React from 'react'
-import AddUrlForm from './AddUrlForm'
-import UrlList from './UrlList'
-import { getUrlsConfiguration } from '../../services/configUrlService'
-import DeleteUrlForm from './DeleteUrlForm'
 import LoadingIcon from '../../images/LoadingIcon.svg'
+import { getUrlsConfiguration } from '../../services/configUrlService'
+import { crawl } from '../../services/crawlerService'
+import AddUrlForm from './AddUrlForm'
+import CrawlerPage from './Crawler/CrawlerPage'
+import DeleteUrlForm from './DeleteUrlForm'
+import UrlList from './UrlList'
 
 export default class ConfigurationPage extends React.PureComponent {
   constructor () {
@@ -15,7 +17,11 @@ export default class ConfigurationPage extends React.PureComponent {
       projectName: '',
       error: '',
       indexToDelete: 0,
-      urls: []
+      urls: [],
+      crawledUrls: [],
+      crawlerLoading: false,
+      displayCrawler: false,
+      hasCrawled: false
     }
   }
 
@@ -77,15 +83,65 @@ export default class ConfigurationPage extends React.PureComponent {
     this.setState({
       urls: this.state.urls.concat(urlsAdded)
     })
+    this.setState({ crawledUrls: [] })
+    this.setState({ displayCrawler: false })
+    this.setState({ hasCrawled: false })
+  };
+
+  setMainUrl = async (url) => {
+    this.setState({ crawlerLoading: true })
+    await crawl(this.state.projectName, url.trim()).then((response) => {
+      this.setState({ crawlerLoading: false })
+      this.setState({ crawledUrls: response })
+      this.setState({ hasCrawled: true })
+    })
+  };
+
+  setDisplayCrawler = () => {
+    this.setState({ displayCrawler: !this.state.displayCrawler })
+    this.setState({ crawledUrls: [] })
+    this.setState({ hasCrawled: false })
+  };
+
+  checkUrl = () => {
+    if (!this.state.displayCrawler) {
+      return (
+        <div className='boxed-group'>
+          <UrlList urlList={this.state.urls} error={this.state.error} onDelete={this.handleDeleteSubmit} setDisplayCrawler={this.setDisplayCrawler} />
+        </div>
+      )
+    } else {
+      return (
+        <div className='boxed-group'>
+          <CrawlerPage
+            setMainUrl={this.setMainUrl}
+            crawledUrls={this.state.crawledUrls}
+            projectName={this.state.projectName}
+            addNewUrls={this.addNewUrls}
+            crawlerLoading={this.state.crawlerLoading}
+            hasCrawled={this.state.hasCrawled}
+            setDisplayCrawler={this.setDisplayCrawler}
+          />
+        </div>
+      )
+    }
   };
 
   render () {
     return (
-      <div className='page'>
-        <header className='page-header'>
+      <div className='page' aria-hidden='true'>
+        <div className='page-header' role='banner' aria-label='configuration page presentation'>
           <h1 className='page-title'>URL Configuration for project {this.state.projectName}</h1>
           <div className='page-actions' aria-hidden={this.state.openCreate}>
-            <button className='create-url-button' onClick={this.handleCreateOpen} type='button' aria-haspopup='dialog' aria-controls='dialog'>
+            <button
+              className='basic-button'
+              disabled={this.state.displayCrawler}
+              onClick={this.handleCreateOpen}
+              type='button'
+              aria-haspopup='dialog'
+              aria-label='add new urls'
+              aria-controls='dialog'
+            >
               Add new URLs
             </button>
             {this.state.openCreate && <AddUrlForm isDisplayed={this.state.openCreate} projectName={this.state.projectName} onClose={this.handleCreateClose} onSubmitSuccess={this.addNewUrls} />}
@@ -96,22 +152,22 @@ export default class ConfigurationPage extends React.PureComponent {
             <br />
             EcoSonar will then analyse all pages of your web app and will guide you to set up practices optimizing ressources.
           </p>
-        </header>
-        {!this.state.loading
-          ? (
-          <div className='boxed-group'>
-            <UrlList urlList={this.state.urls} error={this.state.error} onDelete={this.handleDeleteSubmit} />
-          </div>
-            )
-          : (
-          <img src={LoadingIcon} alt='Loading icon' />
-            )}
+        </div>
+        <main role='main' aria-hidden='true'>
+          {!this.state.loading ? this.checkUrl() : <img src={LoadingIcon} alt='Loading icon' />}
 
-        {this.state.deleting && (
-          <div className='boxed-group'>
-            <DeleteUrlForm urlList={this.state.urls} index={this.state.indexToDelete} projectName={this.state.projectName} deletedUrlState={this.deletedUrlState} onCloseDelete={this.onCloseDelete} />
-          </div>
-        )}
+          {this.state.deleting && (
+            <div className='boxed-group'>
+              <DeleteUrlForm
+                urlList={this.state.urls}
+                index={this.state.indexToDelete}
+                projectName={this.state.projectName}
+                deletedUrlState={this.deletedUrlState}
+                onCloseDelete={this.onCloseDelete}
+              />
+            </div>
+          )}
+        </main>
       </div>
     )
   }

@@ -6,6 +6,7 @@
   z-index: 2;
   padding: 1% 1%;
 }
+
 .right-arrow {
   margin-left: auto;
   margin-right: 2%;
@@ -13,9 +14,11 @@
   width: 6%;
   transition-duration: 500ms;
 }
+
 .right-arrow.active {
   transform: rotate(90deg);
 }
+
 .accordion {
   padding: 0;
 }
@@ -24,11 +27,14 @@
   list-style: none;
   background-color: $white;
   margin-bottom: 1%;
+
   .accordion-toggle {
     cursor: pointer;
+
     .accordion-title {
       display: flex;
       align-items: center;
+
       .right-arrow {
         margin-left: auto;
         margin-right: 2%;
@@ -36,41 +42,50 @@
         width: 6%;
         transition-duration: 500ms;
       }
+
       .accordion-left,
       .accordion-right {
         width: 50%;
         display: flex;
         flex-direction: row;
         align-items: center;
+
         .right-arrow.active {
           transform: rotate(90deg);
         }
       }
     }
   }
+
   .accordion-content {
     padding: 1%;
+
     .description {
       border-radius: 5px;
       background-color: $cream;
       padding: 1%;
     }
+
     .accordion-descriptions {
       margin-top: 1%;
       padding: 1%;
       background-color: $red-background;
       border-radius: 5px;
       overflow: auto;
+
       .accordion-descriptions.extend {
         cursor: pointer;
       }
+
       .accordion-description-extend {
         text-decoration: underline;
       }
+
       .lighthouse-descriptions {
         max-height: 5vh;
         padding-bottom: 6vh;
       }
+
       .lighthouse-descriptions-extend {
         max-height: none;
       }
@@ -100,6 +115,7 @@
   background-color: $white;
   padding: 2% 3%;
 }
+
 .header-best-practices {
   padding: 1%;
   margin-bottom: 1%;
@@ -120,11 +136,92 @@
   text-decoration: none;
   transition: all 0.2s ease;
 }
+
 .not-applicable {
   padding-top: 10vh;
 }
+
 .title-not-applicable {
   text-align: center;
   cursor: grab;
   text-decoration: underline;
+}
+
+.best-practices {
+  .best-practice-filters {
+    font-weight: $medium-weight;
+    margin-bottom: 3%;
+
+    .filters {
+      margin: 2% 0 0 2%;
+      display: flex;
+      justify-content: space-around;
+
+      .best-practice-filters-selector {
+        text-align: center;
+        margin: 0 1vw 0 1vw;
+      }
+
+      label {
+        padding-left: 1%;
+      }
+
+      select {
+        height: 3vh;
+        width: 10vw;
+        background-color: $white;
+        margin-top: 1vh;
+
+        &.url {
+          width: 15vw;
+        }
+      }
+
+      .multi-select {
+        border: $white;
+        background-color: $white;
+        border-radius: 5px;
+        width: 10vw;
+        height: 24px;
+        line-height: 24px;
+        margin-left: 1%;
+        color: $grey;
+        margin-top: 1vh;
+
+        .dropdown-container {
+          margin-top: 4%;
+          border: none;
+
+          &:focus-within {
+            box-shadow: none;
+          }
+
+          .dropdown-heading {
+            height: 3vh;
+            padding-left: 5%;
+          }
+        }
+      }
+    }
+
+    .best-practices-checkbox-container {
+      display: flex;
+      margin: 2vh 1vw 2vh 1vw;
+
+      .best-practices-compliance-checkbox-container {
+        max-width: 10vw;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        .best-practices-checkbox {
+          width: 50%;
+        }
+      }
+    }
+  }
+}
+
+.rmsc .select-item:hover {
+  background: dodgerblue !important;
 }

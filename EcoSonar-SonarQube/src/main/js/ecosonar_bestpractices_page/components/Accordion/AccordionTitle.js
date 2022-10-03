@@ -9,26 +9,26 @@ import F from '../../../images/F.svg'
 import G from '../../../images/G.svg'
 import NA from '../../../images/NA.svg'
 import RightArrow from '../../../images/RightArrow.svg'
-import PopUpCorrection from '../PopUpCorrection/PopUpCorrection'
 import booleanMetrics from '../../../utils/booleanMetrics.json'
+import PopUpCorrection from '../PopUpCorrection/PopUpCorrection'
 
 function getCorrespondingImg (compliance) {
   if (compliance === 'A') {
-    return (<img src={A} alt="A" className='compliance'/>)
+    return (<img src={A} alt="Compliant, type A" className='compliance' />)
   } else if (compliance === 'B') {
-    return (<img src={B} alt="B" className='compliance'/>)
+    return (<img src={B} alt="Compliant, type B" className='compliance' />)
   } else if (compliance === 'C') {
-    return (<img src={C} alt="C" className='compliance'/>)
+    return (<img src={C} alt="Almost compliant, type C" className='compliance' />)
   } else if (compliance === 'D') {
-    return (<img src={D} alt="D" className='compliance'/>)
+    return (<img src={D} alt="Almost compliant, type D" className='compliance' />)
   } else if (compliance === 'E') {
-    return (<img src={E} alt="E" className='compliance'/>)
+    return (<img src={E} alt="Not compliant, type E" className='compliance' />)
   } else if (compliance === 'F') {
-    return (<img src={F} alt="F" className='compliance'/>)
+    return (<img src={F} alt="Not compliant, type F" className='compliance' />)
   } else if (compliance === 'G') {
-    return (<img src={G} alt="G" className='compliance'/>)
+    return (<img src={G} alt="Extremely not compliant, type G" className='compliance' />)
   } else {
-    return (<img src={NA} alt="NA" className='compliance'/>)
+    return (<img src={NA} alt="Non applicable" className='compliance' />)
   }
 }
 export default function AccordionTitle (props) {
@@ -38,33 +38,36 @@ export default function AccordionTitle (props) {
     e.stopPropagation()
     setCorrectionPage(true)
   }
+
+  function displayData (title, staticTitleData, staticTitleDataSuccess, auditedMetric, score) {
+    if (booleanMetrics.includes(title) && score === 100) {
+      return format(staticTitleDataSuccess, 0)
+    } else {
+      if (auditedMetric !== null && auditedMetric !== undefined && auditedMetric !== 'N.A') {
+        return format(staticTitleData, auditedMetric)
+      } else {
+        return format(staticTitleData, 0)
+      }
+    }
+  }
+
   return (
     <div className="accordion-title">
       <div className="accordion-left">
-        { getCorrespondingImg(compliance) }
-       <span className='title'>{ title }</span>
-        <button className="button-pop-up" onClick = { (e) => CorrectionPageOpen(e) }>How to solve it?</button>
+        {getCorrespondingImg(compliance)}
+        <p className='title'>{title}</p>
+        <button className="button-pop-up" onClick={(e) => CorrectionPageOpen(e)} aria-expanded={correctionPage}>How to solve it?</button>
         {correctionPage && (
-            <PopUpCorrection
-          title = {title}
-          correction = {correction}
-         setCorrectionPage = {setCorrectionPage}
+          <PopUpCorrection
+            title={title}
+            correction={correction}
+            setCorrectionPage={setCorrectionPage}
           />
         )}
-
       </div>
       <div className="accordion-right">
-      {
-          (booleanMetrics.includes(title) && score === 100)
-            ? <span className='important-data'>{ format(staticTitleDataSuccess, 0) }</span>
-            : (
-                (auditedMetric !== null && auditedMetric !== undefined && auditedMetric !== 'N.A')
-                  ? <span className='important-data'>{ format(staticTitleData, auditedMetric) }</span>
-                  : <span className='important-data'>{ format(staticTitleData, 0) }</span>
-              )
-        }
-        <img src={RightArrow} alt="arrow" className={isActive ? 'active right-arrow' : 'right-arrow'}/>
-
+        <p className='important-data'>{displayData(title, staticTitleData, staticTitleDataSuccess, auditedMetric, score)}</p>
+        <img src={RightArrow} alt="" className={isActive ? 'active right-arrow' : 'right-arrow'} />
       </div>
     </div>
   )

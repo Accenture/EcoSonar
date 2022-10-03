@@ -19,22 +19,25 @@ export default function UrlField (props) {
       <div className="input">
         <input
           disabled={isSubmitting}
-          error={errors.duplicatedOrSyntaxError}
+          aria-invalid={errors.duplicatedOrSyntaxError}
           name="url"
           onChange={(value) => changeValue(value.currentTarget.value)}
           type="text"
           value={url}
+          id="webhook-url"
+          aria-label="Add a url"
         />
         {index > 0 && (
           <button
             type="button"
             className="delete-url-button"
             onClick={deleteUrl}
+            aria-label='delete this url'
           >
             <img
               className="delete-icon"
               src={DeleteIcon}
-              alt="Delete url icon"
+              alt=""
             />
           </button>
         )}
@@ -42,11 +45,11 @@ export default function UrlField (props) {
           <img
             className="alert-icon"
             src={AlertErrorIcon}
-            alt="Alert error icon"
+            alt=""
           />
         )}
       </div>
-      {error !== '' && <p className="text-danger">{error}</p>}
+      {error !== '' && <p className="text-danger" role="alert">{error}</p>}
     </div>
   )
 }

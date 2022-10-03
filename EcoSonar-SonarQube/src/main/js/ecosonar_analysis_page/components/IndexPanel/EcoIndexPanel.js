@@ -1,13 +1,13 @@
 import classNames from 'classnames'
-import React from 'react'
-import LoadingIcon from '../../../images/LoadingIcon.svg'
+import * as React from 'react'
 import HelpIcon from '../../../images/HelpIcon.svg'
+import LoadingIcon from '../../../images/LoadingIcon.svg'
 
 export default function EcoIndexPanel (props) {
   const { loading, analysis, found } = props
 
   let grade, ecoindex
-  if (found && analysis !== null) {
+  if (found && analysis) {
     grade = analysis.grade
     ecoindex = analysis.ecoIndex
   } else {
@@ -25,7 +25,7 @@ export default function EcoIndexPanel (props) {
             <h2 className="ecoindex-title">
                 EcoIndex Project Grade
                 <div className="tooltip little-spacer-left">
-                  <img src={HelpIcon} alt="Help icon"/>
+                  <img src={HelpIcon} alt=""/>
                   <span className="tooltiptext ecoIndex-tool">EcoIndex is an open source tool which, for a given URL,
                    makes it possible to evaluate its environemental performance using a score out of 100 (higher is better).
                    EcoIndex is calculated based on application metrics such as number of DOM elements, number of requests or

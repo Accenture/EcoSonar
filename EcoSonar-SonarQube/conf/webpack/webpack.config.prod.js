@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const config = require('./webpack.config');
 const getClientEnvironment = require('../env');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 // Get environment variables to inject into our app.
 const env = getClientEnvironment();
@@ -12,7 +11,6 @@ if (env['process.env.NODE_ENV'] !== '"production"') {
   throw new Error('Production builds must have NODE_ENV=production.');
 }
 
-const noUglify = process.argv.some(arg => arg.indexOf('--no-uglify') > -1);
 config.mode = 'production'
 
 // Don't attempt to continue if there are any errors.
@@ -26,11 +24,7 @@ config.plugins = [
   new webpack.DefinePlugin(env)
 ];
 
-if (!noUglify) {
-  config.optimization = {
-    minimizer: [new UglifyJsPlugin()]
-  }
-}
+
 
 config.module.rules =  [
   {

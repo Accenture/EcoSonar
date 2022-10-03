@@ -1,9 +1,10 @@
+import FocusTrap from 'focus-trap-react'
 import React, { useEffect } from 'react'
 import LoadingIcon from '../../images/LoadingIcon.svg'
 import { deleteUrlFromProject } from '../../services/configUrlService'
 
 export default function DeleteUrlForm (props) {
-  const { index, projectName, urlList } = props
+  const { index, projectName, urlList, openDelete } = props
   const [isSubmitting, setSubmitting] = React.useState(false)
   const [errorMessageDelete, setErrorMessageDelete] = React.useState('')
 
@@ -49,49 +50,53 @@ export default function DeleteUrlForm (props) {
       aria-labelledby="Delete URL from your project"
       aria-describedby="Delete URL from your project"
       aria-modal="true"
-      tabIndex="-1"
+      aria-hidden="false"
     >
-      <div
-        className="modal-content-config"
-        onClick={(e) => e.stopPropagation()}
-        role="document"
-      >
-        <div className="modal-header-config">
-          <h2 className="modal-title-config">Delete URL from your project</h2>
-        </div>
-        <div className="modal-validation-field delete-field">
-          <p>
-            If you want to delete {urlList[index]} in {projectName} click on
-            delete.
-          </p>
-        </div>
-        <footer className="modal-footer-config">
-          {isSubmitting && (
-            <div className="loading">
-              <img src={LoadingIcon} alt="Loading icon" />
-            </div>
-          )}
-          {errorMessageDelete !== '' && <p className="text-danger">{errorMessageDelete}</p>}
-          <button
-            className="button-red"
-            disabled={isSubmitting}
-            type="submit"
-            onClick={handleSubmit}
-          >
+      <FocusTrap active={openDelete}>
+        <div
+          className="modal-content-config"
+          onClick={(e) => e.stopPropagation()}
+          role="document"
+        >
+          <div className="modal-header-config">
+            <h2 className="modal-title-config">Delete URL from your project</h2>
+          </div>
+          <div className="modal-validation-field delete-field">
+            <p>
+              If you want to delete {urlList[index]} in {projectName} click on
+              delete.
+            </p>
+          </div>
+          <footer className="modal-footer-config">
+            {isSubmitting && (
+              <div className="loading">
+                <img src={LoadingIcon} alt="Loading icon" />
+              </div>
+            )}
+            {errorMessageDelete !== '' && <p className="text-danger" role="alert">{errorMessageDelete}</p>}
+            <button
+              className="button-red"
+              disabled={isSubmitting}
+              type="submit"
+              onClick={handleSubmit}
+              aria-label="confirm you want to delete this url"
+            >
 
-            Delete
-          </button>
-          <button
-            className="cancel-button"
-            disabled={isSubmitting}
-            type="reset"
-            onClick={handleCancelClick}
-          >
+              Delete
+            </button>
+            <button
+              className="cancel-button"
+              disabled={isSubmitting}
+              type="reset"
+              onClick={handleCancelClick}
+              aria-label="cancel"
+            >
 
-            Cancel
-          </button>
-        </footer>
-      </div>
+              Cancel
+            </button>
+          </footer>
+        </div>
+      </FocusTrap>
     </div>
   )
 }

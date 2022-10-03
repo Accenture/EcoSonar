@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-export default function AccordionDescription (props) {
+export default function AccordionDescriptionLighthouse (props) {
   const { descriptions } = props
 
-  const [isExtended, setIsExtended] = React.useState(false)
+  const [isExtended, setIsExtended] = useState(false)
 
   return (
     !!descriptions.length && (
@@ -13,7 +13,6 @@ export default function AccordionDescription (props) {
          </pre>
        }
         {isExtended && <pre className='lighthouse-descriptions-extend'>{JSON.stringify(descriptions, null, 2)}</pre>}
-
       </div>
     )
   )

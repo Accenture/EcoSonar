@@ -9,21 +9,13 @@ export default function UrlItem (props) {
   }
 
   return (
-      <tr>
-        <td className= "td-formated">{url}</td>
-          <td className="thin nowrap text-right">
-          <button
-            type="button"
-            className="delete-url-button"
-            onClick = {deleteUrl}
-          >
-            <img
-              className="delete-icon"
-              src = {DeleteIcon}
-              alt = "Delete url icon"
-            />
-          </button>
-            </td>
-      </tr>
+    <tr>
+      <td className='td-formated'>{url}</td>
+      <td className='thin nowrap text-right '>
+        <button type='button' className='delete-url-button' aria-label='delete this url' onClick={deleteUrl}>
+          <img className='delete-icon' src={DeleteIcon} alt='' />
+        </button>
+      </td>
+    </tr>
   )
 }

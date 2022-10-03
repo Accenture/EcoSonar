@@ -1,41 +1,65 @@
 import React from 'react'
 import UrlItem from './UrlItem'
-import error from '../../utils/errors.json'
 
 export default function UrlList (props) {
-  if (props.error && props.urlList.length === 0) {
+  const { error, urlList, onDelete, setDisplayCrawler } = props
+
+  const crawler = (
+    <div className='url-list-button'>
+      <p className='crawler-message'>I want to automatically search for all pages within my website</p>
+      <button
+        aria-label='Find pages'
+        className='basic-button'
+        onClick={() => {
+          setDisplayCrawler()
+        }}
+      >
+        <span>Find pages</span>
+      </button>
+    </div>
+  )
+
+  if (error && urlList.length === 0) {
     return (
       <div>
-      <p className='text-danger'>{props.error}</p>
+        {crawler}
+        <table className='data-zebra' role='presentation'>
+          <tbody>
+            <tr className='data-zebra-thead'>
+              <td className='head-url'>{'URL'}</td>
+              <td className='head-url'></td>
+            </tr>
+          </tbody>
+          <p className='text-danger' role='alert'>
+            {error}
+          </p>
+        </table>
       </div>
     )
-  } else if (props.urlList.length === 0) {
+  } else if (urlList.length === 0) {
     return (
       <div>
-      <p className='text-danger'>{error.noUrlAssigned}</p>
+        <p className='text-danger' role='alert'>
+          {error.noUrlAssigned}
+        </p>
       </div>
     )
   }
+
   return (
-    <table className="data-zebra">
-      <thead className="data-zebra-thead">
-        <tr>
-          <th className="head-url">{'URL'}</th>
-          <th className="head-url"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {props.urlList.map((url, index) => {
-          return (
-            <UrlItem
-              key = {'url-' + index}
-              onDelete = {props.onDelete}
-              index = {index}
-              url = {url}
-            />
-          )
-        })}
-      </tbody>
-    </table>
+    <div>
+      {crawler}
+      <table className='data-zebra' role='presentation'>
+        <tbody>
+          <tr className='data-zebra-thead'>
+            <td className='head-url'>{'URL'}</td>
+            <td className='head-url'></td>
+          </tr>
+          {urlList.map((url, index) => {
+            return <UrlItem key={'url-' + index} onDelete={onDelete} index={index} url={url} />
+          })}
+        </tbody>
+      </table>
+    </div>
   )
 }

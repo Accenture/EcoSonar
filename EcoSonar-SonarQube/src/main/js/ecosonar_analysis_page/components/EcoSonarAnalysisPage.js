@@ -1,12 +1,12 @@
-import React from 'react'
-import NoAnalysisWarning from './NoAnalysisWarning'
-import EcoIndexPanel from './IndexPanel/EcoIndexPanel'
-import LighthousePerformancePanel from './IndexPanel/LighthousePerformancePanel'
-import LighthouseAccessibilityPanel from './IndexPanel/LighthouseAccessibilityPanel'
-import DisclaimerPanel from './IndexPanel/DisclaimerPanel'
-import AnalysisPanel from './AnalysisPanel'
-import { getAnalysisForProjectConfiguration } from '../../services/ecosonarService'
+import * as React from 'react'
 import { getUrlsConfiguration } from '../../services/configUrlService'
+import { getAnalysisForProjectConfiguration } from '../../services/ecosonarService'
+import AnalysisPanel from './AnalysisPanel'
+import DisclaimerPanel from './IndexPanel/DisclaimerPanel'
+import EcoIndexPanel from './IndexPanel/EcoIndexPanel'
+import LighthouseAccessibilityPanel from './IndexPanel/LighthouseAccessibilityPanel'
+import LighthousePerformancePanel from './IndexPanel/LighthousePerformancePanel'
+import NoAnalysisWarning from './NoAnalysisWarning'
 
 export default class EcoSonarAnalysisPage extends React.PureComponent {
   constructor () {
@@ -185,60 +185,59 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
 
   render () {
     return (
-      <div className='page'>
+      <main role='main' className='page' aria-hidden='true'>
         <div className='overview'>
           {this.state.projectHasNoAnalysis
             ? (
-            <NoAnalysisWarning projectName={this.state.projectName} />
+              <NoAnalysisWarning projectName={this.state.projectName} />
               )
             : (
-            <div className='display-flex-row'>
-              <div className='index-panel'>
-                <EcoIndexPanel loading={this.state.loading} analysis={this.state.analysisForProjectGreenit} found={this.state.found} />
-                <LighthousePerformancePanel loading={this.state.loading} analysis={this.state.lighthousePerformanceForProject} found={this.state.found} />
-                <LighthouseAccessibilityPanel loading={this.state.loading} analysis={this.state.lighthouseAccessibilityForProject} found={this.state.found} />
-                <DisclaimerPanel/>
+              <div className='display-flex-row'>
+                <div className='index-panel'>
+                  <EcoIndexPanel loading={this.state.loading} analysis={this.state.analysisForProjectGreenit} found={this.state.found} />
+                  <LighthousePerformancePanel loading={this.state.loading} analysis={this.state.lighthousePerformanceForProject} found={this.state.found} />
+                  <LighthouseAccessibilityPanel loading={this.state.loading} analysis={this.state.lighthouseAccessibilityForProject} found={this.state.found} />
+                  <DisclaimerPanel />
+                </div>
+                <AnalysisPanel
+                  loading={this.state.loading}
+                  analysisForProjectGreenit={this.state.analysisForProjectGreenit}
+                  lighthouseMetricsForProject={this.state.lighthouseMetrics}
+                  lighthousePerformanceForProject={this.state.lighthousePerformanceForProject}
+                  lighthouseAccessibilityForProject={this.state.lighthouseAccessibilityForProject}
+                  error={this.state.error}
+                  found={this.state.found}
+                  project={this.state.projectName}
+                  urls={this.state.urls}
+                  foundUrl={this.state.foundUrl}
+                  selectedUrl={this.state.selectedUrl}
+                  errorUrl={this.state.errorUrl}
+                  ecoAnalysis={this.state.ecoAnalysis}
+                  domAnalysis={this.state.domAnalysis}
+                  pageAnalysis={this.state.pageAnalysis}
+                  reqAnalysis={this.state.reqAnalysis}
+                  performanceAnalysis={this.state.performanceAnalysis}
+                  accessibilityAnalysis={this.state.accessibilityAnalysis}
+                  cumulativeLayoutshiftAnalysis={this.state.cumulativeLayoutshiftAnalysis}
+                  firstContentfulPaintAnalysis={this.state.firstContentfulPaintAnalysis}
+                  largestContentfulPaintAnalysis={this.state.largestContentfulPaintAnalysis}
+                  interactiveAnalysis={this.state.interactiveAnalysis}
+                  speedIndexAnalysis={this.state.speedIndexAnalysis}
+                  totalBlockingTimeAnalysis={this.state.totalBlockingTimeAnalysis}
+                  projectName={this.state.projectName}
+                  dateGreenitLastAnalysis={this.state.dateGreenitLastAnalysis}
+                  dateLighthouseLastAnalysis={this.state.dateLighthouseLastAnalysis}
+                  defaultSelectedGraph={this.state.defaultSelectedGraph}
+                  defaultEcoindexSelected={this.state.defaultEcoindexSelected}
+                  defaultPerformanceSelected={this.state.defaultPerformanceSelected}
+                  setSelectedGraph={this.setSelectedGraph}
+                  setEcoIndexSelected={this.setEcoIndexSelected}
+                  setPerformanceSelected={this.setPerformanceSelected}
+                />
               </div>
-              <AnalysisPanel
-                loading={this.state.loading}
-                analysisForProjectGreenit={this.state.analysisForProjectGreenit}
-                lighthouseMetricsForProject={this.state.lighthouseMetrics}
-                lighthousePerformanceForProject={this.state.lighthousePerformanceForProject}
-                lighthouseAccessibilityForProject={this.state.lighthouseAccessibilityForProject}
-                error={this.state.error}
-                found={this.state.found}
-                project={this.state.projectName}
-                urls={this.state.urls}
-                foundUrl={this.state.foundUrl}
-                selectedUrl={this.state.selectedUrl}
-                errorUrl={this.state.errorUrl}
-                ecoAnalysis={this.state.ecoAnalysis}
-                domAnalysis={this.state.domAnalysis}
-                pageAnalysis={this.state.pageAnalysis}
-                reqAnalysis={this.state.reqAnalysis}
-                performanceAnalysis={this.state.performanceAnalysis}
-                accessibilityAnalysis={this.state.accessibilityAnalysis}
-                cumulativeLayoutshiftAnalysis={this.state.cumulativeLayoutshiftAnalysis}
-                firstContentfulPaintAnalysis={this.state.firstContentfulPaintAnalysis}
-                largestContentfulPaintAnalysis={this.state.largestContentfulPaintAnalysis}
-                interactiveAnalysis={this.state.interactiveAnalysis}
-                speedIndexAnalysis={this.state.speedIndexAnalysis}
-                totalBlockingTimeAnalysis={this.state.totalBlockingTimeAnalysis}
-                foundAll={this.state.foundAll}
-                projectName={this.state.projectName}
-                dateGreenitLastAnalysis={this.state.dateGreenitLastAnalysis}
-                dateLighthouseLastAnalysis={this.state.dateLighthouseLastAnalysis}
-                defaultSelectedGraph={this.state.defaultSelectedGraph}
-                defaultEcoindexSelected = {this.state.defaultEcoindexSelected}
-                defaultPerformanceSelected = {this.state.defaultPerformanceSelected}
-                setSelectedGraph={this.setSelectedGraph}
-                setEcoIndexSelected={this.setEcoIndexSelected}
-                setPerformanceSelected={this.setPerformanceSelected}
-              />
-            </div>
               )}
         </div>
-      </div>
+      </main>
     )
   }
 }

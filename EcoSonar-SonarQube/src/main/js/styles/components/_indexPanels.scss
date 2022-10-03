@@ -6,12 +6,14 @@
 
 .ecoindex-panel {
   margin-right: 16px;
+
   .disclaimer {
     padding-top: 10%;
     text-align: justify;
     font-size: $small-font;
   }
 }
+
 .ecoindex-title {
   text-transform: uppercase;
   font-weight: $medium-weight;
@@ -20,15 +22,27 @@
   display: inline-flex;
   align-items: center;
 }
+
+.last-analysis-date {
+  font-size: $small-font;
+}
+
 .ecoindex-panel-content {
   background: $white;
   border: 1px solid $light-grey;
 }
+
 .ecoindex-badge {
   padding: 16px;
   color: $white;
   box-sizing: border-box;
   height: 100%;
+
+  span {
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+  }
 }
 
 .ecoindex-badge-title {

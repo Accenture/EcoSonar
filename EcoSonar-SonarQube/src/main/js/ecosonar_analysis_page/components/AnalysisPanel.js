@@ -1,8 +1,8 @@
-import React from 'react'
-import BoxedTabs from './BoxedTabs'
+import * as React from 'react'
 import LoadingIcon from '../../images/LoadingIcon.svg'
-import AnalysisPerUrlPanel from './AnalysisPerUrlPanel'
 import AnalysisPerProjectPanel from './AnalysisPerProjectPanel'
+import AnalysisPerUrlPanel from './AnalysisPerUrlPanel'
+import BoxedTabs from './BoxedTabs'
 
 const AnalysisPanelTabs = {
   URL: 'URL',
@@ -82,55 +82,55 @@ export default function AnalysisPanel (props) {
     <div className='analysis-panel'>
       <div className='analysis-panel-title'>
         <h2 className='ecoindex-title'>EcoSonar Analysis - &nbsp;</h2>
-        {analysisForProjectGreenit !== {} && <h6>  {compareDates()} </h6>}
+        {analysisForProjectGreenit !== {} && <p className='last-analysis-date'>  {compareDates()} </p>}
       </div>
 
       {loading
         ? (
-        <div className='loading'>
-          <img src={LoadingIcon} alt='Loading icon' />
-        </div>
+          <div className='loading'>
+            <img src={LoadingIcon} alt='Loading icon' />
+          </div>
           )
         : (
-        <>
-          <BoxedTabs onSelect={selectTab} selected={tab} tabs={tabs} />
+          <>
+            <BoxedTabs onSelect={selectTab} selected={tab} tabs={tabs} />
 
-          <div className='analysis-panel-content'>
-            {isPerUrlTab
-              ? (
-              <AnalysisPerUrlPanel project={project} urls={urls} foundUrl={foundUrl} selectedUrl={selectedUrl} errorUrl={errorUrl} />
-                )
-              : (
-              <AnalysisPerProjectPanel
-                analysisForProjectGreenit={analysisForProjectGreenit}
-                lighthouseMetricsForProject={lighthouseMetricsForProject}
-                lighthousePerformanceForProject={lighthousePerformanceForProject}
-                lighthouseAccessibilityForProject={lighthouseAccessibilityForProject}
-                error={error}
-                found={found}
-                ecoAnalysis={ecoAnalysis}
-                domAnalysis={domAnalysis}
-                pageAnalysis={pageAnalysis}
-                reqAnalysis={reqAnalysis}
-                performanceAnalysis={performanceAnalysis}
-                accessibilityAnalysis={accessibilityAnalysis}
-                cumulativeLayoutshiftAnalysis={cumulativeLayoutshiftAnalysis}
-                firstContentfulPaintAnalysis={firstContentfulPaintAnalysis}
-                largestContentfulPaintAnalysis={largestContentfulPaintAnalysis}
-                interactiveAnalysis={interactiveAnalysis}
-                speedIndexAnalysis={speedIndexAnalysis}
-                totalBlockingTimeAnalysis={totalBlockingTimeAnalysis}
-                projectName={projectName}
-                selectedGraph = {defaultSelectedGraph}
-                setSelectedGraph={setSelectedGraph}
-                ecoindexSelected = {defaultEcoindexSelected}
-                setEcoIndexSelected={setEcoIndexSelected}
-                performanceSelected = {defaultPerformanceSelected}
-                setPerformanceSelected={setPerformanceSelected}
-              />
-                )}
-          </div>
-        </>
+            <div className='analysis-panel-content'>
+              {isPerUrlTab
+                ? (
+                  <AnalysisPerUrlPanel project={project} urls={urls} foundUrl={foundUrl} selectedUrl={selectedUrl} errorUrl={errorUrl} />
+                  )
+                : (
+                  <AnalysisPerProjectPanel
+                    analysisForProjectGreenit={analysisForProjectGreenit}
+                    lighthouseMetricsForProject={lighthouseMetricsForProject}
+                    lighthousePerformanceForProject={lighthousePerformanceForProject}
+                    lighthouseAccessibilityForProject={lighthouseAccessibilityForProject}
+                    error={error}
+                    found={found}
+                    ecoAnalysis={ecoAnalysis}
+                    domAnalysis={domAnalysis}
+                    pageAnalysis={pageAnalysis}
+                    reqAnalysis={reqAnalysis}
+                    performanceAnalysis={performanceAnalysis}
+                    accessibilityAnalysis={accessibilityAnalysis}
+                    cumulativeLayoutshiftAnalysis={cumulativeLayoutshiftAnalysis}
+                    firstContentfulPaintAnalysis={firstContentfulPaintAnalysis}
+                    largestContentfulPaintAnalysis={largestContentfulPaintAnalysis}
+                    interactiveAnalysis={interactiveAnalysis}
+                    speedIndexAnalysis={speedIndexAnalysis}
+                    totalBlockingTimeAnalysis={totalBlockingTimeAnalysis}
+                    projectName={projectName}
+                    selectedGraph={defaultSelectedGraph}
+                    setSelectedGraph={setSelectedGraph}
+                    ecoindexSelected={defaultEcoindexSelected}
+                    setEcoIndexSelected={setEcoIndexSelected}
+                    performanceSelected={defaultPerformanceSelected}
+                    setPerformanceSelected={setPerformanceSelected}
+                  />
+                  )}
+            </div>
+          </>
           )}
     </div>
   )

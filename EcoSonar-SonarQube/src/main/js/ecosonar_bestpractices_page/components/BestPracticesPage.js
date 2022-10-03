@@ -1,10 +1,10 @@
 import React from 'react'
-import { getBestPractices } from '../../services/bestpracticesService'
-import Accordion from './Accordion/Accordion'
-import AccordionNotApplicable from './Accordion/AccordionNotApplicable'
-import BestPracticesTabs from './BestPracticesTabs'
 import LoadingIcon from '../../images/LoadingIcon.svg'
-
+import { getBestPractices, getBestPracticesForUrl } from '../../services/bestpracticesService'
+import { getUrlsConfiguration } from './../../services/configUrlService'
+import Accordion from './Accordion/Accordion'
+import BestPracticesFilters from './BestPracticesFilters/BestPracticesFilters'
+import { auditTypes, selectedComplianceArray, setTools } from './BestPracticesFilters/Filters'
 export default class BestPracticesPage extends React.PureComponent {
   constructor () {
     super()
@@ -14,21 +14,26 @@ export default class BestPracticesPage extends React.PureComponent {
       error: '',
       greenItBestPractices: {},
       lighthousePerformanceBestPractices: {},
-      lighthouseAccesssibilityBestPractices: {},
+      lighthouseAccessibilityBestPractices: {},
       dateAnalysisBestPractices: '',
-      bestPracticesPanelTabs: [
-        { key: 'GREENIT', label: 'GreenIt best practices' },
-        { key: 'LIGHTHOUSE PERFORMANCE', label: 'Lighthouse performance best practices' },
-        { key: 'LIGHTHOUSE ACCESSIBILITY', label: 'Lighthouse Accessibility best practices' }
-      ],
-      selectedTab: 'GREENIT'
+      selectedAuditTypes: 'Ecodesign',
+      selectedAuditTools: 'All',
+      selectedComplianceArray: selectedComplianceArray,
+      auditTools: setTools('All'),
+      auditTypes: auditTypes,
+      ariaHidden: true,
+      foundUrl: false,
+      urls: [],
+      selectedUrl: 'All'
     }
   }
 
   componentDidMount () {
     this.setState({
       loading: true,
-      projectName: this.props.project.key
+      projectName: this.props.project.key,
+      urls: [],
+      foundUrl: false
     })
     getBestPractices(this.props.project.key)
       .then((data) => {
@@ -37,8 +42,25 @@ export default class BestPracticesPage extends React.PureComponent {
           loading: false,
           greenItBestPractices: data.greenItBestPractices,
           lighthousePerformanceBestPractices: data.lighthousePerformanceBestPractices,
-          lighthouseAccesssibilityBestPractices: data.lighthouseAccesssibilityBestPractices,
+          lighthouseAccessibilityBestPractices: data.lighthouseAccessibilityBestPractices,
           dateAnalysisBestPractices: `${formattedDate.toDateString()} - ${formattedDate.toLocaleTimeString([], { hour12: false })}`
+        })
+      })
+      .catch((result) => {
+        if (result instanceof Error) {
+          this.setState({
+            loading: false,
+            error: result.message
+          })
+        }
+      })
+    getUrlsConfiguration(this.props.project.key)
+      .then((data) => {
+        data.unshift('All')
+        this.setState({
+          urls: data,
+          foundUrl: true,
+          loading: false
         })
       })
       .catch((result) => {
@@ -51,13 +73,83 @@ export default class BestPracticesPage extends React.PureComponent {
       })
   }
 
-  setSelectedTab = (value) => {
-    this.setState({ selectedTab: value })
+  changeSelectedUrl = async (event) => {
+    this.setState({ error: null })
+    await this.setState({ selectedUrl: event.target.value, loading: true })
+    if (this.state.selectedUrl === 'All') {
+      getBestPractices(this.state.projectName)
+        .then((data) => {
+          const formattedDate2 = new Date(data.dateAnalysisBestPractices)
+          this.setState({
+            loading: false,
+            greenItBestPractices: data.greenItBestPractices,
+            lighthousePerformanceBestPractices: data.lighthousePerformanceBestPractices,
+            lighthouseAccessibilityBestPractices: data.lighthouseAccessibilityBestPractices,
+            dateAnalysisBestPractices: `${formattedDate2.toDateString()} - ${formattedDate2.toLocaleTimeString([], { hour12: false })}`
+          })
+        })
+        .catch((result) => {
+          if (result instanceof Error) {
+            this.setState({
+              loading: false,
+              error: result.message
+            })
+          }
+        })
+    } else {
+      getBestPracticesForUrl(this.state.projectName, this.state.selectedUrl)
+        .then((data) => {
+          const formattedDate3 = new Date(data.dateAnalysisBestPractices)
+          this.setState({
+            loading: false,
+            greenItBestPractices: data.greenItBestPractices,
+            lighthousePerformanceBestPractices: data.lighthousePerformanceBestPractices,
+            lighthouseAccessibilityBestPractices: data.lighthouseAccessibilityBestPractices,
+            dateAnalysisBestPractices: `${formattedDate3.toDateString()} - ${formattedDate3.toLocaleTimeString([], { hour12: false })}`
+          })
+        })
+        .catch((result) => {
+          if (result instanceof Error) {
+            this.setState({
+              loading: false,
+              error: result.message
+            })
+          }
+        })
+    }
+  };
+
+  setSelectedComplianceArray = (selectedComplianceArray) => {
+    this.setState({ selectedComplianceArray: selectedComplianceArray })
+  };
+
+  setSelectedAuditTypes = (selectedAuditTypes) => {
+    this.setState({ selectedAuditTypes: selectedAuditTypes })
+    if (selectedAuditTypes === 'Ecodesign') {
+      this.setSelectedAuditTools('All ecodesign tools')
+      this.setState({
+        auditTools: setTools('Ecodesign')
+      })
+    } else if (selectedAuditTypes === 'Accessibility') {
+      this.setSelectedAuditTools('All accessibility tools')
+      this.setState({
+        auditTools: setTools('Accessibility')
+      })
+    } else {
+      this.setSelectedAuditTools('All')
+      this.setState({
+        auditTools: setTools('All')
+      })
+    }
+  };
+
+  setSelectedAuditTools = (selectedAuditTools) => {
+    this.setState({ selectedAuditTools: selectedAuditTools })
   };
 
   render () {
     return (
-      <div className='page'>
+      <main role='main' className='page' aria-hidden={this.state.ariaHidden}>
         <h1 className='title-best-practices'>
           Best Practices for project {this.props.project.key} - last analysis at {this.state.dateAnalysisBestPractices}
         </h1>
@@ -69,39 +161,89 @@ export default class BestPracticesPage extends React.PureComponent {
           </p>
         </div>
         {this.state.loading && <img src={LoadingIcon} alt='Loading icon' />}
-        {!this.state.loading && !!this.state.error && (
-          <div className='best-practice-error'>
-            <p className='text-danger'>{this.state.error}</p>
-          </div>
-        )}
-        {!this.state.loading && !this.state.error && (
-          <div>
-            <div className='best-practices'>
-              <BestPracticesTabs state={this.state} setSelectedTab={this.setSelectedTab} tabs={this.state.bestPracticesPanelTabs} />
 
-              {this.state.selectedTab === 'GREENIT' && (
-                <div>
-                  <Accordion practiceType='greenit' bestPractices={this.state.greenItBestPractices} />
-                  <AccordionNotApplicable practiceType='greenit' bestPractices={this.state.greenItBestPractices} />
-                </div>
-              )}
-              {this.state.selectedTab === 'LIGHTHOUSE PERFORMANCE' && (
-                <div>
-                  <Accordion practiceType='performance' bestPractices={this.state.lighthousePerformanceBestPractices} />
-                  <AccordionNotApplicable practiceType='performance' bestPractices={this.state.lighthousePerformanceBestPractices} />
-                </div>
-              )}
-              {this.state.selectedTab === 'LIGHTHOUSE ACCESSIBILITY' && (
-                <div>
-                  {' '}
-                  <Accordion practiceType='accessibility' bestPractices={this.state.lighthouseAccesssibilityBestPractices} />
-                  <AccordionNotApplicable practiceType='accessibility' bestPractices={this.state.lighthouseAccesssibilityBestPractices} />
-                </div>
-              )}
-            </div>
+        {!this.state.loading && (
+          <div className='best-practices'>
+            <BestPracticesFilters
+              complianceLevels={this.state.complianceLevels}
+              auditTypes={this.state.auditTypes}
+              setSelectedAuditTypes={this.setSelectedAuditTypes}
+              auditTools={this.state.auditTools}
+              selectedAuditTools={this.state.selectedAuditTools}
+              setSelectedAuditTools={this.setSelectedAuditTools}
+              handleComplianceChange={this.handleComplianceChange}
+              selectedComplianceArray={this.state.selectedComplianceArray}
+              setSelectedComplianceArray={this.setSelectedComplianceArray}
+              selectedUrl={this.state.selectedUrl}
+              changeSelectedUrl={this.changeSelectedUrl}
+              urls={this.state.urls}
+            />
+            {!this.state.error && (
+              <div>
+                {this.state.selectedAuditTools === 'All' && (
+                  <div>
+                    <Accordion
+                      practiceType='All'
+                      greenItBestPractices={this.state.greenItBestPractices}
+                      lighthousePerformanceBestPractices={this.state.lighthousePerformanceBestPractices}
+                      lighthouseAccessibilityBestPractices={this.state.lighthouseAccessibilityBestPractices}
+                      selectedComplianceArray={this.state.selectedComplianceArray}
+                    />
+                  </div>
+                )}
+                {this.state.selectedAuditTools === 'All ecodesign tools' && (
+                  <div>
+                    <Accordion
+                      practiceType='All ecodesign tools'
+                      greenItBestPractices={this.state.greenItBestPractices}
+                      lighthousePerformanceBestPractices={this.state.lighthousePerformanceBestPractices}
+                      selectedComplianceArray={this.state.selectedComplianceArray}
+                    />
+                  </div>
+                )}
+                {this.state.selectedAuditTools === 'All accessibility tools' && (
+                  <div>
+                    <Accordion
+                      practiceType='All accessibility tools'
+                      lighthouseAccessibilityBestPractices={this.state.lighthouseAccessibilityBestPractices}
+                      selectedComplianceArray={this.state.selectedComplianceArray}
+                    />
+                  </div>
+                )}
+
+                {this.state.selectedAuditTools === 'GreenIT-Analysis' && (
+                  <div>
+                    <Accordion practiceType='greenit' greenItBestPractices={this.state.greenItBestPractices} selectedComplianceArray={this.state.selectedComplianceArray} />
+                  </div>
+                )}
+                {this.state.selectedAuditTools === 'Lighthouse Performance' && (
+                  <div>
+                    <Accordion
+                      practiceType='performance'
+                      lighthousePerformanceBestPractices={this.state.lighthousePerformanceBestPractices}
+                      selectedComplianceArray={this.state.selectedComplianceArray}
+                    />
+                  </div>
+                )}
+                {this.state.selectedAuditTools === 'Lighthouse Accessibility' && (
+                  <div>
+                    <Accordion
+                      practiceType='accessibility'
+                      lighthouseAccessibilityBestPractices={this.state.lighthouseAccessibilityBestPractices}
+                      selectedComplianceArray={this.state.selectedComplianceArray}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+            {!this.state.loading && !!this.state.error && (
+              <div className='best-practice-error'>
+                <p className='text-danger'>{this.state.error}</p>
+              </div>
+            )}
           </div>
         )}
-      </div>
+      </main>
     )
   }
 }

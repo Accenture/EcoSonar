@@ -1,7 +1,7 @@
-import React from 'react'
-import LoadingIcon from '../../../images/LoadingIcon.svg'
-import HelpIcon from '../../../images/HelpIcon.svg'
 import classNames from 'classnames'
+import * as React from 'react'
+import HelpIcon from '../../../images/HelpIcon.svg'
+import LoadingIcon from '../../../images/LoadingIcon.svg'
 import { setPanelColor } from './PanelColorSetting'
 
 export default function LighthousePerformancePanel (props) {
@@ -14,7 +14,7 @@ export default function LighthousePerformancePanel (props) {
       <h2 className="ecoindex-title">
         Lighthouse performance Score
         <div className="tooltip little-spacer-left">
-          <img src={HelpIcon} alt="Help icon" />
+          <img src={HelpIcon} alt="" />
           <span className="tooltiptext ecoIndex-tool">
             These checks ensure that your page is optimized for users to be able
             to see and interact with page content. The Performance score is a
@@ -32,33 +32,33 @@ export default function LighthousePerformancePanel (props) {
       <div className="ecoindex-panel-content">
         {loading
           ? (
-          <div>
-            <img src={LoadingIcon} alt="Loading icon" />
-          </div>
+            <div>
+              <img src={LoadingIcon} alt="Loading icon" />
+            </div>
             )
           : (
-          <>
-            {undefinedStatus
-              ? (
-              <div className="ecoindex-badge undefined">
-                <h3 className="ecoindex-badge-title">Undefined</h3>
-                <span className="small">
-                  Lighthouse Performance Score could not be calculated                </span>
-              </div>
-                )
-              : (
-              <div className={classNames('ecoindex-badge', panelColor)}>
-                <h3 className="ecoindex-badge-title">
-                  {analysis.perfComplianceLevel}
-                </h3>
-                <span className="small">
-                  Lighthouse Performance Score for project (average from all
-                  pages) is
-                </span>
-                <span className="score"> {analysis.perfScore}</span>
-              </div>
-                )}
-          </>
+            <>
+              {undefinedStatus
+                ? (
+                  <div className="ecoindex-badge undefined">
+                    <h3 className="ecoindex-badge-title">Undefined</h3>
+                    <span className="small">
+                      Lighthouse Performance Score could not be calculated                </span>
+                  </div>
+                  )
+                : (
+                  <div className={classNames('ecoindex-badge', panelColor)}>
+                    <h3 className="ecoindex-badge-title">
+                      {analysis.perfComplianceLevel}
+                    </h3>
+                    <span className="small">
+                      Lighthouse Performance Score for project (average from all
+                      pages) is
+                    </span>
+                    <span className="score"> {analysis.perfScore}</span>
+                  </div>
+                  )}
+            </>
             )}
       </div>
     </div>
