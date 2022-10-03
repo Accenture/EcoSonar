@@ -14,7 +14,7 @@ rulesManager.registerRule({
   check: function (measures) {
     const imgAnalysedToAdd = new Map()
     measures.imagesResizedInBrowser.forEach(entry => {
-      if (imgAnalysedToAdd.has(entry.src) && this.isRevelant(entry)) {
+      if (!imgAnalysedToAdd.has(entry.src) && this.isRevelant(entry)) {
         imgAnalysedToAdd.set(entry.src) // Do not count two times the same picture
         this.imageDownloadedNotDisplayedNumber += 1
         this.imgAnalysed += entry.src + '|'

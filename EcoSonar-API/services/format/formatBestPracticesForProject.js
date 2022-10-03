@@ -1,5 +1,5 @@
 
-const formatCompliance = require('./formatCompliance')
+const formatCompliance = require('../../services/format/formatCompliance')
 
 class FormatBestPracticesForProject { }
 

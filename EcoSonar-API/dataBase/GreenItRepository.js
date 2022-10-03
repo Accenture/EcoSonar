@@ -45,9 +45,7 @@ const GreenItRepository = function () {
           responsesSize: size,
           responsesSizeUncompress: sizeUncompress,
           ecoIndex: reports[j].ecoIndex,
-          grade: reports[j].grade,
-          waterConsumption: reports[j].waterConsumption,
-          greenhouseGasesEmission: reports[j].greenhouseGasesEmission
+          grade: reports[j].grade
         }
         arrayToInsert.push(greenAnalysis)
       }
@@ -92,7 +90,7 @@ const GreenItRepository = function () {
         stringErr = 'url : ' + urlNameReq + ' or project : ' + projectNameReq + ' not found'
       } else {
         allAnalysis = await greenits
-          .find({ idUrlGreen: res[0].idKey }, { domSize: 1, nbRequest: 1, responsesSize: 1, dateGreenAnalysis: 1, greenhouseGasesEmission: 1, waterConsumption: 1, ecoIndex: 1, grade: 1 })
+          .find({ idUrlGreen: res[0].idKey }, { domSize: 1, nbRequest: 1, responsesSize: 1, dateGreenAnalysis: 1, ecoIndex: 1, grade: 1 })
           .sort({ dateGreenAnalysis: 1 })
         if (allAnalysis.length === 0) {
           stringErr = 'no greenit analysis found for ' + urlNameReq
@@ -115,9 +113,7 @@ const GreenItRepository = function () {
           nbRequest: allAnalysis[allAnalysis.length - 1].nbRequest,
           responsesSize: allAnalysis[allAnalysis.length - 1].responsesSize,
           ecoIndex: allAnalysis[allAnalysis.length - 1].ecoIndex,
-          grade: allAnalysis[allAnalysis.length - 1].grade,
-          waterConsumption: allAnalysis[allAnalysis.length - 1].waterConsumption,
-          greenhouseGasesEmission: allAnalysis[allAnalysis.length - 1].greenhouseGasesEmission
+          grade: allAnalysis[allAnalysis.length - 1].grade
         }
         let i = 0
         let element

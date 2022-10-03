@@ -2,17 +2,17 @@ class FormatCompliance {}
 
 // EcoIndex -> Grade
 FormatCompliance.prototype.getGrade = function (score) {
-  if (score > 75) {
+  if (score > 80) {
     return 'A'
-  } else if (score > 65) {
+  } else if (score > 70) {
     return 'B'
-  } else if (score > 50) {
+  } else if (score > 55) {
     return 'C'
-  } else if (score > 35) {
+  } else if (score > 40) {
     return 'D'
-  } else if (score > 20) {
+  } else if (score > 25) {
     return 'E'
-  } else if (score > 5) {
+  } else if (score > 10) {
     return 'F'
   } else return 'G'
 }
@@ -21,17 +21,17 @@ FormatCompliance.prototype.getGrade = function (score) {
 FormatCompliance.prototype.complianceLevel = function (score) {
   if (score === 'N.A' || score === null) {
     return 'N.A'
-  } else if (score > 75) {
+  } else if (score > 80) {
     return 'A'
-  } else if (score > 65) {
+  } else if (score > 70) {
     return 'B'
-  } else if (score > 50) {
+  } else if (score > 55) {
     return 'C'
-  } else if (score > 35) {
+  } else if (score > 40) {
     return 'D'
-  } else if (score > 20) {
+  } else if (score > 25) {
     return 'E'
-  } else if (score > 5) {
+  } else if (score > 10) {
     return 'F'
   } else return 'G'
 }

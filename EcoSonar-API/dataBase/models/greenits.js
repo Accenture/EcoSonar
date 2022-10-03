@@ -38,14 +38,6 @@ const greenItSchema = new Schema({
   grade: {
     type: String,
     required: true
-  },
-  waterConsumption: {
-    type: Number,
-    required: true
-  },
-  greenhouseGasesEmission: {
-    type: Number,
-    required: true
   }
 })
 

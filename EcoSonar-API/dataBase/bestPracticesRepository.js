@@ -137,6 +137,35 @@ const BestPracticesRepository = function () {
   }
 
   /**
+   * find analysis of best practices  for an URL on the table bestPractices
+   * @param {name of the project} projectName
+   * @param {url} urlName
+   * @returns
+   */
+  this.find = async function (projectName, urlName) {
+    const hasNoUrl = false
+    let systemError = null
+    let resultats
+    try {
+      const resList = await urlsprojects.find({ projectName, urlName }, { idKey: 1 })
+      resultats = await bestpractices.find({ idUrl: resList[0].idKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 }).sort({ dateAnalysisBestPractices: -1 }).limit(1)
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
+      console.log(`Error during generation of ${urlName} best practices analysis`)
+      systemError = new SystemError()
+    }
+    return new Promise((resolve, reject) => {
+      if (systemError !== null) {
+        reject(systemError)
+      } else if (hasNoUrl) {
+        reject(new Error(`No analysis found for url ${urlName} into project ${projectName}`))
+      } else {
+        resolve(resultats)
+      }
+    })
+  }
+
+  /**
  *
  * @param {Array} arrayToInsert
  * @param {Array} urlIdList

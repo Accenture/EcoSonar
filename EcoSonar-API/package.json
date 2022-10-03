@@ -1,6 +1,6 @@
 {
   "name": "ecosonar-api",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Développement d'un plugin custom ajouté à l'outil d'analyse de code SonarQube permettant l'analyse et le monitoring de paramètres clés d'une application web (en utilisant Green-IT Analysis et Lighthouse). L'objectif est d'aider les développeurs à mettre en place des bonnes pratiques d'éco-conception web en optimisant ces paramètres.",
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "dependencies": {
     "@azure/identity": "^2.1.0",
     "@azure/keyvault-secrets": "^4.4.0",
+    "cheerio": "^1.0.0-rc.12",
     "concat-files": "^0.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
@@ -36,6 +37,7 @@
     "eslint": "^8.20.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.3.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "nodemon": "^2.0.19"

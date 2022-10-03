@@ -1,4 +1,4 @@
-const formatBestPracticesForProject = require('./formatBestPracticesForProject')
+const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
 
 class FormatGreenItBestPractices {}
 
@@ -296,34 +296,39 @@ FormatGreenItBestPractices.prototype.minifiedCss = function (reports) {
   let i = 0
   let totalCssSize = 0
   let minifiedCssSize = 0
-  const totalPercentMinifiedCss = 0
+  let totalPercentMinifiedCss = 0
   let averagePercentMinifiedCss = 0
   const array = []
+  let isApplicable = true
 
   while (i < reports.length) {
-    totalScore = formatBestPracticesForProject.addScores(totalScore, reports[i].bestPractices.minifiedCss.score, numberOfValues).totalScore
-    numberOfValues = formatBestPracticesForProject.addScores(totalScore, reports[i].bestPractices.minifiedCss.score, numberOfValues).numberOfValues
-    reports[i].bestPractices.minifiedCss.contents.map((item) => array.push(item))
-    if (reports[i].bestPractices.minifiedCss.totalCssSize >= 0 && reports[i].bestPractices.minifiedCss.totalCssSize !== 'N.A' && reports[i].bestPractices.minifiedCss.totalCssSize !== undefined) {
-      totalCssSize = totalCssSize + reports[i].bestPractices.minifiedCss.totalCssSize
-    }
-    if (
-      reports[i].bestPractices.minifiedCss.minifiedCssSize >= 0 &&
+    // In case the analyzed URL does not use any CSS we don't count it as a consistent
+    if (reports[i].bestPractices.minifiedCss.totalCssSize > 0) {
+      totalPercentMinifiedCss = formatBestPracticesForProject.addScores(totalPercentMinifiedCss, reports[i].bestPractices.minifiedCss.percentMinifiedCss, numberOfValues).totalScore
+      totalScore = formatBestPracticesForProject.addScores(totalScore, reports[i].bestPractices.minifiedCss.score, numberOfValues).totalScore
+      numberOfValues = formatBestPracticesForProject.addScores(totalScore, reports[i].bestPractices.minifiedCss.score, numberOfValues).numberOfValues
+      reports[i].bestPractices.minifiedCss.contents.map((item) => array.push(item))
+      if (reports[i].bestPractices.minifiedCss.totalCssSize >= 0 && reports[i].bestPractices.minifiedCss.totalCssSize !== 'N.A' && reports[i].bestPractices.minifiedCss.totalCssSize !== undefined) {
+        totalCssSize = totalCssSize + reports[i].bestPractices.minifiedCss.totalCssSize
+      }
+      if (
+        reports[i].bestPractices.minifiedCss.minifiedCssSize >= 0 &&
       reports[i].bestPractices.minifiedCss.minifiedCssSize !== 'N.A' &&
       reports[i].bestPractices.minifiedCss.minifiedCssSize !== undefined
-    ) {
-      minifiedCssSize = minifiedCssSize + reports[i].bestPractices.minifiedCss.minifiedCssSize
-    }
-    i++
+      ) {
+        minifiedCssSize = minifiedCssSize + reports[i].bestPractices.minifiedCss.minifiedCssSize
+      }
+    } i++
   }
 
+  // Then we use isApplicable param to set the compliance for this specific URL on N.A in order to avoid a non-using CSS URL to have a G grade
   if (totalCssSize === 0) {
     averagePercentMinifiedCss = 'N.A'
+    isApplicable = false
   } else {
     averagePercentMinifiedCss = totalPercentMinifiedCss / numberOfValues
   }
-
-  return formatBestPracticesForProject.formatResponse(averagePercentMinifiedCss, formatBestPracticesForProject.calculateAverageScore(totalScore, numberOfValues), array)
+  return formatBestPracticesForProject.formatResponse(averagePercentMinifiedCss, formatBestPracticesForProject.calculateAverageScore(totalScore, numberOfValues), array, isApplicable)
 }
 
 FormatGreenItBestPractices.prototype.minifiedJs = function (reports) {

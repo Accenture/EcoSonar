@@ -1,5 +1,5 @@
 const enumAudits = require('../../utils/enumAudits')
-const formatBestPracticesForProject = require('./formatBestPracticesForProject')
+const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
 const metricsCalculate = require('../../utils/metricsCalculate')
 
 class FormatLighthouseBestPractices { }

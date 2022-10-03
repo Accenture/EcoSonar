@@ -44,6 +44,8 @@ module.exports = {
           i++
         }
       }
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
     } finally {
       await browser.close()
     }

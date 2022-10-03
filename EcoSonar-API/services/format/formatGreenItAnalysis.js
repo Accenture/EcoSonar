@@ -11,9 +11,7 @@ FormatGreenItAnalysis.prototype.greenItUrlAnalysisFormatted = function (analysis
       nbRequest: { displayValue: analysis.nbRequest, complianceLevel: ecoIndexCalculationService.setScoreLetter('nbRequest', analysis.nbRequest) },
       responsesSize: { displayValue: analysis.responsesSize, complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', analysis.responsesSize) },
       ecoIndex: analysis.ecoIndex,
-      grade: analysis.grade,
-      waterConsumption: analysis.waterConsumption,
-      greenhouseGasesEmission: analysis.greenhouseGasesEmission
+      grade: analysis.grade
     }
   } catch (err) {
     console.log(err)
@@ -25,7 +23,7 @@ FormatGreenItAnalysis.prototype.greenItUrlAnalysisFormatted = function (analysis
 FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (res) {
   let analysis
   let j = 0
-  let count, domSize, nbRequest, responsesSize, responsesSizeUncompress, ecoIndex, waterConsumption, greenhouseGasesEmission
+  let count, domSize, nbRequest, responsesSize, responsesSizeUncompress, ecoIndex
 
   try {
     domSize = 0
@@ -33,8 +31,6 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
     responsesSize = 0
     responsesSizeUncompress = 0
     ecoIndex = 0
-    waterConsumption = 0
-    greenhouseGasesEmission = 0
     count = 0
     let dateAnalysis
 
@@ -45,8 +41,6 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
       responsesSize += res[j].responsesSize
       responsesSizeUncompress += res[j].responsesSizeUncompress
       ecoIndex += res[j].ecoIndex
-      waterConsumption += res[j].waterConsumption
-      greenhouseGasesEmission += res[j].greenhouseGasesEmission
       count++
       j++
     }
@@ -57,9 +51,7 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
       responsesSize: { displayValue: Math.ceil(responsesSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', Math.ceil(responsesSize / count)) },
       responsesSizeUncompress: Math.ceil(responsesSizeUncompress / count),
       ecoIndex: Math.ceil(ecoIndex / count),
-      grade: formatCompliance.getGrade(ecoIndex / count),
-      waterConsumption: (waterConsumption / count).toFixed(2),
-      greenhouseGasesEmission: (greenhouseGasesEmission / count).toFixed(2)
+      grade: formatCompliance.getGrade(ecoIndex / count)
     }
     return analysis
   } catch (err) {

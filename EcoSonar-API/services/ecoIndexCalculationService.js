@@ -2,9 +2,9 @@ class EcoIndexCalculationService {}
 
 EcoIndexCalculationService.prototype.computeQuantile = function (quantiles, value) {
   for (let i = 1; i < quantiles.length; i++) {
-    if (value < quantiles[i]) return i + (value - quantiles[i - 1]) / (quantiles[i] - quantiles[i - 1])
+    if (value < quantiles[i]) return (i - 1 + (value - quantiles[i - 1]) / (quantiles[i] - quantiles[i - 1]))
   }
-  return quantiles.length
+  return quantiles.length - 1
 }
 
 EcoIndexCalculationService.prototype.calculateEcoIndex = function (dom, req, size) {
@@ -18,13 +18,6 @@ EcoIndexCalculationService.prototype.calculateEcoIndex = function (dom, req, siz
   return Math.round(100 - (5 * (3 * qdom + 2 * qreq + qsize)) / 6)
 }
 
-EcoIndexCalculationService.prototype.computeGreenhouseGasesEmissionfromEcoIndex = function (ecoIndex) {
-  return Math.round(100 * (2 + (2 * (50 - ecoIndex)) / 100)) / 100
-}
-
-EcoIndexCalculationService.prototype.computeWaterConsumptionfromEcoIndex = function (ecoIndex) {
-  return Math.round(100 * (3 + (3 * (50 - ecoIndex)) / 100)) / 100
-}
 EcoIndexCalculationService.prototype.setScoreLetter = function (metric, value) {
   const domSize = [350, 480, 707, 1350, 1653, 2400]
   const nbRequest = [10, 25, 33, 40, 86, 168]

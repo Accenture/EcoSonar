@@ -6,7 +6,9 @@ async function analyse (urlList, autoscroll, projectName) {
   const browserArgs = [
     '--no-sandbox', // can't run inside docker without
     '--disable-setuid-sandbox', // but security issues
-    '--ignore-certificate-errors'
+    '--ignore-certificate-errors',
+    '--window-size=1920,1080',
+    '--start-maximized'
   ]
 
   const proxyConfiguration = await authenticationService.useProxyIfNeeded(projectName)
@@ -32,6 +34,8 @@ async function analyse (urlList, autoscroll, projectName) {
       // analyse each page
       reports = await createGreenITReports(browser, urlList, autoscroll)
     }
+  } catch (error) {
+    console.error('\x1b[31m%s\x1b[0m', error)
   } finally {
     // close browser
     const pages = await browser.pages()

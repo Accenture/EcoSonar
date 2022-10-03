@@ -33,25 +33,17 @@ function computeEcoIndex (dom, req, size) {
 
 function computeQuantile (quantiles, value) {
   for (let i = 1; i < quantiles.length; i++) {
-    if (value < quantiles[i]) return (i + (value - quantiles[i - 1]) / (quantiles[i] - quantiles[i - 1]))
+    if (value < quantiles[i]) return (i - 1 + (value - quantiles[i - 1]) / (quantiles[i] - quantiles[i - 1]))
   }
-  return quantiles.length
+  return quantiles.length - 1
 }
 
-function getGrade (ecoIndex) {
-  if (ecoIndex > 75) return 'A'
-  if (ecoIndex > 65) return 'B'
-  if (ecoIndex > 50) return 'C'
-  if (ecoIndex > 35) return 'D'
-  if (ecoIndex > 20) return 'E'
-  if (ecoIndex > 5) return 'F'
+function getEcoIndexGrade (ecoIndex) {
+  if (ecoIndex > 80) return 'A'
+  if (ecoIndex > 70) return 'B'
+  if (ecoIndex > 55) return 'C'
+  if (ecoIndex > 40) return 'D'
+  if (ecoIndex > 25) return 'E'
+  if (ecoIndex > 10) return 'F'
   return 'G'
-}
-
-function computeGreenhouseGasesEmissionfromEcoIndex (ecoIndex) {
-  return (Math.round(100 * (2 + 2 * (50 - ecoIndex) / 100)) / 100)
-}
-
-function computeWaterConsumptionfromEcoIndex (ecoIndex) {
-  return (Math.round(100 * (3 + 3 * (50 - ecoIndex) / 100)) / 100)
 }

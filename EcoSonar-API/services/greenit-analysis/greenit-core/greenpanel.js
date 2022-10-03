@@ -23,15 +23,14 @@ let lastAnalyseStartingTime = 0
 let measuresAcquisition
 let har
 let resources
+let scoreCalculated
 
 function computeEcoIndexMeasures (measures) {
   measures.ecoIndex = computeEcoIndex(measures.domSize, measures.nbRequest, Math.round(measures.responsesSize / 1000))
-  measures.waterConsumption = computeWaterConsumptionfromEcoIndex(measures.ecoIndex)
-  measures.greenhouseGasesEmission = computeGreenhouseGasesEmissionfromEcoIndex(measures.ecoIndex)
-  measures.grade = getGrade(measures.ecoIndex)
+  measures.grade = getEcoIndexGrade(measures.ecoIndex)
 }
 
-function launchAnalyse () {
+async function launchAnalyse () {
   const now = Date.now()
 
   // To avoid parallel analyse , force 1 secondes between analysis
@@ -45,6 +44,8 @@ function launchAnalyse () {
   measuresAcquisition.initializeMeasures()
   measuresAcquisition.aggregateFrameMeasures(startAnalyseCore())
   measuresAcquisition.startMeasuring()
+  await scoreCalculated
+
   const returnObj = measuresAcquisition.getMeasures()
   const bestPractices = measuresAcquisition.getBestPractices()
   returnObj.bestPractices = formatBestPractices(bestPractices)
@@ -66,8 +67,6 @@ function MeasuresAcquisition (rules) {
       responsesSizeUncompress: 0,
       ecoIndex: 100,
       grade: 'A',
-      waterConsumption: 0,
-      greenhouseGasesEmission: 0,
       pluginsNumber: 0,
       printStyleSheetsNumber: 0,
       inlineStyleSheetsNumber: 0,

@@ -2,10 +2,12 @@ const express = require('express')
 const urlConfigurationService = require('../services/urlConfigurationService')
 const analyseService = require('../services/analysisService')
 const retrieveBestPracticesService = require('../services/retrieveBestPracticesService')
+const crawlerService = require('../services/crawler/crawlerService')
 const SystemError = require('../utils/SystemError')
-
 const asyncMiddleware = require('../utils/AsyncMiddleware')
 const cors = require('cors')
+const dotenv = require('dotenv')
+dotenv.config()
 
 const app = express()
 app.disable('x-powered-by')
@@ -13,13 +15,20 @@ app.disable('x-powered-by')
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-const whitelist = ['http://localhost:3001', 'http://localhost:9000', '<SONARQUBE_SERVER_URL>']
+const sonarqubeServerUrl = process.env.ECOSONAR_ENV_SONARQUBE_SERVER_URL || ''
+const whitelist = [sonarqubeServerUrl]
+
+if (process.env.ECOSONAR_ENV_CLOUD_PROVIDER === 'local') {
+  const localServer = process.env.ECOSONAR_ENV_LOCAL_DEV_SERVER_URL || ''
+  whitelist.push(localServer)
+}
+
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error('Not allowed by CORS : ' + origin))
     }
   }
 }
@@ -146,6 +155,45 @@ app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) =>
       }
       console.log('GET BEST PRACTICES PROJECT - Best practices analysis for project could not be retrieved')
       return res.status(400).json({ error: error.message })
+    })
+}))
+
+// API CRUD BestPractices
+// retrieve  best practices for an URL
+// POST method is used because passing and URL into the req.query isn't possible, query is then misunderstood.
+app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.body.projectName
+  const urlName = req.body.urlName
+  console.log(`GET BEST PRACTICES URL - retrieve best practices analysis for url ${urlName} into project ${projectName}`)
+  retrieveBestPracticesService.getUrlBestPractices(projectName, urlName)
+    .then((resultats) => {
+      console.log('GET BEST PRACTICES URL - Best practices for url retrieved')
+      return res.status(200).json(resultats)
+    })
+    .catch((error) => {
+      if (error instanceof SystemError) {
+        return res.status(500).send()
+      }
+      console.log('GET BEST PRACTICES PROJECT - Best practices analysis for project could not be retrieved')
+      return res.status(400).json({ error: error.message })
+    })
+}))
+
+// Crawler service
+// Crawl across the given website to find URLs
+// POST method is used because passing and URL into the req.query isn't possible, query is then misunderstood.
+app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.body.projectName
+  const mainUrl = req.body.mainUrl
+  console.log(`CRAWLER - Running crawler from ${mainUrl}`)
+  crawlerService.crawl(projectName, mainUrl)
+    .then((result) => {
+      console.log(`CRAWLER - ${result.length} URL retrieved`)
+      return res.status(200).json(result)
+    })
+    .catch(() => {
+      console.log('CRAWLER - Crawler has encountered and error')
+      return res.status(500).send()
     })
 }))
 

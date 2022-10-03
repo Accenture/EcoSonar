@@ -1,5 +1,5 @@
 # See : https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker
-FROM node:14-slim
+FROM node:16-slim
 
 # Uncomment if you need to configure proxy. 
 # You can init these variables by using --build-args during docker build

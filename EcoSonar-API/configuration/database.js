@@ -9,26 +9,24 @@ DataBase.prototype.connection = async function () {
   let password
   let dbName
   let cluster
-  const environment = process.env.NODE_ENV || 'development'
+  const mongoDBType = process.env.ECOSONAR_ENV_DB_TYPE || ''
 
-  if (environment === 'development') {
-    // connection to dataBase mongodb Atlas
-    require('dotenv').config()
-    user = process.env.USER || ''
-    password = process.env.PASSWORD || ''
-    cluster = process.env.CLUSTER || ''
-    dbName = process.env.DB_NAME || ''
+  if (mongoDBType === 'MongoDB_Atlas') {
+    user = process.env.ECOSONAR_ENV_USER || ''
+    password = await retrievePassword()
+    cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
+    dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
     connectionString = `mongodb+srv://${user}:${password}@${cluster}/${dbName}?retryWrites=true&w=majority`
     mongoose.connect(connectionString,
       { useNewUrlParser: true, useUnifiedTopology: true }
     ).then(() => console.log('Connection to MongoDB Atlas successful'))
       .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
-  } else {
+  } else if (mongoDBType === 'CosmosDB') {
     // connection to dataBase Azure CosmosDB for MongoDB API
-    cluster = process.env.CLUSTER || ''
-    const port = process.env.DB_PORT || 0
-    dbName = process.env.DB_NAME || ''
-    user = process.env.USER || ''
+    cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
+    const port = process.env.ECOSONAR_ENV_DB_PORT || 0
+    dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
+    user = process.env.ECOSONAR_ENV_USER || ''
     password = await retrievePassword()
     connectionString = 'mongodb://' + cluster + ':' + port + '/' + dbName + '?ssl=true&replicaSet=globaldb'
     mongoose.connect(connectionString, {
@@ -42,6 +40,8 @@ DataBase.prototype.connection = async function () {
     })
       .then(() => console.log('Connection to CosmosDB successful'))
       .catch((err) => console.error('\x1b[31m%s\x1b[0m', err))
+  } else {
+    console.log('Could not connect to any database')
   }
 }
 
