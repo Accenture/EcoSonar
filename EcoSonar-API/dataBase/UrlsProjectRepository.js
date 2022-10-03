@@ -3,7 +3,7 @@ const urlsprojects = require('./models/urlsprojects')
 const greenits = require('./models/greenits')
 const bestpractices = require('./models/bestpractices')
 const lighthouses = require('./models/lighthouses')
-const SystemError = require('../utils/SystemError')
+const SystemError = require('../utils/systemError')
 
 const UrlsProjectRepository = function () {
   /**

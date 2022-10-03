@@ -7,7 +7,7 @@ const formatLighthouseMetrics = require('./format/formatLighthouseMetrics')
 const uniqid = require('uniqid')
 const greenItAnalysis = require('./greenit-analysis/analyseService')
 const formatLighthouseAnalysis = require('./format/formatLighthouseAnalysis')
-const SystemError = require('../utils/SystemError')
+const SystemError = require('../utils/systemError')
 const formatGreenItAnalysis = require('./format/formatGreenItAnalysis')
 const formatLighthouseBestPractices = require('./format/formatLighthouseBestPractices')
 

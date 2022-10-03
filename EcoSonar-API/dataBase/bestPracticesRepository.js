@@ -1,7 +1,7 @@
 const uniqid = require('uniqid')
 const bestpractices = require('./models/bestpractices')
 const urlsprojects = require('./models/urlsprojects')
-const SystemError = require('../utils/SystemError')
+const SystemError = require('../utils/systemError')
 
 const BestPracticesRepository = function () {
   /**
