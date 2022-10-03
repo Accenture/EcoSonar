@@ -1,7 +1,7 @@
 const uniqid = require('uniqid')
 const greenits = require('./models/greenits')
 const urlsprojects = require('./models/urlsprojects')
-const SystemError = require('../utils/SystemError')
+const SystemError = require('../utils/systemError')
 const formatGreenItAnalysis = require('../services/format/formatGreenItAnalysis')
 
 const GreenItRepository = function () {
