@@ -73,7 +73,7 @@ If not, go to the next step.
     - version 4.0 or later
     - close
 
-### Add Connection to your MongoDB Database
+### Add Environment setup : MongoDB Database + Cors options
 
 #### On a deployed environment
 Add the following environment variables in your Application Configuration:

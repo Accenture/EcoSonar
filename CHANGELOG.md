@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## Version 2.3 , 04/10/2022
+
+### Added
+
+- Implement EcoSonar Website to communicate about the tool and detail tool key priorities and solution differentiators
+- Set up environment variables in EcoSonar-API to config project throughout deployment instead of modifying directly code
+- Implement crawler to detect automatically most pages from your website. The functionality only finds the list of detected urls, you then need to add the ones you want to audit into EcoSonar configuration.
+- Add login authentication on multi-pages configuration
+- Filter best practices according type of audit (ecodesign, accessibility), audit tool (GreenIT-Analysis, Google Lighthouse Performance and Accessibility) and level of implementation
+- Retrieve best practices per URL and per project
+
+### Removed
+- Removing greenhouse gas emissions and water consumption because calculation may not be accurate to some IT Systems
+
+### Changed
+- Upgrade EcoIndex Calculation : https://github.com/cnumr/GreenIT-Analysis/issues/61
+- Upgrading EcoSonar URL Configuration and Best practices pages to resolve some accessibility issues
+- Resolve bug fix on "Optimize Bitmap Images"
+- Resolve bug fix on "Minify CSS"
+- Resolve bug fix on "Image Downloaded and not displayed"
+
+---
+---
 ## Version 2.2 , 03/08/2022
 
 ### Added
