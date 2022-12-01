@@ -1,17 +1,19 @@
-const allTools = { key: 'ALL', label: 'All' }
-const accessibilityTools = { key: 'ALL ACCESSIBILITY', label: 'All accessibility tools' }
-const ecodesignTools = { key: 'ALL ECODESIGN', label: 'All ecodesign tools' }
-const greenITTool = { key: 'GREENIT', label: 'GreenIT-Analysis' }
-const lighthousePerformanceTool = { key: 'LIGHTHOUSE PERFORMANCE', label: 'Lighthouse Performance' }
-const lighthouseAccessibility = { key: 'LIGHTHOUSE ACCESSIBILITY', label: 'Lighthouse Accessibility' }
+export const allTools = { key: 'ALL', label: 'All' }
+export const allAccessibilityTools = { key: 'ALL ACCESSIBILITY', label: 'All accessibility tools' }
+export const allEcodesignTools = { key: 'ALL ECODESIGN', label: 'All Ecodesign tools' }
+export const greenITTool = { key: 'GREENIT', label: 'GreenIT-Analysis' }
+export const lighthousePerformanceTool = { key: 'LIGHTHOUSE PERFORMANCE', label: 'Lighthouse Performance' }
+export const lighthouseAccessibility = { key: 'LIGHTHOUSE ACCESSIBILITY', label: 'Lighthouse Accessibility' }
+export const w3cValidator = { key: 'W3C VALIDATOR', label: 'W3C validator' }
 
 export function setTools (auditType) {
-  if (auditType === 'Accessibility') {
-    return [accessibilityTools, lighthouseAccessibility]
-  } else if (auditType === 'Ecodesign') {
-    return [ecodesignTools, greenITTool, lighthousePerformanceTool]
-  } else if (auditType === 'All') {
-    return [allTools, greenITTool, lighthouseAccessibility, lighthousePerformanceTool]
+  switch (auditType) {
+    case 'Accessibility':
+      return [allAccessibilityTools, lighthouseAccessibility, w3cValidator]
+    case 'Ecodesign':
+      return [allEcodesignTools, greenITTool, lighthousePerformanceTool]
+    default:
+      return [allTools, greenITTool, lighthouseAccessibility, lighthousePerformanceTool, w3cValidator]
   }
 }
 
@@ -25,7 +27,7 @@ export const complianceLevels = [
   { label: 'G', value: 'G' },
   { label: 'N.A', value: 'N.A' }]
 
-export const selectedComplianceArray = [
+export const defaultSelectedComplianceLevel = [
   { label: 'B', value: 'B' },
   { label: 'C', value: 'C' },
   { label: 'D', value: 'D' },
@@ -33,6 +35,7 @@ export const selectedComplianceArray = [
   { label: 'F', value: 'F' },
   { label: 'G', value: 'G' }
 ]
+
 export const auditTypes = [
   { key: 'ALL', label: 'All' },
   { key: 'ECODESIGN', label: 'Ecodesign' },

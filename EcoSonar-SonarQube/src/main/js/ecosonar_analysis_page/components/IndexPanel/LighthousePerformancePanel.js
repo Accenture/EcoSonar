@@ -1,7 +1,7 @@
-import classNames from 'classnames'
 import * as React from 'react'
-import HelpIcon from '../../../images/HelpIcon.svg'
 import LoadingIcon from '../../../images/LoadingIcon.svg'
+import HelpIcon from '../../../images/HelpIcon.svg'
+import classNames from 'classnames'
 import { setPanelColor } from './PanelColorSetting'
 
 export default function LighthousePerformancePanel (props) {
@@ -13,9 +13,9 @@ export default function LighthousePerformancePanel (props) {
     <div className="ecoindex-panel">
       <h2 className="ecoindex-title">
         Lighthouse performance Score
-        <div className="tooltip little-spacer-left">
+        <text className="tooltip little-spacer-left" tabIndex={0}>
           <img src={HelpIcon} alt="" />
-          <span className="tooltiptext ecoIndex-tool">
+          <p className="tooltiptext ecoIndex-tool">
             These checks ensure that your page is optimized for users to be able
             to see and interact with page content. The Performance score is a
             weighted average of the performance metric scores. The weightings
@@ -26,8 +26,8 @@ export default function LighthousePerformancePanel (props) {
             user-perceived performance. To have more details on Lightouse
             Performance scoring, have a look at this calculator :
             https://googlechrome.github.io/lighthouse/scorecalc/
-          </span>
-        </div>
+          </p>
+        </text>
       </h2>
       <div className="ecoindex-panel-content">
         {loading
@@ -51,11 +51,11 @@ export default function LighthousePerformancePanel (props) {
                     <h3 className="ecoindex-badge-title">
                       {analysis.perfComplianceLevel}
                     </h3>
-                    <span className="small">
+                    <p className="small">
                       Lighthouse Performance Score for project (average from all
-                      pages) is
-                    </span>
-                    <span className="score"> {analysis.perfScore}</span>
+                      pages) is                    <span className="score"> {analysis.perfScore}</span>
+
+                    </p>
                   </div>
                   )}
             </>

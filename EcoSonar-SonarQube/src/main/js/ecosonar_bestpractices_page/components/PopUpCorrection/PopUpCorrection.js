@@ -2,7 +2,7 @@ import { Markup } from 'interweave'
 import React, { useEffect } from 'react'
 
 export default function PopUpCorrection (props) {
-  const { title, correction } = props
+  const { title, correction, tool } = props
 
   useEffect(() => {
     document.body.addEventListener('keydown', closeOnEscapeKeyDown)
@@ -23,22 +23,30 @@ export default function PopUpCorrection (props) {
     event.currentTarget.blur()
     props.setCorrectionPage(false)
   }
+  function checkTool (tool) {
+    if (tool !== 'W3C validator') return title
+  }
 
   return (
-    <div className="modal" onClick={handleCancelClick}
-       id="dialog"
-       role="dialog"
-       aria-labelledby="Correction of the best practice"
-       aria-describedby="Correction of the best practice"
-       aria-modal="true"
-       aria-hidden="false"
-      tabIndex="-1">
-      <div className="correction-content" onClick={(e) => e.stopPropagation()} role="document">
-        <div className="modal-header">
-          <h2 className="correction-title">{title}</h2>
+    <div
+      className='modal'
+      onClick={handleCancelClick}
+      id='dialog'
+      role='dialog'
+      aria-labelledby='Correction of the best practice'
+      aria-describedby='Correction of the best practice'
+      aria-modal='true'
+      aria-hidden='false'
+      tabIndex='-1'
+    >
+      <div className='correction-content' onClick={(e) => e.stopPropagation()} role='document'>
+        <div className='modal-header'>
+          <h2 className='correction-title'>{title}</h2>
         </div>
         <div className='modal-body'>
-          <div className='modal-body-title'>{title}</div>
+          <div className='modal-body-title'>
+            {checkTool(tool)}
+            </div>
           <div className='style-correction'>
             <Markup content={correction} />
           </div>

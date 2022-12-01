@@ -5,15 +5,13 @@
 }
 
 .ecoindex-panel {
-  margin-right: 16px;
-
+  margin-right: 1vw;
   .disclaimer {
-    padding-top: 10%;
+    padding-top: 2vh;
     text-align: justify;
     font-size: $small-font;
   }
 }
-
 .ecoindex-title {
   text-transform: uppercase;
   font-weight: $medium-weight;
@@ -22,26 +20,26 @@
   display: inline-flex;
   align-items: center;
 }
-
 .last-analysis-date {
   font-size: $small-font;
 }
-
 .ecoindex-panel-content {
   background: $white;
   border: 1px solid $light-grey;
 }
-
 .ecoindex-badge {
   padding: 16px;
   color: $white;
   box-sizing: border-box;
   height: 100%;
-
-  span {
+  p {
     overflow: hidden;
     white-space: normal;
     text-overflow: ellipsis;
+  }
+  .score {
+    font-size: $xlarge-font;
+    font-weight: $medium-small-weight;
   }
 }
 

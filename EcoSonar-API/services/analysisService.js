@@ -7,9 +7,13 @@ const formatLighthouseMetrics = require('./format/formatLighthouseMetrics')
 const uniqid = require('uniqid')
 const greenItAnalysis = require('./greenit-analysis/analyseService')
 const formatLighthouseAnalysis = require('./format/formatLighthouseAnalysis')
-const SystemError = require('../utils/systemError')
+const SystemError = require('../utils/SystemError')
 const formatGreenItAnalysis = require('./format/formatGreenItAnalysis')
 const formatLighthouseBestPractices = require('./format/formatLighthouseBestPractices')
+const w3cAnalysis = require('../services/W3C/w3cAnalysis')
+const w3cRepository = require('../dataBase/w3cRepository')
+const formatW3cBestPractices = require('./format/formatW3cBestPractices')
+const formatW3cAnalysis = require('./format/formatW3cAnalysis')
 
 class AnalysisService {}
 
@@ -19,6 +23,7 @@ class AnalysisService {}
  * @param {boolean} autoscroll is used to enable autoscrolling for each tab opened during analysis
  */
 AnalysisService.prototype.insert = async function (projectName, autoscroll) {
+  const allowExternalAPI = process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API
   let urlProjectList = []
   try {
     urlProjectList = await urlsProjectRepository.findAll(projectName, true)
@@ -29,6 +34,7 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
   let urlIdList = []
   let reportsGreenit = []
   let reportsLighthouse = []
+  let reportsW3c = []
   let urlList = []
   if (urlProjectList.length !== 0) {
     urlIdList = urlProjectList.map((url) => url.idKey)
@@ -43,9 +49,20 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
     } catch (error) {
       console.log(error)
     }
+    if (allowExternalAPI === 'true') {
+      try {
+        reportsW3c = await w3cAnalysis.w3cAnalysisWithAPI(urlList, urlIdList)
+      } catch (error) {
+        console.log(error)
+      }
+    } else {
+      console.log('INSERT ANALYSIS - Usage of external API is not allowed, W3C analysis skipped')
+    }
   }
+
   const urlIdListGreenit = Object.values(urlIdList)
 
+  // Lighthouse formatting
   const tabLighthouse = []
   let i = 0
   const date = Date.now()
@@ -82,6 +99,7 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
     j++
   }
 
+  // Analysis insertions
   if (urlProjectList.length !== 0) {
     greenItRepository
       .insertAll(reportsGreenit, urlIdListGreenit, urlList)
@@ -99,6 +117,20 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
       .catch(() => {
         console.log('LIGHTHOUSE INSERT - lighthouse insertion failed')
       })
+
+    if (allowExternalAPI === 'true') {
+      reportsW3c = formatW3cBestPractices.formatW3c(reportsW3c)
+      for (const report of reportsW3c) {
+        report.score = formatW3cAnalysis.calculateScore(report.w3cBestPractices)
+      }
+      w3cRepository.insertAll(reportsW3c, urlIdList)
+        .then(() => {
+          console.log('W3C INSERT - analysis has been insert')
+        })
+        .catch(() => {
+          console.log('W3C INSERT - w3c insertion failed')
+        })
+    }
 
     bestPracticesRepository
       .insertBestPractices(reportsGreenit, lighthousePerformanceBestPractices, lighthouseAccessibilityBestPractices, urlIdListGreenit, projectName)
@@ -121,82 +153,72 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
  */
 
 AnalysisService.prototype.getUrlAnalysis = async function (projectName, urlName) {
-  let greenitAnalysis = null
-  let lighthouseResult = null
+  let greenitAnalysisDeployment
+  let lighthouseResultDeployment
+  let w3cAnalysisDeployment
+  let w3cAnalysisLastAnalysis
+  let lighthouseResultLastAnalysis
+  let greenitAnalysisLastAnalysis
   let errorRetrievedGreenItAnalysis = null
   let errorRetrievedLighthouseAnalysis = null
+  let errorRetrievedW3cAnalysis = null
+
+  // Fetching analysis for each tool
+  await w3cRepository
+    .findAnalysisUrl(projectName, urlName)
+    .then((result) => {
+      w3cAnalysisDeployment = result.deployments
+      w3cAnalysisLastAnalysis = result.w3cLastAnalysis
+    })
+    .catch((err) => {
+      errorRetrievedW3cAnalysis = err
+      w3cAnalysisDeployment = []
+      w3cAnalysisLastAnalysis = null
+    })
+
   await greenItRepository
     .findAnalysisUrl(projectName, urlName)
     .then((result) => {
-      greenitAnalysis = result
+      greenitAnalysisDeployment = result.deployments
+      greenitAnalysisLastAnalysis = formatGreenItAnalysis.greenItUrlAnalysisFormatted(result.lastAnalysis)
     })
     .catch((err) => {
       errorRetrievedGreenItAnalysis = err
+      greenitAnalysisDeployment = []
+      greenitAnalysisLastAnalysis = null
     })
   await lighthouseRepository
     .findAnalysisUrl(projectName, urlName)
     .then((result) => {
-      lighthouseResult = result
+      lighthouseResultDeployment = result.deployments
+      lighthouseResultLastAnalysis = formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(result.lastAnalysis)
     })
     .catch((err) => {
       errorRetrievedLighthouseAnalysis = err
+      lighthouseResultDeployment = []
+      lighthouseResultLastAnalysis = null
     })
+
+  // Creating the response content
   return new Promise((resolve, reject) => {
-    let date = null
-    if (errorRetrievedGreenItAnalysis === null && errorRetrievedLighthouseAnalysis === null) {
-      if (greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1].dateAnalysis.getTime() < lighthouseResult.lastAnalysis.dateLighthouseAnalysis.getTime()) {
-        date = greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1].dateGreenAnalysis
-      } else {
-        date = lighthouseResult.lastAnalysis.dateLighthouseAnalysis
-      }
-      delete lighthouseResult.lastAnalysis.dateLighthouseAnalysis
-      const analysis = {
-        deployments: {
-          greenit: greenitAnalysis.deployments,
-          lighthouse: lighthouseResult.deployments
-        },
-        lastAnalysis: {
-          dateAnalysis: date,
-          greenit: formatGreenItAnalysis.greenItUrlAnalysisFormatted(greenitAnalysis.lastAnalysis),
-          lighthouse: formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(lighthouseResult.lastAnalysis)
-        }
-      }
-      resolve(analysis)
-    } else if (errorRetrievedGreenItAnalysis === null) {
-      date = greenitAnalysis.deployments[greenitAnalysis.deployments.length - 1].dateGreenAnalysis
-      const analysis = {
-        deployments: { greenit: greenitAnalysis.deployments, lighthouse: [] },
-        lastAnalysis: {
-          dateAnalysis: date,
-          greenit: formatGreenItAnalysis.greenItUrlAnalysisFormatted(greenitAnalysis.lastAnalysis),
-          lighthouse: null
-        }
-      }
-      resolve(analysis)
-    } else if (errorRetrievedLighthouseAnalysis === null) {
-      date = lighthouseResult.lastAnalysis.dateLighthouseAnalysis
-      delete lighthouseResult.lastAnalysis.dateLighthouseAnalysis
-      const analysis = {
-        deployments: {
-          greenit: [],
-          lighthouse: lighthouseResult.deployments
-        },
-        lastAnalysis: {
-          dateAnalysis: date,
-          greenit: null,
-          lighthouse: formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(lighthouseResult.lastAnalysis)
-        }
-      }
-      resolve(analysis)
-    } else {
-      if (errorRetrievedGreenItAnalysis instanceof SystemError || errorRetrievedLighthouseAnalysis instanceof SystemError) {
-        reject(new SystemError())
-      } else if (errorRetrievedGreenItAnalysis === errorRetrievedLighthouseAnalysis) {
-        reject(errorRetrievedGreenItAnalysis)
-      } else {
-        reject(new Error('No lighthouse and greenit analysis found for url ' + urlName + ' in project ' + projectName))
+    if (errorRetrievedGreenItAnalysis instanceof SystemError || errorRetrievedLighthouseAnalysis instanceof SystemError || errorRetrievedW3cAnalysis instanceof SystemError) {
+      reject(new SystemError())
+    } else if (errorRetrievedGreenItAnalysis !== null && errorRetrievedLighthouseAnalysis !== null && errorRetrievedW3cAnalysis !== null) {
+      reject(new Error('No analysis found for url ' + urlName + ' in project ' + projectName))
+    }
+    const analysis = {
+      deployments: {
+        greenit: greenitAnalysisDeployment,
+        lighthouse: lighthouseResultDeployment,
+        w3c: w3cAnalysisDeployment
+      },
+      lastAnalysis: {
+        greenit: greenitAnalysisLastAnalysis,
+        lighthouse: lighthouseResultLastAnalysis,
+        w3c: w3cAnalysisLastAnalysis
       }
     }
+    resolve(analysis)
   })
 }
 
@@ -208,12 +230,15 @@ AnalysisService.prototype.getUrlAnalysis = async function (projectName, urlName)
 
 AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
   let greenitAnalysisDeployments = []
-  let greenitLastAnalysis, lighthouseProjectLastAnalysis, dateLighthouseLastAnalysis, dateGreenitLastAnalysis
   let lighthouseAnalysisDeployments = []
+  let w3cAnalysisDeployment = []
+  let greenitLastAnalysis, lighthouseProjectLastAnalysis, w3cProjectLastAnalysis
   let catchLighthouse = null
   let catchGreenit = null
+  let catchW3c = null
   let errRetrievedAnalysisGreenit = null
   let errRetrievedLighthouseAnalysis = null
+  let errRetrievedW3cAnalysis = null
 
   await greenItRepository
     .findAnalysisProject(projectName)
@@ -224,7 +249,7 @@ AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
       } else {
         greenitLastAnalysis = null
         greenitAnalysisDeployments = []
-        errRetrievedAnalysisGreenit = 'No greenit analysis found for project ' + projectName
+        errRetrievedAnalysisGreenit = 'GET ANALYSIS PROJECT - No greenit analysis found for project ' + projectName
       }
     })
     .catch((err) => {
@@ -240,7 +265,7 @@ AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
         // lastAnalysis
         lighthouseProjectLastAnalysis = formatLighthouseAnalysis.lighthouseProjectLastAnalysisFormatted(res.lastAnalysis)
       } else {
-        errRetrievedLighthouseAnalysis = 'No lighthouse Analysis found for project ' + projectName
+        errRetrievedLighthouseAnalysis = 'GET ANALYSIS PROJECT - No lighthouse Analysis found for project ' + projectName
         lighthouseAnalysisDeployments = []
         lighthouseProjectLastAnalysis = null
       }
@@ -248,38 +273,45 @@ AnalysisService.prototype.getProjectAnalysis = async function (projectName) {
     .catch((err) => {
       catchLighthouse = err
     })
+
+  await w3cRepository.findAnalysisProject(projectName).then((res) => {
+    if (res.deployments.length !== 0) {
+      w3cAnalysisDeployment = formatW3cAnalysis.w3cAnalysisFormattedDeployments(res.deployments)
+
+      // lastAnalysis
+      w3cProjectLastAnalysis = formatW3cAnalysis.w3cLastAnalysisFormatted(res.lastAnalysis)
+    } else {
+      errRetrievedW3cAnalysis = 'GET ANALYSIS PROJECT - No W3C Analysis found for project ' + projectName
+      w3cAnalysisDeployment = []
+      w3cProjectLastAnalysis = null
+    }
+  })
+    .catch((err) => {
+      catchW3c = err
+    })
+
   return new Promise((resolve, reject) => {
-    if (catchGreenit instanceof SystemError || catchLighthouse instanceof SystemError) {
+    if (catchGreenit instanceof SystemError || catchLighthouse instanceof SystemError || catchW3c instanceof SystemError) {
       reject(new SystemError())
-    } else if (catchGreenit !== null || catchLighthouse !== null) {
-      reject(new Error('error during generation of ' + projectName + ' analysis'))
+    } else if (catchGreenit !== null || catchLighthouse !== null || catchW3c !== null) {
+      reject(new Error('GET ANALYSIS PROJECT - error during generation of ' + projectName + ' analysis'))
     }
 
-    // Setting the analysis date
-    if (errRetrievedLighthouseAnalysis === null && errRetrievedAnalysisGreenit === null) {
-      dateGreenitLastAnalysis = greenitLastAnalysis.dateAnalysis
-      dateLighthouseLastAnalysis = lighthouseProjectLastAnalysis.dateAnalysis
-    } else if (errRetrievedLighthouseAnalysis != null && errRetrievedAnalysisGreenit === null) {
-      dateGreenitLastAnalysis = greenitLastAnalysis.dateAnalysis
-      dateLighthouseLastAnalysis = null
-    } else if (errRetrievedAnalysisGreenit != null && errRetrievedLighthouseAnalysis === null) {
-      dateGreenitLastAnalysis = null
-      dateLighthouseLastAnalysis = lighthouseProjectLastAnalysis.dateAnalysis
-    } else {
-      reject(new Error('No Analysis found for project ' + projectName))
-    }
+    if (errRetrievedLighthouseAnalysis && errRetrievedAnalysisGreenit && errRetrievedW3cAnalysis) reject(new Error('GET ANALYSIS PROJECT - No Analysis found for project ' + projectName))
 
     // Creating the response content
     const allAnalysis = {
+      allowW3c: process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API,
       deployments: {
         greenit: greenitAnalysisDeployments,
-        lighthouse: lighthouseAnalysisDeployments
+        lighthouse: lighthouseAnalysisDeployments,
+        w3c: w3cAnalysisDeployment
       },
       lastAnalysis: {
-        dateGreenitLastAnalysis,
-        dateLighthouseLastAnalysis,
+
         greenit: greenitLastAnalysis,
-        lighthouse: lighthouseProjectLastAnalysis
+        lighthouse: lighthouseProjectLastAnalysis,
+        w3c: w3cProjectLastAnalysis
       }
     }
     resolve(allAnalysis)

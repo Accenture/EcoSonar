@@ -8,7 +8,6 @@
 }
 
 .right-arrow {
-  margin-left: auto;
   margin-right: 2%;
   height: 1%;
   width: 6%;
@@ -21,6 +20,7 @@
 
 .accordion {
   padding: 0;
+  margin-top: 0;
 }
 
 .accordion-item {
@@ -29,14 +29,12 @@
   margin-bottom: 1%;
 
   .accordion-toggle {
-    cursor: pointer;
-
     .accordion-title {
       display: flex;
       align-items: center;
 
       .right-arrow {
-        margin-left: auto;
+        margin-left: 5%;
         margin-right: 2%;
         height: 1%;
         width: 6%;
@@ -53,6 +51,24 @@
         .right-arrow.active {
           transform: rotate(90deg);
         }
+        .title {
+          margin: 0 3%;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          max-width: 12vw;
+          max-height: 9vh;
+          text-align: justify;
+          &:hover {
+            overflow: auto;
+            white-space: normal;
+          }
+        }
+      }
+      .tool-title {
+        margin-left: auto;
+        min-width: 170px;
+        text-align: right;
       }
     }
   }
@@ -94,11 +110,7 @@
 }
 
 .compliance {
-  width: 15%;
-}
-
-.title {
-  margin: 0 3%;
+  height: 9vh;
 }
 
 .important-data {
@@ -151,12 +163,10 @@
   .best-practice-filters {
     font-weight: $medium-weight;
     margin-bottom: 3%;
-
     .filters {
       margin: 2% 0 0 2%;
       display: flex;
       justify-content: space-around;
-
       .best-practice-filters-selector {
         text-align: center;
         margin: 0 1vw 0 1vw;
@@ -171,7 +181,6 @@
         width: 10vw;
         background-color: $white;
         margin-top: 1vh;
-
         &.url {
           width: 15vw;
         }

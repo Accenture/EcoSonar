@@ -13,6 +13,7 @@ export default function CrawlerPage (props) {
   const handleChangeSetUrl = (event) => {
     setUrl(event.target.value)
   }
+
   const handleChangeCheckedUrls = (checkedUrl) => {
     if (!checkedUrls.includes(checkedUrl)) {
       setCheckedUrls((checkedUrls) => [...checkedUrls, checkedUrl])
@@ -52,6 +53,7 @@ export default function CrawlerPage (props) {
       setAllChecked(false)
     }
   }
+
   const checkCrawledAndNoUrl = () => {
     return hasCrawled && crawledUrls.length === 0
   }
@@ -83,7 +85,7 @@ export default function CrawlerPage (props) {
           </div>
           {crawlerLoading && (
             <div className='crawler-loading'>
-              <img src={LoadingIcon} alt=''/>
+              <img src={LoadingIcon} alt='' />
               <p>Ecosonar crawler is running. Process can take several minutes according to the size of the website. Leave this page open.</p>
             </div>
           )}
@@ -106,9 +108,7 @@ export default function CrawlerPage (props) {
                 <td>
                   <input
                     type='checkbox'
-                    onChange={() => {
-                      selectAll()
-                    }}
+                    onChange={() => { selectAll() }}
                     checked={allChecked}
                     aria-label='select all'
                   ></input>

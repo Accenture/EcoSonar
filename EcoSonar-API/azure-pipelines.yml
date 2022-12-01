@@ -44,10 +44,26 @@ stages:
         DockerNamespace: '$(containerRegistry)'
         DockerRepository: '$(imageRepository)'
         DockerImageTag: '$(tag)'
-        AppSettings: '-ECOSONAR_ENV_SONARQUBE_SERVER_URL $(sonarqubeUrl) -ECOSONAR_ENV_DB_TYPE $(dbType) -ECOSONAR_ENV_CLOUD_PROVIDER $(cloudProvider) -ECOSONAR_ENV_DB_NAME $(dbName) -ECOSONAR_ENV_USER $(userCosmosDB) -ECOSONAR_ENV_CLUSTER $(clusterCosmosDB) -ECOSONAR_ENV_DB_PORT $(portCosmosDB) -ECOSONAR_ENV_KEY_VAULT_NAME $(keyVaultName) -ECOSONAR_ENV_SECRET_NAME $(secretName)'
+        AppSettings: '-ECOSONAR_ENV_SONARQUBE_SERVER_URL $(sonarqubeUrl) -ECOSONAR_ENV_DB_TYPE $(dbType) -ECOSONAR_ENV_CLOUD_PROVIDER $(cloudProvider) -ECOSONAR_ENV_DB_NAME $(dbName) -ECOSONAR_ENV_USER $(userCosmosDB) -ECOSONAR_ENV_CLUSTER $(clusterCosmosDB) -ECOSONAR_ENV_DB_PORT $(portCosmosDB) -ECOSONAR_ENV_KEY_VAULT_NAME $(keyVaultName) -ECOSONAR_ENV_SECRET_NAME $(secretName) -ECOSONAR_ENV_ALLOW_EXTERNAL_API $(allowExternalAPI)'
     - task: AzureAppServiceManage@0
       displayName: 'Start WebApp'
       inputs:
         azureSubscription: $(azureSubscription)
         Action: 'Start Azure App Service'
         WebAppName: $(appName)
+# Prepare Analysis Configuration task
+    - task: SonarQubePrepare@4
+      inputs:
+        SonarQube: 'SonarQube'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'EcoSonar-API'
+
+    # Run Code Analysis task
+    - task: SonarQubeAnalyze@4
+
+    # Publish Quality Gate Result task
+    - task: SonarQubePublish@4
+      inputs:
+        pollingTimeoutSec: '300'
+            

@@ -1,9 +1,22 @@
+async function clickOnElement (element, step) {
+  if (step.offsetX && step.offsetY) {
+    await element.click({
+      offset: {
+        x: step.offsetX,
+        y: step.offsetY
+      }
+    })
+  } else {
+    await element.click({})
+  }
+}
+
 async function waitForSelectors (selectors, frame, options) {
   for (const selector of selectors) {
     try {
       return await waitForSelector(selector, frame, options)
     } catch (err) {
-      console.error(err)
+      console.error(err.message)
     }
   }
   throw new Error('Could not find element for selectors: ' + JSON.stringify(selectors))
@@ -56,4 +69,4 @@ async function applyChange (valueToChange, element) {
   }
 }
 
-module.exports = { waitForSelectors, applyChange }
+module.exports = { clickOnElement, waitForSelectors, applyChange }

@@ -2,8 +2,9 @@ const uniqid = require('uniqid')
 const urlsprojects = require('./models/urlsprojects')
 const greenits = require('./models/greenits')
 const bestpractices = require('./models/bestpractices')
+const w3cs = require('./models/w3cs')
 const lighthouses = require('./models/lighthouses')
-const SystemError = require('../utils/systemError')
+const SystemError = require('../utils/SystemError')
 
 const UrlsProjectRepository = function () {
   /**
@@ -65,6 +66,7 @@ const UrlsProjectRepository = function () {
       } else {
         await greenits.deleteMany({ idUrlGreen: idKey[0].idKey })
         await bestpractices.deleteOne({ idUrl: idKey[0].idKey })
+        await w3cs.deleteMany({ idUrlW3c: idKey[0].idKey })
         await lighthouses.deleteMany({ idUrlLighthouse: idKey[0].idKey })
         await urlsprojects.deleteOne({ projectName: projectNameReq, urlName: urlNameReq })
       }
@@ -104,6 +106,72 @@ const UrlsProjectRepository = function () {
         console.error('\x1b[31m%s\x1b[0m', error)
         const systemError = new SystemError()
         reject(systemError)
+      }
+    })
+  }
+
+  /**
+   * Insert or Update user flow for a specific url
+   * @param {urlObject} urlsProject previously registered
+   * @param {userFlow} user flow to be saved
+   * @returns
+   */
+  this.insertUserFlow = async function (urlObject, userFlow) {
+    const userflowMap = new Map(Object.entries(userFlow))
+    return new Promise((resolve, reject) => {
+      urlsprojects.updateOne({ idKey: urlObject.idKey, projectName: urlObject.projectName, urlName: urlObject.urlName }, { userFlow: userflowMap })
+        .then(() => { resolve() })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          const systemError = new SystemError()
+          reject(systemError)
+        })
+    })
+  }
+
+  /**
+   * find user flow for url to be audited
+   * @param {urlName} url to find user flow
+   * @returns
+   */
+  this.getUserFlow = async function (urlName) {
+    let systemError = null
+    let result
+    try {
+      result = await urlsprojects.findOne({ urlName }, { idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error.message)
+      console.log(`Error when retrieving user flow for ${urlName}`)
+      systemError = new SystemError()
+    }
+    return new Promise((resolve, reject) => {
+      if (systemError !== null) {
+        reject(systemError)
+      } else {
+        resolve(result)
+      }
+    })
+  }
+
+  /**
+   * Deletion of user flow for a specified url
+   * @param {urlName} url to delete user flow
+   * @returns
+   */
+  this.deleteUserFlow = async function (urlName) {
+    let systemError = null
+    try {
+      await urlsprojects.updateOne({ urlName }, { $unset: { userFlow: '' } })
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error.message)
+      systemError = new SystemError()
+    }
+    return new Promise((resolve, reject) => {
+      if (systemError !== null) {
+        console.log('error during deletion of user flow for ' + urlName)
+        reject(systemError)
+      } else {
+        resolve()
       }
     })
   }

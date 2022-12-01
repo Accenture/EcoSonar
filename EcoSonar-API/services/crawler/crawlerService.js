@@ -63,6 +63,12 @@ CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
   if (projectUrls.includes(mainUrl) || projectUrls.includes(mainUrl + '/') || projectUrls.includes(mainUrl.slice(0, -1)) || crawledUrls.includes(mainUrl + '/')) {
     crawledUrls = crawledUrls.filter((url) => (url !== mainUrl))
   }
+
+  // Remove URLS that are being crawler twice due to ending slash in it (www.myurl.com/ vs www.myurl.com)
+  for (const crawledUrl of crawledUrls) {
+    crawledUrls = crawledUrls.filter((url) => !(url === crawledUrl.slice(0, -1)))
+  }
+
   crawledUrls = crawledUrls.filter((url) => (!projectUrls.includes(url) && !projectUrls.includes(url + '/') && !projectUrls.includes(url.slice(0, -1))))
 
   return crawledUrls

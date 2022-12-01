@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import RequestGraph from '../Graphs/RequestGraph'
 import DomGraph from '../Graphs/DomGraph'
 import EcoIndexGraph from '../Graphs/EcoIndexGraph'
@@ -11,9 +11,14 @@ import LargestContentfulPaintGraph from '../Graphs/LargestContentfulGraph'
 import InteractiveGraph from '../Graphs/InteractiveGraph'
 import SpeedIndexGraph from '../Graphs/SpeedIndexGraph'
 import TotalBlockingTimeGraph from '../Graphs/TotalBlockingTimeGraph'
+import { GraphContext } from '../../../context/GraphContext'
+import handleChangeGraphs from './GraphManager'
+import AccessibleArray from './AccessibleArray'
+import W3cGraph from '../Graphs/W3c'
 
 export default function GraphPanelForProject (props) {
   const {
+    allowW3c,
     ecoAnalysis,
     reqAnalysis,
     domAnalysis,
@@ -27,22 +32,16 @@ export default function GraphPanelForProject (props) {
     speedIndexAnalysis,
     totalBlockingTimeAnalysis,
     found,
-    selectedGraph,
-    reqSelected,
-    domSelected,
-    pageSelected,
-    ecoindexSelected,
-    performanceSelected,
-    accessibilitySelected,
-    cumulativeLayoutShiftSelected,
-    firstContentfulPaintSelected,
-    largestContentfulPaintSelected,
-    interactiveSelected,
-    speedIndexSelected,
-    totalBlockingTimeSelected,
-    handleChangeGraphs,
-    error
+    error,
+    w3cAnalysis
   } = props
+  // Context is used to manage graphs in both URL and Project components
+  const { selectedGraph, setSelectedGraph } = useContext(GraphContext)
+  const [displayArrayForAccessibility, setDisplayArrayForAccessibility] = React.useState(false)
+
+  function handleDisplayArrayForAccessibility () {
+    setDisplayArrayForAccessibility(!displayArrayForAccessibility)
+  }
 
   return (
     <div className='overview-panel'>
@@ -57,7 +56,9 @@ export default function GraphPanelForProject (props) {
             <div aria-hidden='true' className='overview-panel-padded display-flex-column flex-1'>
               <div className='position-relative'>
                 <label htmlFor='graphs'>Select a metric to view its evolution during deployments:</label>
-                <select className='select-button' name='graphs' id='graphs' value={selectedGraph} onChange={handleChangeGraphs}>
+                <select className='select-button' name='graphs' id='graphs' value={selectedGraph} onChange={(event) => handleChangeGraphs(event, setSelectedGraph)}>
+                <optgroup label='List of graphs'>
+
                   {ecoAnalysis.length > 0 && <option key='ecoindex' value='ecoindex'>
                     EcoIndex
                   </option>}
@@ -94,26 +95,57 @@ export default function GraphPanelForProject (props) {
                   {totalBlockingTimeAnalysis.length > 0 && <option key='totalblockingtime' value='totalblockingtime'>
                     Total Blocking Time Score
                   </option>}
+                  {allowW3c === 'true' && w3cAnalysis.length > 0 && <option key='w3c' value='w3c'>
+                    W3C Score
+                  </option>}
+                  </optgroup>
                 </select>
               </div>
               <div className='activity-graph-container flex-grow display-flex-column display-flex-stretch display-flex-justify-center'>
                 <div>
-                {reqSelected && <RequestGraph reqAnalysis={reqAnalysis} />}
-                {domSelected && <DomGraph domAnalysis={domAnalysis} />}
-                {pageSelected && <PageGraph pageAnalysis={pageAnalysis} />}
-                {ecoindexSelected && <EcoIndexGraph ecoAnalysis={ecoAnalysis} />}
-                {performanceSelected && <PerformanceGraph performanceAnalysis={performanceAnalysis} />}
-                {accessibilitySelected && <AccessibilityGraph accessibilityAnalysis={accessibilityAnalysis} />}
-                {cumulativeLayoutShiftSelected && <CumulativeGraph cumulativeAnalysis={cumulativeLayoutshiftAnalysis} />}
-                {firstContentfulPaintSelected && <FirstContentfulPaintGraph firstContentfulPaintAnalysis={firstContentfulPaintAnalysis} />}
-                {largestContentfulPaintSelected && <LargestContentfulPaintGraph largestContentfulPaintAnalysis={largestContentfulPaintAnalysis} />}
-                {interactiveSelected && <InteractiveGraph interactiveAnalysis={interactiveAnalysis} />}
-                {speedIndexSelected && <SpeedIndexGraph speedIndexAnalysis={speedIndexAnalysis} />}
-                {totalBlockingTimeSelected && <TotalBlockingTimeGraph totalBlockingTimeAnalysis={totalBlockingTimeAnalysis} />}
+                {selectedGraph === 'request' && <RequestGraph reqAnalysis={reqAnalysis} />}
+                {selectedGraph === 'dom' && <DomGraph domAnalysis={domAnalysis} />}
+                {selectedGraph === 'page' && <PageGraph pageAnalysis={pageAnalysis} />}
+                {selectedGraph === 'ecoindex' && <EcoIndexGraph ecoAnalysis={ecoAnalysis} />}
+                {selectedGraph === 'performance' && <PerformanceGraph performanceAnalysis={performanceAnalysis} />}
+                {selectedGraph === 'accessibility' && <AccessibilityGraph accessibilityAnalysis={accessibilityAnalysis} />}
+                {selectedGraph === 'cumulative' && <CumulativeGraph cumulativeAnalysis={cumulativeLayoutshiftAnalysis} />}
+                {selectedGraph === 'firstcontentfulpaint' && <FirstContentfulPaintGraph firstContentfulPaintAnalysis={firstContentfulPaintAnalysis} />}
+                {selectedGraph === 'largestcontentfulpaint' && <LargestContentfulPaintGraph largestContentfulPaintAnalysis={largestContentfulPaintAnalysis} />}
+                {selectedGraph === 'interactive' && <InteractiveGraph interactiveAnalysis={interactiveAnalysis} />}
+                {selectedGraph === 'speedindex' && <SpeedIndexGraph speedIndexAnalysis={speedIndexAnalysis} />}
+                {selectedGraph === 'totalblockingtime' && <TotalBlockingTimeGraph totalBlockingTimeAnalysis={totalBlockingTimeAnalysis} />}
+                {selectedGraph === 'w3c' && <W3cGraph w3cAnalysis={w3cAnalysis} />}
                 </div></div>
             </div>
           </div>
         </div>)}
+        <div className='graph-accessibility-button'>
+              <button active='false' className='basic-button' onClick={() => handleDisplayArrayForAccessibility()}>
+                Display as a table
+              </button>
+            </div>
+
+            {displayArrayForAccessibility && (
+              <div className='accessibility-array'>
+                <AccessibleArray
+                  ecoUrl={ecoAnalysis}
+                  reqUrl={reqAnalysis}
+                  domUrl={domAnalysis}
+                  pageUrl={pageAnalysis}
+                  performanceUrl={performanceAnalysis}
+                  accessibilityUrl={accessibilityAnalysis}
+                  cumulativeLayoutShiftUrl={cumulativeLayoutshiftAnalysis}
+                  firstContentfulPaintUrl={firstContentfulPaintAnalysis}
+                  largestContentfulPaintUrl={largestContentfulPaintAnalysis}
+                  interactiveUrl={interactiveAnalysis}
+                  speedIndexUrl={speedIndexAnalysis}
+                  totalBlockingTimeUrl={totalBlockingTimeAnalysis}
+                  w3cAnalysis={w3cAnalysis}
+                  selectedGraph={selectedGraph}
+                />
+              </div>
+            )}
       </div>
     </div>
   )

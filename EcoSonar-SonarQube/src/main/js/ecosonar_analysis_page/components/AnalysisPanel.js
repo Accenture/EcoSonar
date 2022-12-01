@@ -1,8 +1,9 @@
 import * as React from 'react'
-import LoadingIcon from '../../images/LoadingIcon.svg'
-import AnalysisPerProjectPanel from './AnalysisPerProjectPanel'
-import AnalysisPerUrlPanel from './AnalysisPerUrlPanel'
 import BoxedTabs from './BoxedTabs'
+import LoadingIcon from '../../images/LoadingIcon.svg'
+import AnalysisPerUrlPanel from './AnalysisPerUrlPanel'
+import AnalysisPerProjectPanel from './AnalysisPerProjectPanel'
+import { GraphContext } from '../../context/GraphContext'
 
 const AnalysisPanelTabs = {
   URL: 'URL',
@@ -10,6 +11,7 @@ const AnalysisPanelTabs = {
 }
 export default function AnalysisPanel (props) {
   const {
+    allowW3c,
     loading,
     analysisForProjectGreenit,
     lighthouseMetricsForProject,
@@ -17,6 +19,7 @@ export default function AnalysisPanel (props) {
     lighthouseAccessibilityForProject,
     dateLighthouseLastAnalysis,
     dateGreenitLastAnalysis,
+    w3cAnalysis,
     error,
     projectName,
     found,
@@ -37,13 +40,10 @@ export default function AnalysisPanel (props) {
     foundUrl,
     selectedUrl,
     errorUrl,
-    defaultSelectedGraph,
-    defaultEcoindexSelected,
-    defaultPerformanceSelected,
-    setSelectedGraph,
-    setEcoIndexSelected,
-    setPerformanceSelected
+    analysisForProjectW3c
   } = props
+
+  const [selectedGraph, setSelectedGraph] = React.useState('ecoindex')
 
   function compareDates () {
     if (dateLighthouseLastAnalysis === dateGreenitLastAnalysis) {
@@ -66,7 +66,8 @@ export default function AnalysisPanel (props) {
         <div className='analysis-tab'>
           <span className='text-bold'>EcoSonar Analysis per URL</span>
         </div>
-      )
+      ),
+      panelName: 'tab-panel-per-URL'
     },
     {
       key: AnalysisPanelTabs.PROJECT,
@@ -74,64 +75,64 @@ export default function AnalysisPanel (props) {
         <div className='analysis-tab'>
           <span className='text-bold'>EcoSonar Analysis for project</span>
         </div>
-      )
+      ),
+      panelName: 'tab-panel-for-project'
     }
   ]
 
   return (
-    <div className='analysis-panel'>
-      <div className='analysis-panel-title'>
-        <h2 className='ecoindex-title'>EcoSonar Analysis - &nbsp;</h2>
-        {analysisForProjectGreenit !== {} && <p className='last-analysis-date'>  {compareDates()} </p>}
-      </div>
+    <GraphContext.Provider value={{ selectedGraph, setSelectedGraph }}>
+      <div className='analysis-panel'>
+        <div className='analysis-panel-title'>
+          <h2 className='ecoindex-title'>EcoSonar Analysis - &nbsp;</h2>
+          {analysisForProjectGreenit !== {} && <p className='last-analysis-date'> {compareDates()} </p>}
+        </div>
 
-      {loading
-        ? (
+        {loading
+          ? (
           <div className='loading'>
             <img src={LoadingIcon} alt='Loading icon' />
           </div>
-          )
-        : (
+            )
+          : (
           <>
             <BoxedTabs onSelect={selectTab} selected={tab} tabs={tabs} />
 
             <div className='analysis-panel-content'>
               {isPerUrlTab
                 ? (
-                  <AnalysisPerUrlPanel project={project} urls={urls} foundUrl={foundUrl} selectedUrl={selectedUrl} errorUrl={errorUrl} />
+                <AnalysisPerUrlPanel allowW3c={allowW3c} project={project} urls={urls} foundUrl={foundUrl} selectedUrl={selectedUrl} errorUrl={errorUrl} />
                   )
                 : (
-                  <AnalysisPerProjectPanel
-                    analysisForProjectGreenit={analysisForProjectGreenit}
-                    lighthouseMetricsForProject={lighthouseMetricsForProject}
-                    lighthousePerformanceForProject={lighthousePerformanceForProject}
-                    lighthouseAccessibilityForProject={lighthouseAccessibilityForProject}
-                    error={error}
-                    found={found}
-                    ecoAnalysis={ecoAnalysis}
-                    domAnalysis={domAnalysis}
-                    pageAnalysis={pageAnalysis}
-                    reqAnalysis={reqAnalysis}
-                    performanceAnalysis={performanceAnalysis}
-                    accessibilityAnalysis={accessibilityAnalysis}
-                    cumulativeLayoutshiftAnalysis={cumulativeLayoutshiftAnalysis}
-                    firstContentfulPaintAnalysis={firstContentfulPaintAnalysis}
-                    largestContentfulPaintAnalysis={largestContentfulPaintAnalysis}
-                    interactiveAnalysis={interactiveAnalysis}
-                    speedIndexAnalysis={speedIndexAnalysis}
-                    totalBlockingTimeAnalysis={totalBlockingTimeAnalysis}
-                    projectName={projectName}
-                    selectedGraph={defaultSelectedGraph}
-                    setSelectedGraph={setSelectedGraph}
-                    ecoindexSelected={defaultEcoindexSelected}
-                    setEcoIndexSelected={setEcoIndexSelected}
-                    performanceSelected={defaultPerformanceSelected}
-                    setPerformanceSelected={setPerformanceSelected}
-                  />
+                <AnalysisPerProjectPanel
+                  allowW3c={allowW3c}
+                  analysisForProjectGreenit={analysisForProjectGreenit}
+                  analysisForProjectW3c={analysisForProjectW3c}
+                  lighthouseMetricsForProject={lighthouseMetricsForProject}
+                  lighthousePerformanceForProject={lighthousePerformanceForProject}
+                  lighthouseAccessibilityForProject={lighthouseAccessibilityForProject}
+                  error={error}
+                  found={found}
+                  ecoAnalysis={ecoAnalysis}
+                  domAnalysis={domAnalysis}
+                  pageAnalysis={pageAnalysis}
+                  reqAnalysis={reqAnalysis}
+                  performanceAnalysis={performanceAnalysis}
+                  accessibilityAnalysis={accessibilityAnalysis}
+                  cumulativeLayoutshiftAnalysis={cumulativeLayoutshiftAnalysis}
+                  firstContentfulPaintAnalysis={firstContentfulPaintAnalysis}
+                  largestContentfulPaintAnalysis={largestContentfulPaintAnalysis}
+                  interactiveAnalysis={interactiveAnalysis}
+                  speedIndexAnalysis={speedIndexAnalysis}
+                  totalBlockingTimeAnalysis={totalBlockingTimeAnalysis}
+                  projectName={projectName}
+                  w3cAnalysis={w3cAnalysis}
+                />
                   )}
             </div>
           </>
-          )}
-    </div>
+            )}
+      </div>
+    </GraphContext.Provider>
   )
 }

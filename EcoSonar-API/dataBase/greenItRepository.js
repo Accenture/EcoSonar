@@ -1,12 +1,12 @@
 const uniqid = require('uniqid')
 const greenits = require('./models/greenits')
 const urlsprojects = require('./models/urlsprojects')
-const SystemError = require('../utils/systemError')
+const SystemError = require('../utils/SystemError')
 const formatGreenItAnalysis = require('../services/format/formatGreenItAnalysis')
 
 const GreenItRepository = function () {
   /**
-   * insertion of one or more analysis on the arrayToInsertle greenit :OK
+   * insertion of one or more analysis
    * @param {analysis of url} reports
    * @param {list of id of urls} urlIdList
    * @param {list of urls} urlList

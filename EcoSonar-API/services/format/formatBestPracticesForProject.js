@@ -1,5 +1,5 @@
 
-const formatCompliance = require('../../services/format/formatCompliance')
+const formatCompliance = require('./formatCompliance')
 
 class FormatBestPracticesForProject { }
 
@@ -41,6 +41,7 @@ FormatBestPracticesForProject.prototype.mergeArrays = function (formattedReport,
     return combinedArray
   }
 }
+
 FormatBestPracticesForProject.prototype.sortByScore = function (formattedReport) {
   const naValues = []
   const withScoreValues = []

@@ -12,6 +12,15 @@ EnumAudits.prototype.lighthouseMetrics = function () {
   }
 }
 
+EnumAudits.prototype.procedures = function () {
+  return {
+    scoreImpact: 'scoreImpact',
+    quickWins: 'quickWins',
+    highestImpact: 'highestImpact',
+    smartImpact: 'smartImpact'
+  }
+}
+
 EnumAudits.prototype.performanceNamesToSave = function () {
   return {
 

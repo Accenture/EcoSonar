@@ -1,5 +1,5 @@
 const enumAudits = require('../../utils/enumAudits')
-const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
+const formatBestPracticesForProject = require('./formatBestPracticesForProject')
 const metricsCalculate = require('../../utils/metricsCalculate')
 
 class FormatLighthouseBestPractices { }
@@ -134,7 +134,8 @@ FormatLighthouseBestPractices.prototype.returnFormattedPerformance = function (r
       averageScore: formattedResponse.averageScore,
       description: formattedResponse.description,
       compliance: formattedResponse.compliance,
-      isApplicableOrInformative
+      isApplicableOrInformative,
+      tool: 'Lighthouse Performance'
     }
   }
 
@@ -211,7 +212,8 @@ FormatLighthouseBestPractices.prototype.returnFormattedAccessibility = function 
       averageScore: formattedResponse.averageScore,
       description: formattedResponse.description,
       compliance: formattedResponse.compliance,
-      isApplicableOrInformative
+      isApplicableOrInformative,
+      tool: 'Lighthouse Accessibility'
     }
   }
   // For each BP, we merge the description [] of every URL analyzed in a single array

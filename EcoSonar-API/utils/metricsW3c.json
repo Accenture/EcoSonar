@@ -1,0 +1,267 @@
+[
+  {
+    "errorMessage" :"Start tag seen without seeing a doctype first(\\S) Expected (\\S)<!DOCTYPE html>(\\S)(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage":"The character encoding was not declared. Proceeding using(\\S| )*",
+    "coefficient":4,
+    "score":1
+  },
+  {
+    "errorMessage" :"CSS:(\\S| )*:(\\S| )*(\\S) You must put a unit after your number(\\S)(\\S| )*",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"The(\\S| )*attribute on the(\\S| )*element is obsolete(\\S) (\\S| )*",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"The(\\S| )*element is obsolete(\\S) Use (\\S| )*",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"Attribute(\\S| )*not allowed on element(\\S| )*at this point(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Too many messages(\\S)",
+    "coefficient" : 10,
+    "score":6
+  },
+  {
+    "errorMessage" :"The(\\S| )*attribute for the (\\S)style(\\S)(\\S| )*is not needed and should be omitted(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"The(\\S| )*attribute is obsolete(\\S) Consider specifying(\\S| )*in CSS instead(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Trailing slash on void elements has no effect and interacts badly with unquoted attribute values(\\S)",
+    "coefficient" : 0.5,
+    "score":1
+  },
+  {
+    "errorMessage" :"Attribute (\\S)xmlns:og(\\S) not allowed here(\\S)",
+    "coefficient" : 4,
+    "score":3
+  },
+  {
+    "errorMessage" :"Bad value(\\S| )*for attribute(\\S| )*on element(\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"Bad value(\\S| )*for the attribute(\\S| )*(\\S)only(\\S| )*permitted here(\\S)(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"Forbidden code point U(\\S)0008(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"CSS *:(\\S| )*:(\\S| )*is not a(\\S| )*value(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"CSS:(\\S| )*: Property(\\S| )*doesn't exist(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Element(\\S| )*not allowed as child of element(\\S| )*in this context(\\S) (\\S)Suppressing further errors from this subtree(\\S)(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Element(\\S| )*is missing required attribute(\\S| )*",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Element(\\S| )*is missing one or more of the following attributes *:(\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"The(\\S| )*element must not appear as a descendant of the(\\S| )*element(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"A document must not include more than one visible (\\S)main(\\S) element(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"The element(\\S| )*must not appear as a descendant of an element with the attribute(\\S| )*",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"Element (\\S)picture(\\S) is missing a required instance of child element (\\S)img(\\S)(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"The(\\S| )*attribute must not be used on a(\\S| )*element which has a(\\S| )*ancestor with no(\\S| )*attribute, or with a (\\S)role(\\S) attribute whose value is(\\S| )*,(\\S| )*, or(\\S| )*",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"An (\\S)img(\\S) element must have an (\\S)alt(\\S) attribute, except under certain conditions(\\S) For details, consult guidance on providing text alternatives for images(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"Attribute with the local name (\\S)xmlns:og(\\S) is not serializable as XML 1(\\S)0(\\S)",
+    "coefficient" : 1,
+    "score":0.5
+  },
+  {
+    "errorMessage" :"The(\\S| )*attribute is unnecessary for JavaScript resources(\\S)",
+    "coefficient" : 1,
+    "score":1
+  },
+  {
+    "errorMessage" :"Section lacks heading(\\S) Consider using(\\S| )*elements to add identifying headings to all sections, or else use a(\\S| )*element instead for any cases where no heading is needed(\\S)",
+    "coefficient" : 1,
+    "score":1
+  },
+  {
+    "errorMessage" :"Possible misuse of (\\S)aria-label(\\S)(\\S) (\\S)If you disagree with this warning, file an issue report or send e-mail to www-validator@w3(\\S)org(\\S)(\\S)(\\S)*",
+    "coefficient" : 1,
+    "score":1
+  },
+  {
+    "errorMessage" :"Attribute(\\S| )*is not serializable as XML 1(\\S)0(\\S)",
+    "coefficient" : 1,
+    "score":0.5
+  },
+  {
+    "errorMessage" :"The(\\S| )*role is unnecessary for element(\\S| )*(\\S)",
+    "coefficient" : 1,
+    "score":3
+  },
+  {
+    "errorMessage" :"(\\S| )*in an unquoted attribute value(\\S) Probable causes *: *Attributes running together or a URL query string in an unquoted attribute value(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Quote(\\S| )*in attribute name(\\S) Probable cause *: *Matching quote missing somewhere earlier(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Attribute value missing(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"Duplicate ID(\\S| )*",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"The(\\S| )*attribute must point to an element in the same document(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"The first occurrence of ID(\\S| )*was here(\\S)",
+    "coefficient" : 1,
+    "score":1
+  },
+  {
+    "errorMessage" :"Stray end tag(\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":3
+  },
+  {
+    "errorMessage" :"A document must not include both a(\\S| )*element with an(\\S| )*attribute whose value is(\\S| )*, and a(\\S| )*element with a(\\S| )*attribute(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"An(\\S| )*element with a(\\S| )*attribute whose value is(\\S| )*must not have an(\\S| )*attribute whose value is(\\S| )*or(\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"The(\\S| )*attribute is obsolete(\\S) Consider(\\S| )*instead(\\S)",
+    "coefficient" : 1,
+    "score":1
+  },
+  {
+    "errorMessage" :"X-UA-Compatible HTTP header must have the value (\\S)IE=edge(\\S), was (\\S)IE=edge,chrome=1(\\S)(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"No space between attributes(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"An element with(\\S| )*must be contained in, or owned by, an element with(\\S| )*or(\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":6
+  },
+  {
+    "errorMessage" :"Duplicate attribute (\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Bad character(\\S| )*after(\\S| )*(\\S) Probable cause *: *Unescaped(\\S| )*(\\S) Try escaping it as(\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Empty heading(\\S)",
+    "coefficient" : 1,
+    "score":3
+  },
+  {
+    "errorMessage" :"Legacy encoding(\\S| )*used(\\S) Documents must use(\\S| )*",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"Consider adding a(\\S| )*attribute to the(\\S| )*start tag to declare the language of this document(\\S)",
+    "coefficient" : 1,
+    "score":3
+  },
+  {
+    "errorMessage" :"When the(\\S| )*attribute has any image candidate string with a width descriptor, the(\\S| )*attribute must also be specified(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage" :"CSS *:(\\S| )*: *only (\\S| )* can be a(\\S| )*(\\S) You must put a unit after your number(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage": "CSS: *Unknown pseudo-element or pseudo-class(\\S| )*(\\S)",
+    "coefficient" : 4,
+    "score":1
+  },
+  {
+    "errorMessage": "The(\\S| )*attribute was specifed, but the element is not a property of any item(\\S)",
+    "coefficient" : 4,
+    "score":1
+  }
+]

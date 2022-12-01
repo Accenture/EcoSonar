@@ -20,7 +20,7 @@
 
 function startAnalyseCore () {
   const analyseStartingTime = Date.now()
-  const domSize = document.getElementsByTagName('*').length
+  const domSize = getDomSizeWithoutSvg()
   const pluginsNumber = getPluginsNumber()
   const printStyleSheetsNumber = getPrintStyleSheetsNumber()
   const inlineStyleSheetsNumber = getInlineStyleSheetsNumber()
@@ -41,6 +41,28 @@ function startAnalyseCore () {
     inlineJsScriptsNumber,
     imagesResizedInBrowser
   }
+}
+function getDomSizeWithoutSvg () {
+  let domSize = document.getElementsByTagName('*').length
+  const svgElements = document.getElementsByTagName('svg')
+  for (const svgElement of svgElements) {
+    domSize -= getNbChildsExcludingNestedSvg(svgElement) - 1
+  }
+  return domSize
+}
+
+function getNbChildsExcludingNestedSvg (element) {
+  if (element.nodeType === Node.TEXT_NODE) return 0
+  let nbElements = 1
+  for (const childNode of element.childNodes) {
+    // deal with svg nested case
+    if (childNode.tagName !== 'svg') {
+      nbElements += getNbChildsExcludingNestedSvg(childNode)
+    } else {
+      nbElements += 1
+    }
+  }
+  return nbElements
 }
 
 function getPluginsNumber () {

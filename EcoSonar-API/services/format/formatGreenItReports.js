@@ -1,6 +1,6 @@
 
 const formatGreenItBestPractices = require('./formatGreenItBestPractices')
-const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
+const formatBestPracticesForProject = require('./formatBestPracticesForProject')
 
 class FormatGreenItReports {}
 
@@ -31,6 +31,10 @@ FormatGreenItReports.prototype.returnFormattedGreenIt = function (reports) {
     useETags: formatGreenItBestPractices.useETags(reports),
     useStandardTypefaces: formatGreenItBestPractices.useStandardTypefaces(reports)
   }
+
+  Object.keys(greenItBestPractices).forEach(function (k) {
+    greenItBestPractices[k].tool = 'GreenIT-Analysis'
+  })
 
   return formatBestPracticesForProject.sortByScore(greenItBestPractices)
 }

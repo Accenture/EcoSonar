@@ -52,50 +52,48 @@ export default function DeleteUrlForm (props) {
       aria-modal="true"
       aria-hidden="false"
     >
-      <FocusTrap active={openDelete}>
+    <FocusTrap active={openDelete}>
         <div
           className="modal-content-config"
           onClick={(e) => e.stopPropagation()}
           role="document"
         >
-          <div className="modal-header-config">
-            <h2 className="modal-title-config">Delete URL from your project</h2>
-          </div>
-          <div className="modal-validation-field delete-field">
-            <p>
-              If you want to delete {urlList[index]} in {projectName} click on
-              delete.
-            </p>
-          </div>
-          <footer className="modal-footer-config">
-            {isSubmitting && (
-              <div className="loading">
-                <img src={LoadingIcon} alt="Loading icon" />
-              </div>
-            )}
-            {errorMessageDelete !== '' && <p className="text-danger" role="alert">{errorMessageDelete}</p>}
-            <button
-              className="button-red"
-              disabled={isSubmitting}
-              type="submit"
-              onClick={handleSubmit}
-              aria-label="confirm you want to delete this url"
-            >
-
-              Delete
-            </button>
-            <button
-              className="cancel-button"
-              disabled={isSubmitting}
-              type="reset"
-              onClick={handleCancelClick}
-              aria-label="cancel"
-            >
-
-              Cancel
-            </button>
-          </footer>
+        <div className="modal-header-config">
+          <h2 className="modal-title-config">Delete URL from your project</h2>
         </div>
+        <div className="modal-validation-field delete-field">
+          <p>
+            If you want to delete {urlList[index]} in {projectName} click on
+            delete.
+          </p>
+        </div>
+        <footer className="modal-footer-config">
+          {isSubmitting && (
+            <div className="loading">
+              <img src={LoadingIcon} alt="Loading icon" />
+            </div>
+          )}
+          {errorMessageDelete !== '' && <p className="text-danger" role="alert">{errorMessageDelete}</p>}
+          <button
+            className="button-red"
+            disabled={isSubmitting}
+            type="submit"
+            onClick={handleSubmit}
+            aria-label="confirm you want to delete this url"
+          >
+            Delete
+          </button>
+          <button
+            className="cancel-button"
+            disabled={isSubmitting}
+            type="reset"
+            onClick={handleCancelClick}
+            aria-label="cancel"
+          >
+            Cancel
+          </button>
+        </footer>
+      </div>
       </FocusTrap>
     </div>
   )

@@ -15,6 +15,9 @@ const urlsProjectSchema = new Schema({
     type: String,
     required: true,
     match: [/^(https|http):\/\/\S*$/g, 'Please fill in a valid url']
+  },
+  userFlow: {
+    type: Map
   }
 })
 

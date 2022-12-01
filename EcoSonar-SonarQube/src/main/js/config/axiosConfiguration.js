@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-const baseUrlHosted = '<BASE_URL_OF_ECOSONAR_API>'
+const baseUrlHosted = process.env.REACT_APP_BASE_URL_ECOSONAR_API || ''
 
 export const axiosInstance = axios.create({
   baseURL: baseUrlHosted,

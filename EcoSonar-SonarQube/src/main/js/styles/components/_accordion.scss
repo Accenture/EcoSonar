@@ -2,11 +2,12 @@
   position: relative;
   left: 93%;
   display: inline-block;
-  font-size: 1em; 
+  font-size: 1em;
   height: 1em;
   width: 4em;
   background: $light-grey;
   border-radius: 1em;
+
   div {
     height: 1em;
     width: 2em;
@@ -17,14 +18,20 @@
     -moz-transition: all 300ms;
     transition: all 300ms;
   }
+
   input {
     position: absolute;
     opacity: 0;
   }
-  input:checked + div {
+
+  input:checked+div {
     -webkit-transform: translate3d(100%, 0, 0);
     -moz-transform: translate3d(100%, 0, 0);
     transform: translate3d(100%, 0, 0);
     background-color: $blue;
   }
+}
+
+.accordion-name {
+  text-transform: uppercase;
 }

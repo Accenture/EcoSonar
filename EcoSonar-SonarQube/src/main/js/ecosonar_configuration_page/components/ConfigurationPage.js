@@ -129,6 +129,8 @@ export default class ConfigurationPage extends React.PureComponent {
 
   render () {
     return (
+      <main role='main' aria-hidden='true'>
+
       <div className='page' aria-hidden='true'>
         <div className='page-header' role='banner' aria-label='configuration page presentation'>
           <h1 className='page-title'>URL Configuration for project {this.state.projectName}</h1>
@@ -153,7 +155,6 @@ export default class ConfigurationPage extends React.PureComponent {
             EcoSonar will then analyse all pages of your web app and will guide you to set up practices optimizing ressources.
           </p>
         </div>
-        <main role='main' aria-hidden='true'>
           {!this.state.loading ? this.checkUrl() : <img src={LoadingIcon} alt='Loading icon' />}
 
           {this.state.deleting && (
@@ -167,8 +168,9 @@ export default class ConfigurationPage extends React.PureComponent {
               />
             </div>
           )}
-        </main>
       </div>
+      </main>
+
     )
   }
 }

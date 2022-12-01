@@ -36,5 +36,18 @@ FormatCompliance.prototype.complianceLevel = function (score) {
   } else return 'G'
 }
 
+// W3C Compliance Level
+FormatCompliance.prototype.complianceLevelW3c = function (type) {
+  if (type === 'info') {
+    return 'C'
+  }
+  if (type === 'warning') {
+    return 'E'
+  }
+  if (type === 'error' || type === 'fatal error' || !type) {
+    return 'G'
+  }
+}
+
 const formatCompliance = new FormatCompliance()
 module.exports = formatCompliance

@@ -1,6 +1,6 @@
 const lighthouses = require('./models/lighthouses')
 const urlsprojects = require('./models/urlsprojects')
-const SystemError = require('../utils/systemError')
+const SystemError = require('../utils/SystemError')
 const formatLighthouseAnalysis = require('../services/format/formatLighthouseAnalysis')
 
 const LighthouseRepository = function () {

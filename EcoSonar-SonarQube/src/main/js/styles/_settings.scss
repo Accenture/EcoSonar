@@ -12,7 +12,7 @@ $red: #a4030f;
 $red-error: #ad0000;
 $red-background: #ffc5c5;
 $green: #156605;
-$orange: #c06702;
+$orange: #ac5c02;
 
 $transparent-light-grey: rgba(187, 187, 187, 0.6);
 
@@ -499,10 +499,6 @@ small {
 .small-text {
   font-size: $small-font;
 }
-.score {
-  font-size: $xlarge-font;
-  font-weight: $medium-small-weight;
-}
 
 .undefined {
   background: $grey;
@@ -529,6 +525,7 @@ small {
 
 .analysis-panel-title {
   display: flex;
+  align-items: baseline;
 }
 
 .analysis-panel-content {
@@ -552,6 +549,12 @@ small {
   cursor: pointer;
   outline: 0;
   padding: 16px;
+  &:focus {
+    border: $blue 2px solid;
+  }
+  &:hover {
+    border: $blue 2px solid;
+  }
 }
 
 .tab-active {
@@ -609,6 +612,14 @@ small {
   opacity: 0;
   transition: opacity 0.3s;
 }
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+.tooltip:focus .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
 
 .ecoIndex-tool {
   margin-top: 2vh;
@@ -639,11 +650,6 @@ small {
   margin-left: -60px;
 }
 
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
-}
-
 .select-button {
   border: $white;
   background-color: $cream;
@@ -653,6 +659,9 @@ small {
   line-height: 24px;
   margin-left: 1%;
   color: $grey;
+  &:focus-visible {
+    border: solid 2px $black;
+  }
 }
 
 .choose-url {
@@ -716,4 +725,17 @@ small {
 .overview-measures-aside {
   flex-basis: 210px;
   box-sizing: border-box;
+}
+
+// Accessibility
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }

@@ -6,7 +6,7 @@ export default function AccordionDescriptionLighthouse (props) {
   const [isExtended, setIsExtended] = useState(false)
 
   return (
-    !!descriptions.length && (
+    descriptions.length && (
       <div className={`accordion-descriptions ${descriptions.length > 5 ? 'extend' : ''}`} onClick={() => setIsExtended(!isExtended)}>
         {!isExtended &&
         <pre className='lighthouse-descriptions'>{JSON.stringify(descriptions, null, 2)}

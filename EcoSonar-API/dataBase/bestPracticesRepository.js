@@ -1,7 +1,7 @@
 const uniqid = require('uniqid')
 const bestpractices = require('./models/bestpractices')
 const urlsprojects = require('./models/urlsprojects')
-const SystemError = require('../utils/systemError')
+const SystemError = require('../utils/SystemError')
 
 const BestPracticesRepository = function () {
   /**
@@ -23,9 +23,7 @@ const BestPracticesRepository = function () {
 
     while (i < reports.length) {
       idAnalysisBestPractices = uniqid()
-      const bestPracticesFormatted = Object.fromEntries(
-        Object.entries(reports[i].bestPractices).map(([key, value]) => [key.charAt(0).toLowerCase() + key.slice(1), value])
-      )
+      const bestPracticesFormatted = Object.fromEntries(Object.entries(reports[i].bestPractices).map(([key, value]) => [key.charAt(0).toLowerCase() + key.slice(1), value]))
       string = {
         idAnalysisBestPractices,
         idUrl: urlIdList[i],
@@ -41,7 +39,8 @@ const BestPracticesRepository = function () {
 
     return new Promise((resolve, reject) => {
       if (arrayToInsert.length > 0) {
-        bestpractices.insertMany(arrayToInsert)
+        bestpractices
+          .insertMany(arrayToInsert)
           .then(() => {
             resolve()
           })
@@ -71,7 +70,7 @@ const BestPracticesRepository = function () {
       if (resList.length === 0) {
         empty = true
       } else {
-        const listIdKey = resList.map(url => url.idKey)
+        const listIdKey = resList.map((url) => url.idKey)
         resAnalysis = await bestpractices.deleteMany({ idUrl: listIdKey })
       }
     } catch (error) {
@@ -118,7 +117,9 @@ const BestPracticesRepository = function () {
           listIdKey[i] = resList[i].idKey
           i++
         }
-        resultats = await bestpractices.find({ idUrl: listIdKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 }).sort({ dateAnalysisBestPractices: -1 })
+        resultats = await bestpractices
+          .find({ idUrl: listIdKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
+          .sort({ dateAnalysisBestPractices: -1 })
       }
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error)
@@ -143,12 +144,19 @@ const BestPracticesRepository = function () {
    * @returns
    */
   this.find = async function (projectName, urlName) {
-    const hasNoUrl = false
+    let hasNoUrl = false
     let systemError = null
     let resultats
     try {
       const resList = await urlsprojects.find({ projectName, urlName }, { idKey: 1 })
-      resultats = await bestpractices.find({ idUrl: resList[0].idKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 }).sort({ dateAnalysisBestPractices: -1 }).limit(1)
+      if (resList.length < 1) {
+        hasNoUrl = true
+      } else {
+        resultats = await bestpractices
+          .find({ idUrl: resList[0].idKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
+          .sort({ dateAnalysisBestPractices: -1 })
+          .limit(1)
+      }
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error)
       console.log(`Error during generation of ${urlName} best practices analysis`)
@@ -166,13 +174,13 @@ const BestPracticesRepository = function () {
   }
 
   /**
- *
- * @param {Array} arrayToInsert
- * @param {Array} urlIdList
- * @param {String} projectName
- * @returns an array cleaned of analysis containing undefined and NaN to avoid mongoose rejecting every GreenIt Best Practices insertion
- * This function check if best practices exists for each url of the report (arrayToInsert), if true then also update urlIdList array to match
- */
+   *
+   * @param {Array} arrayToInsert
+   * @param {Array} urlIdList
+   * @param {String} projectName
+   * @returns an array cleaned of analysis containing undefined and NaN to avoid mongoose rejecting every GreenIt Best Practices insertion
+   * This function check if best practices exists for each url of the report (arrayToInsert), if true then also update urlIdList array to match
+   */
   async function checkValues (arrayToInsert, urlIdList, projectName) {
     const arrayToInsertSanitized = []
     const urlIdListSanitized = []
@@ -180,7 +188,7 @@ const BestPracticesRepository = function () {
       if (analysis.bestPractices) {
         arrayToInsertSanitized.push(analysis)
         const urlInfos = await urlsprojects.find({ projectName, urlName: analysis.url })
-        urlIdListSanitized.push(urlIdList.find(element => element === urlInfos[0].idKey))
+        urlIdListSanitized.push(urlIdList.find((element) => element === urlInfos[0].idKey))
       } else {
         console.log(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
       }

@@ -19,11 +19,13 @@
 .correction-title {
   font-size: $small-font;
   font-weight: $medium-weight;
-  overflow-wrap: break-word;
   font-family: $main-font;
   margin: 0;
   padding: 1%;
   color: $white;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .style-correction {

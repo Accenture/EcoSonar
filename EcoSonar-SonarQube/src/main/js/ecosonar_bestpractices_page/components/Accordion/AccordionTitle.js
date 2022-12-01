@@ -32,7 +32,18 @@ function getCorrespondingImg (compliance) {
   }
 }
 export default function AccordionTitle (props) {
-  const { compliance, title, staticTitleData, staticTitleDataSuccess, auditedMetric, isActive, correction, score } = props
+  const {
+    compliance,
+    title,
+    staticTitleData,
+    staticTitleDataSuccess,
+    auditedMetric,
+    isActive,
+    correction,
+    score,
+    tool
+  } = props
+
   const [correctionPage, setCorrectionPage] = React.useState(false)
   const CorrectionPageOpen = (e) => {
     e.stopPropagation()
@@ -62,11 +73,13 @@ export default function AccordionTitle (props) {
             title={title}
             correction={correction}
             setCorrectionPage={setCorrectionPage}
+            tool = {tool}
           />
         )}
       </div>
       <div className="accordion-right">
         <p className='important-data'>{displayData(title, staticTitleData, staticTitleDataSuccess, auditedMetric, score)}</p>
+        <p className='tool-title'><b>{tool}</b></p>
         <img src={RightArrow} alt="" className={isActive ? 'active right-arrow' : 'right-arrow'} />
       </div>
     </div>

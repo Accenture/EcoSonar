@@ -1,5 +1,5 @@
 
-import React from 'react'
+import * as React from 'react'
 
 export default function AccordionDescription (props) {
   const { descriptions } = props
@@ -9,7 +9,7 @@ export default function AccordionDescription (props) {
   const shown = descriptions.slice(0, isExtended ? descriptions.length : 5)
 
   return (
-    !!descriptions.length &&
+    descriptions.length > 0 &&
     <div
       className={`accordion-descriptions ${descriptions.length > 5 ? 'extend' : ''}`}
       onClick={() => setIsExtended(!isExtended)}

@@ -19,7 +19,7 @@ steps:
     jdkArchitectureOption: 'x64'
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
-    goals: 'clean package'
+    goals: 'clean package -Durl=$(REACT_APP_BASE_URL_ECOSONAR_API)'
 # Copy files
 - task: CopyFiles@2
   inputs:
