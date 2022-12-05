@@ -40,7 +40,7 @@ module.exports = {
     try {
       let lighthouseResults
       let userJourney
-      const loginSucceeded = await authenticationService.loginIfNeeded(browser)
+      const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
       if (loginSucceeded) {
         for (const [index, url] of urlList.entries()) {
           try {
@@ -57,7 +57,7 @@ module.exports = {
               lighthouseResults = await lighthouse(url, options, config)
             }
             console.log('Lighthouse Analysis ended for url ' + url)
-            results[index] = lighthouseResults.lhr
+            results[index] = { ...lighthouseResults.lhr, url }
           } catch (error) {
             console.log('LIGHTHOUSE ANALYSIS - An error occured when auditing ' + url)
             console.error('\x1b[31m%s\x1b[0m', error)

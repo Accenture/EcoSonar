@@ -14,9 +14,9 @@ class FormatW3cBestPractices {}
  * @returns  a formatted analysis to match with the best practices format
  */
 FormatW3cBestPractices.prototype.formatW3c = function (w3cAnalysis) {
-  try {
-    // For each URL we assemble siblings best practices to avoid duplicate and create an array of extracts
-    for (const element of w3cAnalysis) {
+  // For each URL we assemble siblings best practices to avoid duplicate and create an array of extracts
+  for (const element of w3cAnalysis) {
+    try {
       element.w3cBestPractices = []
       for (const item of element.messages) {
         if (!element.w3cBestPractices.filter(e => e.auditName === item.message).length > 0) {
@@ -32,9 +32,9 @@ FormatW3cBestPractices.prototype.formatW3c = function (w3cAnalysis) {
           element.w3cBestPractices[indexToPushOn].description.push({ extract: item.extract, lineToCorrect: item.lastLine })
         }
       }
+    } catch (err) {
+      console.log('W3C - Error during the formatting of w3c analysis for url ' + w3cAnalysis.url)
     }
-  } catch (err) {
-    console.log('W3C - Error during the formatting of w3c analysis')
   }
   return w3cAnalysis
 }

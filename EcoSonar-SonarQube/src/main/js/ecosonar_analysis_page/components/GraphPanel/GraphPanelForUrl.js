@@ -13,7 +13,7 @@ import SpeedIndexGraph from '../Graphs/SpeedIndexGraph'
 import TotalBlockingTimeGraph from '../Graphs/TotalBlockingTimeGraph'
 import { GraphContext } from '../../../context/GraphContext'
 import handleChangeGraphs from './GraphManager'
-import AccessibleArray from '../GraphPanel/AccessibleArray'
+import AccessibleArray from './AccessibleArray'
 import W3cGraph from '../Graphs/W3c'
 
 export default function GraphPanelForUrl (props) {

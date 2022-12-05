@@ -2,38 +2,19 @@
 const SystemError = require('../utils/SystemError')
 const w3cs = require('./models/w3cs')
 const urlsprojects = require('./models/urlsprojects')
-const uniqid = require('uniqid')
 const formatW3cAnalysis = require('../services/format/formatW3cAnalysis')
 
 const W3cRepository = function () {
   /**
    * Insert the w3c analysis for a project
-   * @param {report} reportW3c is a list a the report for the w3c analysis
-   * @param {list of id of urls} urlIdList is a list of the analyzed URLs ID
+   * @param {reportsW3c} reportW3c is a list a the report for the w3c analysis
    * @returns
    */
-  this.insertAll = function (reportsW3c, urlIdList) {
-    const arrayToInsert = []
-    const date = Date.now()
-    // For each url into the report we create an analysis object
-    let j = 0
-    for (const report of reportsW3c) {
-      const w3cAnalysis = {
-        url: report.url,
-        dateW3cAnalysis: date,
-        idUrlW3c: urlIdList[j],
-        idW3cAnalysis: uniqid(),
-        score: reportsW3c[j].score,
-        w3cBestPractices: reportsW3c[j].w3cBestPractices
-      }
-      arrayToInsert.push(w3cAnalysis)
-      j++
-    }
-
+  this.insertAll = function (reportsW3c) {
     return new Promise((resolve, reject) => {
-      if (arrayToInsert.length > 0) {
+      if (reportsW3c.length > 0) {
         w3cs
-          .insertMany(arrayToInsert)
+          .insertMany(reportsW3c)
           .then(() => {
             resolve()
           })

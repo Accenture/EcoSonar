@@ -54,7 +54,7 @@ async function loginOnOnePage (page, loginInformations) {
     return true
   } catch (error) {
     console.error(error.message)
-    if (error.message === 'Navigation timeout of 10000 ms exceeded') {
+    if (error.message === 'Navigation timeout of 30000 ms exceeded') {
       return true
     }
     console.error('Could not log in')
@@ -83,6 +83,9 @@ async function loginOnMultiPages (page, steps) {
     return true
   } catch (error) {
     console.error(error.message)
+    if (error.message === 'Navigation timeout of 10000 ms exceeded' || error.message === 'Navigation timeout of 30000 ms exceeded') {
+      return true
+    }
     console.error('Could not log in')
     return false
   }

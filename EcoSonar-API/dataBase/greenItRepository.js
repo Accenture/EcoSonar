@@ -1,4 +1,3 @@
-const uniqid = require('uniqid')
 const greenits = require('./models/greenits')
 const urlsprojects = require('./models/urlsprojects')
 const SystemError = require('../utils/SystemError')
@@ -7,50 +6,10 @@ const formatGreenItAnalysis = require('../services/format/formatGreenItAnalysis'
 const GreenItRepository = function () {
   /**
    * insertion of one or more analysis
-   * @param {analysis of url} reports
-   * @param {list of id of urls} urlIdList
-   * @param {list of urls} urlList
+   * @param {arrayToInsert} reports
    * @returns
    */
-  this.insertAll = async function (reports, urlIdList, urlList) {
-    let arrayToInsert = []
-    let i = 0
-    let idGreenAnalysis
-    const date = Date.now()
-    let greenAnalysis
-    let size
-    let sizeUncompress
-    let j = 0
-    let find = false
-    while (i < urlIdList.length) {
-      if (urlIdList[i] !== null) {
-        j = 0
-        while (j < reports.length && !find) {
-          if (reports[j].url === urlList[i]) {
-            find = true
-          } else {
-            j++
-          }
-        }
-        find = false
-        idGreenAnalysis = uniqid()
-        size = Math.round(reports[j].responsesSize / 1000)
-        sizeUncompress = Math.round(reports[j].responsesSizeUncompress / 1000)
-        greenAnalysis = {
-          idGreenAnalysis,
-          idUrlGreen: urlIdList[i],
-          dateGreenAnalysis: date,
-          domSize: reports[j].domSize,
-          nbRequest: reports[j].nbRequest,
-          responsesSize: size,
-          responsesSizeUncompress: sizeUncompress,
-          ecoIndex: reports[j].ecoIndex,
-          grade: reports[j].grade
-        }
-        arrayToInsert.push(greenAnalysis)
-      }
-      i++
-    }
+  this.insertAll = async function (arrayToInsert) {
     if (arrayToInsert.length > 0) { arrayToInsert = await checkValues(arrayToInsert) }
 
     return new Promise((resolve, reject) => {

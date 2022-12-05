@@ -34,7 +34,7 @@ async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projec
   for (const url of urlList) {
     // start browser
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       args: browserArgs,
       ignoreHTTPSErrors: true,
       // Keep gpu horsepower in headless

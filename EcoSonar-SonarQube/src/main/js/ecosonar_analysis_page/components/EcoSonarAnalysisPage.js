@@ -66,10 +66,10 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
     getAnalysisForProjectConfiguration(this.props.project.key)
       .then((analysis) => {
         if (analysis.deployments !== undefined) {
-          const dateGreenitLastAnalysis = analysis.lastAnalysis.greenit.dateAnalysis
+          const dateGreenitLastAnalysis = analysis.lastAnalysis.greenit !== null && analysis.lastAnalysis.greenit.dateAnalysis
             ? `${new Date(analysis.lastAnalysis.greenit.dateAnalysis).toDateString()} - ${new Date(analysis.lastAnalysis.greenit.dateAnalysis).toLocaleTimeString([], { hour12: false })}  `
             : null
-          const dateLighthouseLastAnalysis = analysis.lastAnalysis.lighthouse.dateAnalysis
+          const dateLighthouseLastAnalysis = analysis.lastAnalysis.lighthouse !== null && analysis.lastAnalysis.lighthouse.dateAnalysis
             ? `${new Date(analysis.lastAnalysis.lighthouse.dateAnalysis).toDateString()} - ${new Date(analysis.lastAnalysis.lighthouse.dateAnalysis).toLocaleTimeString([], { hour12: false })}  `
             : null
 

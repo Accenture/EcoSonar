@@ -12,7 +12,7 @@ ProcedureService.prototype.saveProcedure = async function (projectName, selected
   }
   return new Promise((resolve, reject) => {
     if (projectExist !== null) {
-      projectsRepository.updateProjectProcedure(projectName, selectedProcedure, projectExist.login, projectExist.proxy)
+      projectsRepository.updateProjectProcedure(projectName, selectedProcedure)
         .then(() => resolve())
         .catch((error) => reject(error))
     } else {

@@ -1,5 +1,6 @@
 import React from 'react'
 import UrlItem from './UrlItem'
+import Errors from '../../utils/errors.json'
 
 export default function UrlList (props) {
   const { error, urlList, onDelete, setDisplayCrawler } = props
@@ -19,47 +20,56 @@ export default function UrlList (props) {
     </div>
   )
 
-  if (error && urlList.length === 0) {
-    return (
-      <div>
-        {crawler}
-        <table className='data-zebra' role='presentation'>
-          <tbody>
-            <tr className='data-zebra-thead'>
-              <td className='head-url'>{'URL'}</td>
-              <td className='head-url'></td>
-            </tr>
-          </tbody>
-          <p className='text-danger' role='alert'>
-            {error}
-          </p>
-        </table>
-      </div>
-    )
-  } else if (urlList.length === 0) {
-    return (
-      <div>
-        <p className='text-danger' role='alert'>
-          {error.noUrlAssigned}
-        </p>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      {crawler}
+  const emptyTabWithError = (
+    <>
       <table className='data-zebra' role='presentation'>
         <tbody>
           <tr className='data-zebra-thead'>
             <td className='head-url'>{'URL'}</td>
             <td className='head-url'></td>
           </tr>
-          {urlList.map((url, index) => {
-            return <UrlItem key={'url-' + index} onDelete={onDelete} index={index} url={url} />
-          })}
         </tbody>
       </table>
+      <p className='text-danger' role='alert'>
+        {error}
+      </p>
+    </>
+  )
+
+  const noUrl = (
+    <><table className='data-zebra' role='presentation'>
+      <tbody>
+        <tr className='data-zebra-thead'>
+          <td className='head-url'>{'URL'}</td>
+          <td className='head-url'></td>
+        </tr>
+      </tbody>
+    </table><p className='text-danger' role='alert'>
+        {Errors.noUrlAssigned}
+      </p></>
+  )
+
+  const filledTab = (
+    <table className='data-zebra' role='presentation'>
+      <tbody>
+        <tr className='data-zebra-thead'>
+          <td className='head-url'>{'URL'}</td>
+          <td className='head-url'></td>
+        </tr>
+        {urlList.map((url, index) => {
+          return <UrlItem key={'url-' + index} onDelete={onDelete} index={index} url={url} />
+        })}
+      </tbody>
+    </table>
+  )
+
+  return (
+    <div>
+      {crawler}
+      {error && urlList.length === 0
+        ? emptyTabWithError
+        : (urlList.length === 0 ? noUrl : filledTab)
+      }
     </div>
   )
 }

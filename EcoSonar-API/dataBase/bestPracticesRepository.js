@@ -1,4 +1,3 @@
-const uniqid = require('uniqid')
 const bestpractices = require('./models/bestpractices')
 const urlsprojects = require('./models/urlsprojects')
 const SystemError = require('../utils/SystemError')
@@ -10,32 +9,8 @@ const BestPracticesRepository = function () {
    * @param {Array} urlIdList array of urls ID
    * @param {String} projectName name of the project
    */
-  this.insertBestPractices = async function (reports, lighthousePerformanceBestPractices, lighthouseAccessibilityBestPractices, urlIdList, projectName) {
-    const arrayToInsert = []
-    let i = 0
-    let idAnalysisBestPractices, string
-    const date = Date.now()
-    if (reports.length > 0) {
-      const sanitizedValues = await checkValues(reports, urlIdList, projectName)
-      reports = sanitizedValues.arrayToInsertSanitized
-      urlIdList = sanitizedValues.urlIdListSanitized
-    }
-
-    while (i < reports.length) {
-      idAnalysisBestPractices = uniqid()
-      const bestPracticesFormatted = Object.fromEntries(Object.entries(reports[i].bestPractices).map(([key, value]) => [key.charAt(0).toLowerCase() + key.slice(1), value]))
-      string = {
-        idAnalysisBestPractices,
-        idUrl: urlIdList[i],
-        dateAnalysisBestPractices: date,
-        bestPractices: bestPracticesFormatted,
-        lighthousePerformanceBestPractices: lighthousePerformanceBestPractices[i],
-        lighthouseAccessibilityBestPractices: lighthouseAccessibilityBestPractices[i]
-      }
-      arrayToInsert.push(string)
-
-      i++
-    }
+  this.insertBestPractices = async function (arrayToInsert) {
+    if (arrayToInsert.length > 0) { arrayToInsert = await checkValues(arrayToInsert) }
 
     return new Promise((resolve, reject) => {
       if (arrayToInsert.length > 0) {
@@ -181,19 +156,16 @@ const BestPracticesRepository = function () {
    * @returns an array cleaned of analysis containing undefined and NaN to avoid mongoose rejecting every GreenIt Best Practices insertion
    * This function check if best practices exists for each url of the report (arrayToInsert), if true then also update urlIdList array to match
    */
-  async function checkValues (arrayToInsert, urlIdList, projectName) {
+  async function checkValues (arrayToInsert) {
     const arrayToInsertSanitized = []
-    const urlIdListSanitized = []
     for (const analysis of arrayToInsert) {
       if (analysis.bestPractices) {
         arrayToInsertSanitized.push(analysis)
-        const urlInfos = await urlsprojects.find({ projectName, urlName: analysis.url })
-        urlIdListSanitized.push(urlIdList.find((element) => element === urlInfos[0].idKey))
       } else {
         console.log(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
       }
     }
-    return { arrayToInsertSanitized, urlIdListSanitized }
+    return arrayToInsertSanitized
   }
 }
 

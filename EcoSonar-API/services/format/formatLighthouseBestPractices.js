@@ -1,5 +1,5 @@
 const enumAudits = require('../../utils/enumAudits')
-const formatBestPracticesForProject = require('./formatBestPracticesForProject')
+const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
 const metricsCalculate = require('../../utils/metricsCalculate')
 
 class FormatLighthouseBestPractices { }
@@ -12,50 +12,50 @@ class FormatLighthouseBestPractices { }
 
 /**
  *
- * @param {*} reports
+ * @param {*} report
  * @returns Formatted lighthouse best practices for accessibility
  *  * Accessibility Scores are on a range of 0 to 1, function transform it to a 0 to 100
  * Score may be null for some practices even if it has items. It is a wanted behavior of lighthouse : if the scoreDisplayMode is set on "informative", then the score is automatically setted to null before return
  */
-FormatLighthouseBestPractices.prototype.formatAccessibility = function (reports) {
+FormatLighthouseBestPractices.prototype.formatAccessibility = function (report) {
   const accessibilityBestPractices = enumAudits.accessibilityNames()
   const formattedReports = {}
 
   for (const element in accessibilityBestPractices) {
-    const score = reports.audits[accessibilityBestPractices[element]].score
-    const scoreDisplayMode = reports.audits[accessibilityBestPractices[element]].scoreDisplayMode
-    let displayValue = reports.audits[accessibilityBestPractices[element]].displayValue
-    const items = (reports.audits[accessibilityBestPractices[element]].details !== undefined) ? reports.audits[accessibilityBestPractices[element]].details.items : []
+    const score = report.audits[accessibilityBestPractices[element]].score
+    const scoreDisplayMode = report.audits[accessibilityBestPractices[element]].scoreDisplayMode
+    let displayValue = report.audits[accessibilityBestPractices[element]].displayValue
+    const items = (report.audits[accessibilityBestPractices[element]].details !== undefined) ? report.audits[accessibilityBestPractices[element]].details.items : []
     if (scoreDisplayMode === 'binary' && (displayValue === 0 || displayValue === undefined)) {
       displayValue = items.length
     } else if (displayValue === undefined) {
       displayValue = 0
     }
-    formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
+    formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue, url: report.finalUrl }
   }
-  return formattedReports
+  return { ...formattedReports, url: report.url }
 }
 
 /**
  *
- * @param {*} reports
+ * @param {*} report
  * @returns Formatted lighthouse best practices for performance
  * Score may be null for some practices even if it has items. It is a wanted behavior of lighthouse : if the scoreDisplayMode is set on "informative", then the score is automatically setted to null before return
  */
-FormatLighthouseBestPractices.prototype.formatPerformance = function (reports) {
+FormatLighthouseBestPractices.prototype.formatPerformance = function (report) {
   const reg = /\d+\.*\d*/g
   const performanceBestPractices = enumAudits.performanceNamesToSave()
   const formattedReports = {}
   for (const element in performanceBestPractices) {
     let items
-    const score = reports.audits[performanceBestPractices[element]].score
-    const scoreDisplayMode = reports.audits[performanceBestPractices[element]].scoreDisplayMode
+    const score = report.audits[performanceBestPractices[element]].score
+    const scoreDisplayMode = report.audits[performanceBestPractices[element]].scoreDisplayMode
     if (element === 'criticalRequestChains') {
-      items = (reports.audits[performanceBestPractices[element]].details !== undefined) ? [reports.audits[performanceBestPractices[element]].details] : []
+      items = (report.audits[performanceBestPractices[element]].details !== undefined) ? [report.audits[performanceBestPractices[element]].details] : []
     } else {
-      items = (reports.audits[performanceBestPractices[element]].details !== undefined) ? reports.audits[performanceBestPractices[element]].details.items : []
+      items = (report.audits[performanceBestPractices[element]].details !== undefined) ? report.audits[performanceBestPractices[element]].details.items : []
     }
-    let displayValue = reports.audits[performanceBestPractices[element]].displayValue
+    let displayValue = report.audits[performanceBestPractices[element]].displayValue
     if (displayValue) {
       displayValue = Number(displayValue.replace(',', '').match(reg)[0])
     } else {
@@ -63,7 +63,7 @@ FormatLighthouseBestPractices.prototype.formatPerformance = function (reports) {
     }
     formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
   }
-  return formattedReports
+  return { ...formattedReports, url: report.url }
 }
 
 /**

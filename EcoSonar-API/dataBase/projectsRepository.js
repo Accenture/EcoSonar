@@ -29,9 +29,9 @@ const ProjectsRepository = function () {
    * @param {loginCredentials}  : the login credentials to be set when analysing the project
    * @returns
    */
-  this.updateProjectProcedure = async function (projectName, selectedProcedure, login, proxy) {
+  this.updateProjectProcedure = async function (projectName, selectedProcedure) {
     return new Promise((resolve, reject) => {
-      projects.updateOne({ projectName, login, proxy }, { procedure: selectedProcedure })
+      projects.updateOne({ projectName }, { procedure: selectedProcedure })
         .then(() => {
           resolve()
         })
