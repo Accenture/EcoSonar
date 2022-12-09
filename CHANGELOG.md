@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Version 3.0 , 09/12/2022
+
+### Added
+- W3C Validator Audit available for public pages:
+    - Retrieve all errors to improve ecodesign and accessibility levels of web application
+    - Scoring methodology: if an error has been resolved, it will increase your w3c score
+- Environment Configuration For Sonarqube Plugin to ease deployments
+- API Configuration of Login Credentials, dedicated Credentials per project and possibility to save them into database (if security allows it)
+- API Configuration of Proxy Configuration per project
+- API Configuration of User Flow Configuration, saved into the database (instead of yaml files)
+
+
+### Removed
+
+### Changed
+- Best Practices is divided into 2 seperated sections : Ecodesign and accessibility (previously it was by audit tool)
+- BUG FIX: set a default browser viewport in case of unresponsive website to have the right user flow
+- BUG FIX: inserting the analysis to the wrong url if one url of the batch fails
+- BUG FIX: possiiblity to create a browser for one url audit if user flow is enabled to allow a better cookie management (however performance of the API will decrease - more time to audit all pages)
+
+---
 ---
 ## Version 2.3 , 04/10/2022
 

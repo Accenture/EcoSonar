@@ -137,6 +137,56 @@ EcoSonar API is not able to request to the MongoDB Database :
 
   * **Code:** 500 Internal Server Error <br />
 
+**EcoSonar URL Configuration - GET CRAWLER RESUL**
+----
+
+* **URL**
+
+  /api/crawl
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+None
+
+* **Data Params**
+    
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+    homepage_url is the home page of your website from where the crawler will start finding all pages within your website
+
+`
+{
+    "projectName": "PROJECT_NAME",
+    "mainUrl": "homepage_url"
+}
+`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `[
+    "url1",
+    "url2",
+    "url3"]`
+ 
+* **Error Response:**
+
+When you don't have any URLs assigned to a project into EcoSonar
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Your project has no url assigned into EcoSonar. You must at least add one url if you want to analyse ecodesign practices."
+    }`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
 **EcoSonar LAUNCH ANALYSIS**
 ----
 EcoSonar analysis is launched through this API call either directly or through Sonarqube pipeline. API Call is done asynchronously to avoid performance issue ( ~ 3 seconds to analyse one page)
@@ -192,6 +242,7 @@ EcoSonar analysis is launched through this API call either directly or through S
 
   * **Code:** 200 <br />
     **Content:** `{
+    "allowW3c": "true",
     "deployments": {
         "greenit": [
             {
@@ -213,6 +264,12 @@ EcoSonar analysis is launched through this API call either directly or through S
                 "speedIndex": 0,
                 "totalBlockingTime": 0,
                 "interactive": 0
+            }
+        ],
+        "w3c": [
+            {
+                "score": 0,
+                "dateAnalysis": "2022-11-23T14:20:04.888Z"
             }
         ]
     },
@@ -274,6 +331,15 @@ EcoSonar analysis is launched through this API call either directly or through S
                 "displayValue": "0 s",
                 "complianceLevel": "G"
             }
+        },
+        "w3c": {
+            "totalInfo": 0,
+            "totalWarning": 0,
+            "totalError": 0,
+            "totalFatalError": 0,
+            "score": 0,
+            "grade": "F",
+            "dateAnalysis": "2022-12-04T21:50:14.353Z"
         }
     }
 }`
@@ -343,6 +409,12 @@ EcoSonar API is not able to request to the MongoDB Database :
                 "totalBlockingTime": 0,
                 "interactive": 0
             }
+        ],
+        "w3c": [
+            {
+                "score": 0,
+                "dateAnalysis": "2022-11-23T14:20:04.888Z"
+            }
         ]
     },
     "lastAnalysis": {
@@ -403,6 +475,15 @@ EcoSonar API is not able to request to the MongoDB Database :
                 "displayValue": "0 s",
                 "complianceLevel": "G"
             }
+        },
+        "w3c": {
+            "totalInfo": 0,
+            "totalWarning": 0,
+            "totalError": 0,
+            "totalFatalError": 0,
+            "score": 0,
+            "grade": "F",
+            "dateAnalysis": "2022-12-04T21:50:14.353Z"
         }
     }
 }`
@@ -450,644 +531,47 @@ Retrieve audits from GreenIt-Analysis and Google Lighthouse aggregated per proje
 
   * **Code:** 200 <br />
     **Content:** `{
-    "greenItBestPractices": {
-        "compressHttp": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "jsValidate": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "maxCookiesLength": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "minifiedCss": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "minifiedJs": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "noRedirect": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
+    "ecodesign": {
         "printStyleSheet": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "useETags": {
             "auditedMetric": "0",
             "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "useStandardTypefaces": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "dontResizeImageInBrowser": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "httpRequests": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 
-        },
-        "externalizeJs": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "styleSheets": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "addExpiresOrCacheControlHeaders": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "optimizeSvg": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "externalizeCss": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "domainsNumber": {
-            "auditedMetric": "0",
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "emptySrcTag": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "httpError": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "imageDownloadedNotDisplayed": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "noCookieForStaticRessources": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "optimizeBitmapImages": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "plugins": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        },
-        "socialNetworkButton": {
-            "compliance": "G",
-            "description": [],
-            "averageScore": 0
-        }
-    },
-    "lighthousePerformanceBestPractices": {
-        "fontDisplay": {
-            "auditedMetric": "N.A",
             "averageScore": 0,
             "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "thirdPartySummary": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
+            "tool": "GreenIT-Analysis"
         },
         "thirdPartyFacades": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "lcpLazyLoaded": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "nonCompositedAnimations": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "layoutShiftElements": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "efficientAnimatedContent": {
             "auditedMetric": "0",
             "averageScore": 0,
             "description": [],
             "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "usesTextCompression": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "E",
-            "isApplicableOrInformative": true
-        },
-        "unusedCssRules": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "unusedJavascript": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "usesLongCacheTtl": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "serverResponseTime": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "unminifiedJavascript": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [ ],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "modernImageFormats": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "mainthreadWorkBreakdown": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "viewport": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "bootupTime": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "domSize": {
-            "auditedMetric": "0",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "G",
-            "isApplicableOrInformative": true
-        },
-        "usesResponsiveImages": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "offscreenImages": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "usesOptimizedImages": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "usesHttp2": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "legacyJavascript": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "totalByteWeight": {
-            "auditedMetric": "0",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "noDocumentWrite": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "usesPassiveEventListeners": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "duplicatedJavascript": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        }
+            "isApplicableOrInformative": true,
+            "tool": "Lighthouse Performance"
+        },  
     },
-    "lighthouseAccesssibilityBestPractices": {
-        "ariaCommandName": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "tdHeadersAttr": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "validLang": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
+    "dateAnalysisBestPractices": "2022-12-04T21:50:14.353Z",
+    "accessibility": {
         "ariaInputFieldName": {
-            "auditedMetric": "N.A",
+            "auditedMetric": "0",
             "averageScore": 0,
             "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
+            "compliance": "G",
+            "isApplicableOrInformative": true,
+            "tool": "Lighthouse Accessibility"
         },
-        "ariaMeterName": {
+        "Attribute “xmlns:og” not allowed here.": {
             "auditedMetric": "N.A",
             "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "ariaProgressbarName": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "ariaRequiredChildren": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "ariaRequiredParent": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "ariaToggleFieldName": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "ariaTooltipName": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "ariaTreeitemName": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "definitionList": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "dlItem": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "formFieldMultipleLabels": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "frameTitle": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "inputImageAlt": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "metaRefresh": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "objectAlt": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "thHasDataCells": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "videoCaption": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "accessKeys": {
-            "auditedMetric": "N.A",
-            "averageScore": 0,
-            "description": [],
-            "compliance": "N.A",
-            "isApplicableOrInformative": false
-        },
-        "ariaAllowedAttr": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "ariaHiddenBody": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "ariaHiddenFocus": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "ariaRequiredAttr": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "ariaRoles": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "ariaValidAttrValue": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "ariaValidAttr": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "bypass": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "colorContrast": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "documentTitle": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "duplicateIdActive": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "duplicateIdAria": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "headingOrder": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "htmlHasLang": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "htmlLangValid": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "imageAlt": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "label": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "linkName": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "list": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "listItem": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "tabIndex": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "buttonName": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
-        },
-        "metaViewport": {
-            "auditedMetric": "N.A",
-            "averageScore": 100,
-            "description": [],
-            "compliance": "A",
-            "isApplicableOrInformative": true
+            "description": [
+                {
+                    "extract": "",
+                    "lineToCorrect": 2
+                }
+            ],
+            "compliance": "G",
+            "isApplicableOrInformative": true,
+            "tool": "W3C validator"
         }
-    },
-    "dateAnalysisBestPractices": "2022-07-18T16:44:19.565Z"
+    }
 }`
  
 * **Error Response:**
@@ -1097,6 +581,93 @@ When  no analysis has been done yet on your project
   * **Code:** 400 BAD REQUEST  <br />
     **Content:** `{
     "error": "No analysis found for PROJECT_NAME"
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar ANALYSIS - RETRIEVE BEST PRACTICES PER URL**
+----
+Retrieve audits from GreenIt-Analysis and Google Lighthouse per url audited.
+
+* **URL**
+
+/api/bestPractices/url
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+    None
+
+* **Data Params**
+
+  PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+  `{
+    "projectName" : "PROJECT_NAME",
+    "urlName": "url_to_retrieve"
+  }`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `{
+    "ecodesign": {
+        "printStyleSheet": {
+            "auditedMetric": "0",
+            "compliance": "G",
+            "averageScore": 0,
+            "description": [],
+            "tool": "GreenIT-Analysis"
+        },
+        "thirdPartyFacades": {
+            "auditedMetric": "0",
+            "averageScore": 0,
+            "description": [],
+            "compliance": "G",
+            "isApplicableOrInformative": true,
+            "tool": "Lighthouse Performance"
+        },  
+    },
+    "dateAnalysisBestPractices": "2022-12-04T21:50:14.353Z",
+    "accessibility": {
+        "ariaInputFieldName": {
+            "auditedMetric": "0",
+            "averageScore": 0,
+            "description": [],
+            "compliance": "G",
+            "isApplicableOrInformative": true,
+            "tool": "Lighthouse Accessibility"
+        },
+        "Attribute “xmlns:og” not allowed here.": {
+            "auditedMetric": "N.A",
+            "averageScore": 0,
+            "description": [
+                {
+                    "extract": "",
+                    "lineToCorrect": 2
+                }
+            ],
+            "compliance": "G",
+            "isApplicableOrInformative": true,
+            "tool": "W3C validator"
+        }
+    }
+}`
+ 
+* **Error Response:**
+
+When  no analysis has been done yet on your project
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "No analysis found for url url_to_retrieve into project PROJECT_NAME"
 }`
 
   OR
