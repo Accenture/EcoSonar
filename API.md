@@ -137,7 +137,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
   * **Code:** 500 Internal Server Error <br />
 
-**EcoSonar URL Configuration - GET CRAWLER RESUL**
+**EcoSonar URL Configuration - GET CRAWLER RESULT**
 ----
 
 * **URL**
@@ -174,16 +174,7 @@ None
  
 * **Error Response:**
 
-When you don't have any URLs assigned to a project into EcoSonar
-
-  * **Code:** 400 BAD REQUEST  <br />
-    **Content:** `{
-    "error": "Your project has no url assigned into EcoSonar. You must at least add one url if you want to analyse ecodesign practices."
-    }`
-
-  OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API failed to launch crawler:
 
   * **Code:** 500 Internal Server Error <br />
 
@@ -671,6 +662,340 @@ When  no analysis has been done yet on your project
 }`
 
   OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar Login Configuration - SAVE LOGIN AND PROXY FOR PROJECT**
+----
+
+* **URL**
+
+  /api/login/insert?projectName=<PROJECT_NAME>
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+    **Required:**
+  
+    `PROJECT_NAME=[string]`
+
+* **Data Params**
+  `{
+    "login": {
+        "authentication_url":  "",
+        "steps": []
+    },
+    "proxy": {
+        "ipAddress": "",
+        "port": ""
+    }
+}`
+
+* **Success Response:**
+
+  * **Code:** 201 <br />
+ 
+* **Error Response:**
+
+EcoSonar API is not able to save into the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar Login Configuration - GET LOGIN FOR PROJECT**
+----
+
+* **URL**
+
+  /api/login/find?projectName=<PROJECT_NAME>
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+    **Required:**
+  
+    `PROJECT_NAME=[string]`
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `{
+    "authentication_url": "",
+    "steps": []
+}`
+ 
+* **Error Response:**
+
+When you don't have any login registered for your project into EcoSonar
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Your project does not have login saved into database."
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar Login Configuration - GET PROXY FOR PROJECT**
+----
+
+* **URL**
+
+  /api/proxy/find?projectName=<PROJECT_NAME>
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+    **Required:**
+  
+    `PROJECT_NAME=[string]`
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `{
+    "ipAddress": "",
+    "port": ""
+}`
+ 
+* **Error Response:**
+
+When you don't have any proxy registered for your project into EcoSonar
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Your project does not have proxy configuration saved into database."
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar Login Configuration - DELETE LOGIN FOR PROJECT**
+----
+
+* **URL**
+
+  /api/login?projectName=<PROJECT_NAME>
+
+* **Method:**
+
+  `DELETE`
+  
+*  **URL Params**
+
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+    **Required:**
+  
+    `PROJECT_NAME=[string]`
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+ 
+* **Error Response:**
+
+When you don't have any login registered for your project into EcoSonar and you want still to delete it
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Project not found"
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+
+**EcoSonar Login Configuration - DELETE PROXY FOR PROJECT**
+----
+
+* **URL**
+
+  /api/proxy?projectName=<PROJECT_NAME>
+
+* **Method:**
+
+  `DELETE`
+  
+*  **URL Params**
+
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+    **Required:**
+  
+    `PROJECT_NAME=[string]`
+
+* **Data Params**
+
+  None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar USER FLOW Configuration - GET USER FLOW for URL**
+----
+
+* **URL**
+
+  /api/user-flow/find
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+None
+
+* **Data Params**
+
+`
+{
+    "url": ""
+}
+`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `{
+    "steps": [
+    ]
+}`
+ 
+* **Error Response:**
+
+When you don't have any user flow registered for the url into EcoSonar
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Your project does not have user flow saved into database."
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar USER FLOW Configuration - SAVE USER FLOW for URL**
+----
+
+* **URL**
+
+  /api/user-flow/insert
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+None
+
+* **Data Params**
+
+`
+{
+    "url": "",
+    "userFlow": {
+    "steps": [
+    ]
+  }
+}
+`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `{
+    "steps": [
+    ]
+}`
+ 
+* **Error Response:**
+
+You want to add user flow to unexisting url :
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Url not found"
+}}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar USER FLOW Configuration - DELETE USER FLOW FOR URL**
+----
+
+* **URL**
+
+  /api/user-flow
+
+* **Method:**
+
+  `DELETE`
+  
+*  **URL Params**
+
+None
+
+* **Data Params**
+
+`
+{
+    "url": ""
+}
+`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
 
 EcoSonar API is not able to request to the MongoDB Database :
 

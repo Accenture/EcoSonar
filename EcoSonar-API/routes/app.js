@@ -206,7 +206,7 @@ app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
         return res.status(500).send()
       }
       console.log('INSERT USER FLOW - insertion failed')
-      return res.status(400).json({ error })
+      return res.status(400).json({ error: error.message })
     })
 }))
 

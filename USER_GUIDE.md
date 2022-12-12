@@ -41,6 +41,7 @@ If you do not wish to correlate a Sonarqube analysis and an EcoSonar audit, you 
 1. the EcoIndex Score reflects the environmental impact of your website. We have been using an open-source audit calculation called EcoIndex : http://www.ecoindex.fr/
 2. the Lighthouse Performance Score reflects the performance of your website. We are using the audit offered by Google Lighthouse : https://developers.google.com/web/tools/lighthouse
 3. the Lighthouse Accessibility Score reflects the level of accessibility of your website. We are using the audit offered by Google Lighthouse : https://developers.google.com/web/tools/lighthouse
+4. The W3C Score that reflects the number of errors that have been addressed into the project : https://validator.w3.org/
 
 The proposed scores are indicative and only take into account automatically measurable criteria. A manual and in-depth analysis is recommended to complete the EcoSonar audit report.
 
@@ -49,6 +50,8 @@ In the central panel, you will find all the metrics used to calculate the 3 scor
 ![EcoSonar Analysis Page greenIT](./images/ecosonar-analyis-greenit.webp)
 
 ![EcoSonar Analysis Page lighthouse](./images/ecosonar-analyis-lighthouse.webp)
+
+![EcoSonar Analysis Page W3C](./images/ecosonar-analysis-w3c.webp)
 
 ![EcoSonar Analysis Page charts](./images/ecosonar-analyis-charts.webp)
 
