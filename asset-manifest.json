@@ -1,13 +1,15 @@
 {
   "files": {
     "main.css": "/static/css/main.1acdbc84.css",
-    "main.js": "/static/js/main.e1afac2b.js",
+    "main.js": "/static/js/main.9e516c27.js",
     "static/media/EcoSonarLogo2.svg": "/static/media/EcoSonarLogo2.c3ad736cf58bd014cb2b53bf7a473b30.svg",
     "static/media/LighthouseLogo.svg": "/static/media/LighthouseLogo.2d9d0e9ca0eecf2f40b39ff23231ba16.svg",
+    "static/media/W3C Scoring Methodology.pdf": "/static/media/W3C Scoring Methodology.c319d9f70975b6bdf6d9.pdf",
     "static/media/Transcript.pdf": "/static/media/Transcript.2f344b4fd8197e0a8e27.pdf",
     "static/media/HomeBackground.svg": "/static/media/HomeBackground.f0bec07d04f48418e825.svg",
     "static/media/LiquidStudioLogo.svg": "/static/media/LiquidStudioLogo.bcd8acd7d6ceec29fe83524ca5c86d15.svg",
     "static/media/KevinGalerne.webp": "/static/media/KevinGalerne.a8973be5eb6060e5b924.webp",
+    "static/media/W3CLogo.webp": "/static/media/W3CLogo.93fd5cc3c25f1e8e17ab.webp",
     "static/media/FlowerWhite2.svg": "/static/media/FlowerWhite2.0a9250b57485868c0cc2d0b3c01ce458.svg",
     "static/media/LeilaThiery.webp": "/static/media/LeilaThiery.5b56c02de0a02f6275d1.webp",
     "static/media/GreenITLogo.svg": "/static/media/GreenITLogo.c59544abaae0865c15a1a29b3c0a568d.svg",
@@ -20,6 +22,7 @@
     "static/media/EcoSonarLogo.svg": "/static/media/EcoSonarLogo.d350d54b80ed2014c867c2342b6c9d6a.svg",
     "static/media/SonarQubeLogo.svg": "/static/media/SonarQubeLogo.d802a835a555da544ab3455836fccc33.svg",
     "static/media/OlivierDemarez.webp": "/static/media/OlivierDemarez.fc38517ef244834db14f.webp",
+    "static/media/MeriamSaad.webp": "/static/media/MeriamSaad.7cea4d94169b2badb254.webp",
     "static/media/AccentureLogo.svg": "/static/media/AccentureLogo.629c0413841161923ef68240d1aad60d.svg",
     "index.html": "/index.html",
     "static/media/Co2.svg": "/static/media/Co2.a6febba71564d8f092616c3515925fb3.svg",
@@ -33,10 +36,10 @@
     "static/media/ArrowBtnClose.svg": "/static/media/ArrowBtnClose.37e4170575a8021278691ff87def467b.svg",
     "static/media/ArrowBtnOpen.svg": "/static/media/ArrowBtnOpen.82a4df20a445f6c2a21faaf0cfe37589.svg",
     "main.1acdbc84.css.map": "/static/css/main.1acdbc84.css.map",
-    "main.e1afac2b.js.map": "/static/js/main.e1afac2b.js.map"
+    "main.9e516c27.js.map": "/static/js/main.9e516c27.js.map"
   },
   "entrypoints": [
     "static/css/main.1acdbc84.css",
-    "static/js/main.e1afac2b.js"
+    "static/js/main.9e516c27.js"
   ]
 }
