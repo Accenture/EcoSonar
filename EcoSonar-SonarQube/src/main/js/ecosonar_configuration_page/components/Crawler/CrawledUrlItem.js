@@ -1,11 +1,11 @@
 import React from 'react'
 
-export default function UrlItem (props) {
+export default function CrawledUrlItem (props) {
   const { url, handleChangeCheckedUrls, checkedUrls, setAllChecked } = props
 
-  const isChecked = (url) => {
+  const isChecked = (urlToCheck) => {
     for (const checkedUrl of checkedUrls) {
-      if (url === checkedUrl) {
+      if (urlToCheck === checkedUrl) {
         return true
       }
     }

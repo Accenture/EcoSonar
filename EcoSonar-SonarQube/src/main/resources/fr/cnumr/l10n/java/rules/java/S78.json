@@ -1,0 +1,13 @@
+{
+  "title": "Avoid setting constants in batch update",
+  "type": "CODE_SMELL",
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "15min"
+  },
+  "tags": [
+    "eco-design", "eco-sql"
+  ],
+  "defaultSeverity": "Minor"
+}

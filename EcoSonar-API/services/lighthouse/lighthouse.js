@@ -45,7 +45,7 @@ module.exports = {
         for (const [index, url] of urlList.entries()) {
           try {
             console.log('Lighthouse Analysis launched for url ' + url)
-            await userJourneyService.getUserFlow(url)
+            await userJourneyService.getUserFlow(projectName, url)
               .then((userflow) => {
                 userJourney = userflow
               }).catch((error) => {

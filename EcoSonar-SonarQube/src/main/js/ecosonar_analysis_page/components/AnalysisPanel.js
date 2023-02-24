@@ -1,9 +1,10 @@
-import * as React from 'react'
+import React from 'react'
 import BoxedTabs from './BoxedTabs'
-import LoadingIcon from '../../images/LoadingIcon.svg'
 import AnalysisPerUrlPanel from './AnalysisPerUrlPanel'
 import AnalysisPerProjectPanel from './AnalysisPerProjectPanel'
 import { GraphContext } from '../../context/GraphContext'
+import { exportAudit } from '../../services/exportAuditService'
+import { saveAs } from 'file-saver'
 
 const AnalysisPanelTabs = {
   URL: 'URL',
@@ -12,7 +13,6 @@ const AnalysisPanelTabs = {
 export default function AnalysisPanel (props) {
   const {
     allowW3c,
-    loading,
     analysisForProjectGreenit,
     lighthouseMetricsForProject,
     lighthousePerformanceForProject,
@@ -44,17 +44,36 @@ export default function AnalysisPanel (props) {
   } = props
 
   const [selectedGraph, setSelectedGraph] = React.useState('ecoindex')
+  const [errorAuditMessage, setErrorAuditMessage] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
 
   function compareDates () {
     if (dateLighthouseLastAnalysis === dateGreenitLastAnalysis) {
       return `last analysis at ${dateLighthouseLastAnalysis}`
     } else if (dateLighthouseLastAnalysis === null) {
-      return `GreenIt last analysis ${dateGreenitLastAnalysis} - No date found for Lighthouse analysis`
+      return `GreenIt last analysis ${dateGreenitLastAnalysis}`
     } else if (dateGreenitLastAnalysis === null) {
-      return `Ligthouse last analysis ${dateLighthouseLastAnalysis} - No date found for GreenIt analysis`
+      return `Ligthouse last analysis ${dateLighthouseLastAnalysis}`
     } else {
       return `GreenIt last analysis ${dateGreenitLastAnalysis}  - Lighthouse last analysis ${dateLighthouseLastAnalysis}`
     }
+  }
+
+  function exportAuditToExcel () {
+    setErrorAuditMessage('')
+    setLoading(true)
+    exportAudit(projectName)
+      .then((buffer) => {
+        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        const fileExtension = '.xlsx'
+        const blob = new Blob([buffer], { type: fileType })
+        saveAs(blob, './audits' + fileExtension)
+        setLoading(false)
+      })
+      .catch((err) => {
+        setErrorAuditMessage(err.message)
+        setLoading(false)
+      })
   }
 
   const [tab, selectTab] = React.useState(AnalysisPanelTabs.PROJECT)
@@ -83,21 +102,21 @@ export default function AnalysisPanel (props) {
   return (
     <GraphContext.Provider value={{ selectedGraph, setSelectedGraph }}>
       <div className='analysis-panel'>
-        <div className='analysis-panel-title'>
-          <h2 className='ecoindex-title'>EcoSonar Analysis - &nbsp;</h2>
-          {analysisForProjectGreenit !== {} && <p className='last-analysis-date'> {compareDates()} </p>}
-        </div>
-
-        {loading
-          ? (
-          <div className='loading'>
-            <img src={LoadingIcon} alt='Loading icon' />
+        <div className='export-button'>
+          <div className='analysis-panel-title'>
+            <h2 className='ecoindex-title'>EcoSonar Analysis - &nbsp;</h2>
+            {analysisForProjectGreenit !== {} && <p className='last-analysis-date'> {compareDates()} </p>}
           </div>
-            )
-          : (
+          {loading && <div className='loading move-to-right'>
+            <div className="loader small-loader"></div>
+          </div>}
+          <div>
+            <button aria-label="export audit" className="basic-button right-justify" onClick={() => exportAuditToExcel()}>Export Audit</button>
+            {errorAuditMessage !== '' && <p className='text-danger'>{errorAuditMessage}</p>}
+          </div>
+        </div>
           <>
             <BoxedTabs onSelect={selectTab} selected={tab} tabs={tabs} />
-
             <div className='analysis-panel-content'>
               {isPerUrlTab
                 ? (
@@ -131,7 +150,6 @@ export default function AnalysisPanel (props) {
                   )}
             </div>
           </>
-            )}
       </div>
     </GraphContext.Provider>
   )

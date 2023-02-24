@@ -3,7 +3,8 @@ const formatGreenItReports = require('./format/formatGreenItReports')
 const formatLighthouseBestPractices = require('./format/formatLighthouseBestPractices')
 const w3cRepository = require('../dataBase/w3cRepository')
 const formatW3cBestPractices = require('./format/formatW3cBestPractices')
-
+const bestPracticesSorting = require('./format/bestPracticesSorting')
+const projectsRepository = require('../dataBase/projectsRepository')
 class RetrieveBestPracticesService { }
 
 /**
@@ -26,7 +27,12 @@ RetrieveBestPracticesService.prototype.getProjectAnalysis = async function (proj
     .catch((err) => {
       console.log(err)
     })
-
+  let procedure = ''
+  await projectsRepository.getProjectSettings(projectName).then((result) => {
+    procedure = result.procedure
+  }).catch(() => {
+    console.log('Best Practices is returned with default procedure score impact')
+  })
   return new Promise((resolve, reject) => {
     bestPracticesRepository.findAll(projectName)
       .then((reports) => {
@@ -34,28 +40,38 @@ RetrieveBestPracticesService.prototype.getProjectAnalysis = async function (proj
           console.log('GET BEST PRACTICES PROJECT- no best practices analysis found for project ' + projectName)
           reject(new Error('No best practices analysis has been launched for project ' + projectName))
         } else {
-          const res = {}
-          const latestBestPracticeDate = new Date(
-            Math.max(...reports.map(element => { return new Date(element.dateAnalysisBestPractices) }))
-          )
-          const latestBestPracticeReport = reports.filter(element => element.dateAnalysisBestPractices.getTime() === latestBestPracticeDate.getTime())
-          const greenIt = formatGreenItReports.returnFormattedGreenIt(latestBestPracticeReport)
-          const lighthousePerformance = formatLighthouseBestPractices.returnFormattedPerformance(latestBestPracticeReport)
+          let res = {}
+          const greenIt = formatGreenItReports.returnFormattedGreenIt(reports)
+          const lighthousePerformance = formatLighthouseBestPractices.returnFormattedPerformance(reports)
           const ecoDesign = Object.assign(greenIt, lighthousePerformance)
-          res.ecodesign = Object.fromEntries(Object.entries(ecoDesign).sort((a, b) => a[1].averageScore - b[1].averageScore))
-          res.dateAnalysisBestPractices = latestBestPracticeDate
-          let accessibility = formatLighthouseBestPractices.returnFormattedAccessibility(latestBestPracticeReport)
+
+          // Filtering averageScore depending of they are numeric values or string ('N.A')
+          let numbersAverageScorePerf = Object.fromEntries(Object.entries(ecoDesign).filter((element) => typeof element[1].averageScore === 'number'))
+          const nonNumbersAverageScorePerf = Object.fromEntries(Object.entries(ecoDesign).filter((element) => typeof element[1].averageScore !== 'number'))
+          numbersAverageScorePerf = Object.fromEntries(Object.entries(numbersAverageScorePerf).sort((a, b) => a[1].averageScore - b[1].averageScore))
+          res.ecodesign = Object.assign(numbersAverageScorePerf, nonNumbersAverageScorePerf)
+          res.dateAnalysisBestPractices = reports[0].dateAnalysisBestPractices
+          let accessibility = formatLighthouseBestPractices.returnFormattedAccessibility(reports)
 
           // Check if there is a W3C Analysis as user can disable this analysis with environment variable
           if (w3cAnalysis.deployments.length > 0) {
             accessibility = Object.assign(accessibility, formatW3cBestPractices.returnFormattedW3c(w3cAnalysis.lastAnalysis))
           }
 
-          // Filtering averageScore depeding of they are numeric values or string ('N.A')
+          // Filtering averageScore depending of they are numeric values or string ('N.A')
           let numbersAverageScore = Object.fromEntries(Object.entries(accessibility).filter((element) => typeof element[1].averageScore === 'number'))
           const nonNumbersAverageScore = Object.fromEntries(Object.entries(accessibility).filter((element) => typeof element[1].averageScore !== 'number'))
           numbersAverageScore = Object.fromEntries(Object.entries(numbersAverageScore).sort((a, b) => a[1].averageScore - b[1].averageScore))
           res.accessibility = Object.assign(numbersAverageScore, nonNumbersAverageScore)
+
+          // sorting
+          if (procedure === 'highestImpact') {
+            res = bestPracticesSorting.sortByHighestImpact(res)
+          } else if (procedure === 'smartImpact') {
+            res = bestPracticesSorting.sortBySmartImpact(res)
+          } else if (procedure === 'quickWins') {
+            res = bestPracticesSorting.sortByQuickWins(res)
+          }
 
           resolve(res)
         }
@@ -113,6 +129,7 @@ RetrieveBestPracticesService.prototype.getUrlBestPractices = function (projectNa
           numbersAverageScore = Object.fromEntries(Object.entries(numbersAverageScore).sort((a, b) => a[1].averageScore - b[1].averageScore))
           res.accessibility = Object.assign(numbersAverageScore, nonNumbersAverageScore)
           res.accessibility = Object.fromEntries(Object.entries(res.accessibility).sort((a, b) => a[1].averageScore - b[1].averageScore))
+
           resolve(res)
         }
       }).catch((err) => {

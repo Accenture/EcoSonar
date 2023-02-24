@@ -10,43 +10,47 @@ export default function AccordionManager (props) {
     ecoDesignData,
     accessibilityData,
     isFolded,
-    setIsFolded
+    setIsFolded,
+    procedure,
+    changeProcedureFct
   } = props
   const [filteredEcodesignData, setFilteredEcodesignData] = useState(ecoDesignData)
   const [filteredAccessibilityData, setFilteredAccessibilityData] = useState(accessibilityData)
 
   useEffect(() => {
     // Filter Ecodesign Audit Tool
-    const filteredEcodesignData = {}
+    const filteredEcodesignDataToSave = {}
     Object.keys(ecoDesignData).forEach(key => {
       if (selectedAuditTools === allTools.label || selectedAuditTools === allEcodesignTools.label || ecoDesignData[key].tool === selectedAuditTools) {
-        filteredEcodesignData[key] = ecoDesignData[key]
+        filteredEcodesignDataToSave[key] = ecoDesignData[key]
       }
     })
-    setFilteredEcodesignData(filteredEcodesignData)
+    setFilteredEcodesignData(filteredEcodesignDataToSave)
   }, [ecoDesignData, selectedAuditTools, selectedComplianceLevel])
 
   useEffect(() => {
     // Filter Accessibility Audit tool
-    const filteredAccessibilityData = {}
+    const filteredAccessibilityDataToSave = {}
     Object.keys(accessibilityData).forEach(key => {
       if (selectedAuditTools === allTools.label || selectedAuditTools === allAccessibilityTools.label || accessibilityData[key].tool === selectedAuditTools) {
-        filteredAccessibilityData[key] = accessibilityData[key]
+        filteredAccessibilityDataToSave[key] = accessibilityData[key]
       }
     })
-    setFilteredAccessibilityData(filteredAccessibilityData)
+    setFilteredAccessibilityData(filteredAccessibilityDataToSave)
   }, [accessibilityData, selectedAuditTools, selectedComplianceLevel])
 
   return (
     <div>
       {selectedAuditTypes !== 'Accessibility' && (
-        <Accordion
-          practiceType='Ecodesign'
-          data={filteredEcodesignData}
-          selectedComplianceArray={selectedComplianceLevel}
-          isFolded={isFolded}
-          setIsFolded={setIsFolded}
-        />
+          <Accordion
+            practiceType='Ecodesign'
+            data={filteredEcodesignData}
+            selectedComplianceArray={selectedComplianceLevel}
+            isFolded={isFolded}
+            setIsFolded={setIsFolded}
+            procedure={procedure}
+            changeProcedureFct={changeProcedureFct}
+          />
       )}
       {selectedAuditTypes !== 'Ecodesign' && (
         <Accordion

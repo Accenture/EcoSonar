@@ -4,9 +4,7 @@ const path = require('path')
 const userJourneyService = require('../userJourneyService')
 
 module.exports = {
-  async createGreenITReports (browser, urlList, autoscroll) {
-  // Timeout for an analysis
-    const TIMEOUT = 880000
+  async createGreenITReports (browser, projectName, urlList, autoscroll) {
     // Concurent tab
     const MAX_TAB = 40
     // Nb of retry before dropping analysis
@@ -28,9 +26,9 @@ module.exports = {
       asyncFunctions.push(
         analyseURL(
           browser,
+          projectName,
           urlList[index],
           {
-            timeout: TIMEOUT,
             tabId: i
           },
           autoscroll
@@ -47,9 +45,9 @@ module.exports = {
           1,
           analyseURL(
             browser,
+            projectName,
             results.url,
             {
-              timeout: TIMEOUT,
               tabId: results.tabId,
               tryNb: results.tryNb + 1
             },
@@ -69,9 +67,9 @@ module.exports = {
             1,
             analyseURL(
               browser,
+              projectName,
               urlList[index],
               {
-                timeout: TIMEOUT,
                 tabId: results.tabId
               },
               autoscroll
@@ -86,7 +84,7 @@ module.exports = {
 }
 
 // Analyse a webpage
-async function analyseURL (browser, url, options, autoscroll) {
+async function analyseURL (browser, projectName, url, options, autoscroll) {
   let result = {}
   const TAB_ID = options.tabId
   const TRY_NB = options.tryNb || 1
@@ -95,7 +93,7 @@ async function analyseURL (browser, url, options, autoscroll) {
     let page
     let harObj
     let userJourney
-    await userJourneyService.getUserFlow(url)
+    await userJourneyService.getUserFlow(projectName, url)
       .then((userflow) => {
         userJourney = userflow
       }).catch((error) => {
@@ -105,7 +103,7 @@ async function analyseURL (browser, url, options, autoscroll) {
       ({ page, harObj } = await userJourneyService.playUserJourney(url, browser, userJourney))
       console.log('GREENIT Analysis - Page requires user journey')
     } else {
-      ({ page, harObj } = await launchPageWithoutUserJourney(browser, page, url, harObj, autoscroll))
+      ({ page, harObj } = await launchPageWithoutUserJourney(browser, url, autoscroll))
       console.log('GREENIT Analysis - Page does not require user journey')
     }
 
@@ -171,8 +169,8 @@ async function analyseURL (browser, url, options, autoscroll) {
   return result
 }
 
-async function launchPageWithoutUserJourney (browser, page, url, harObj, autoscroll) {
-  page = await browser.newPage()
+async function launchPageWithoutUserJourney (browser, url, autoscroll) {
+  const page = await browser.newPage()
 
   await page.setViewport({
     width: 1920,
@@ -188,9 +186,9 @@ async function launchPageWithoutUserJourney (browser, page, url, harObj, autoscr
   page.setBypassCSP(true)
 
   // go to url
-  await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
+  await page.goto(url, { timeout: 30000, waitUntil: 'networkidle2' })
   if (autoscroll) { await autoScroll(page) }
-  harObj = await pptrHar.stop()
+  const harObj = await pptrHar.stop()
   return { page, harObj }
 }
 

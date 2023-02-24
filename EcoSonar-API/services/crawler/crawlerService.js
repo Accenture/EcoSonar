@@ -45,9 +45,9 @@ CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
   })
 
   try {
-    this.getWebsiteProtocolAndPrefix(mainUrl)
+    getWebsiteProtocolAndPrefix(mainUrl)
     await authenticationService.loginIfNeeded(browser)
-    await CrawlerService.prototype.recursiveCrawl(mainUrl, browser, crawledUrls)
+    await recursiveCrawl(mainUrl, browser, crawledUrls)
   } catch (error) {
     console.log(error)
   } finally { browser.close() }
@@ -66,7 +66,7 @@ CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
 
   // Remove URLS that are being crawler twice due to ending slash in it (www.myurl.com/ vs www.myurl.com)
   for (const crawledUrl of crawledUrls) {
-    crawledUrls = crawledUrls.filter((url) => !(url === crawledUrl.slice(0, -1)))
+    crawledUrls = crawledUrls.filter((url) => (url !== crawledUrl.slice(0, -1)))
   }
 
   crawledUrls = crawledUrls.filter((url) => (!projectUrls.includes(url) && !projectUrls.includes(url + '/') && !projectUrls.includes(url.slice(0, -1))))
@@ -79,7 +79,7 @@ CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
  * @param {string} url the main url used to start scrawling
  * This function extract the websiteProtocol (http or https) and the website name from the given entry URL
  */
-CrawlerService.prototype.getWebsiteProtocolAndPrefix = function (url) {
+function getWebsiteProtocolAndPrefix (url) {
   if (url.includes('http://')) {
     websiteProtocol = 'http://'
     alternativeProtocol = 'https://'
@@ -107,7 +107,7 @@ CrawlerService.prototype.getWebsiteProtocolAndPrefix = function (url) {
    * @returns a array of URL
    * Crawler extract every URL into the website, then crawl them recursively until every URL has already been seen.
    */
-CrawlerService.prototype.recursiveCrawl = async function (url, browser, crawledUrls) {
+async function recursiveCrawl (url, browser, crawledUrls) {
   try {
     if (!seenUrls.includes(url)) {
       if (CrawlerService.prototype.checkUrl(url)) {
@@ -131,7 +131,7 @@ CrawlerService.prototype.recursiveCrawl = async function (url, browser, crawledU
         for (const link of links) {
           const retrievedUrl = CrawlerService.prototype.getUrl(link)
           if (retrievedUrl) {
-            await CrawlerService.prototype.recursiveCrawl(retrievedUrl, browser, crawledUrls)
+            await recursiveCrawl(retrievedUrl, browser, crawledUrls)
           }
         }
       }

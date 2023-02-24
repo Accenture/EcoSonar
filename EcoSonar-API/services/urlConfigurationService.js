@@ -1,4 +1,5 @@
 const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
+const SystemError = require('../utils/SystemError')
 
 class UrlConfigurationService {
 }
@@ -17,7 +18,7 @@ UrlConfigurationService.prototype.getAll = function (projectName) {
 
 /**
  * @param {String} projectName is the name of the project on wich we try to insert urls
- * @param {*} urlsList is the list of the URLs to be inserted
+ * @param {*} urlList is the list of the URLs to be inserted
  * This function will do 2 checks :
  * 1 - Verify into database if URL isn't already registered
  * 2-  Verify that every URLs in the list is different
@@ -26,47 +27,39 @@ UrlConfigurationService.prototype.getAll = function (projectName) {
  * @reject in case of error, the function reject error type and description
  */
 
-UrlConfigurationService.prototype.insert = async function (projectName, urlsList) {
-  // Retrieving URLs in database for project
-  const formattedArray = await urlsProjectRepository.findAll(projectName, true).then((urlList) => urlList.map((res) => res.urlName))
-
+UrlConfigurationService.prototype.insert = async function (projectName, urlList) {
   // Initializing parameters
-  const values = []
-  values.push(projectName)
   const notInsertedArray = []
   const errorArray = []
-
-  // Excluding duplicate already existing in database
-  let i = 0
-  while (i < urlsList.length) {
-    if (formattedArray.includes(urlsList[i].trim())) {
-      if (!notInsertedArray.includes(urlsList[i].trim())) {
-        notInsertedArray.push(urlsList[i].trim())
+  let systemError = false
+  // Retrieving URLs in database for project
+  const urlAlreadyAddedInProject = await urlsProjectRepository.findAll(projectName, true)
+    .then((urlList) => urlList.map((res) => res.urlName))
+    .catch((error) => {
+      if (error instanceof SystemError) {
+        systemError = true
       }
-      errorArray[i] = 'URL was duplicated or already inserted'
+    })
+
+  let index = 0
+  while (index < urlList.length) {
+    const newList = urlList.filter((url) => url.trim() === urlList[index].trim())
+    if (urlAlreadyAddedInProject.includes(urlList[index].trim()) || newList.length > 1) {
+      notInsertedArray.push(urlList[index].trim())
+      errorArray[index] = 'URL was duplicated or already inserted'
     } else {
-      errorArray[i] = ''
+      errorArray[index] = ''
     }
-    i++
-  }
-
-  // Excluding duplicate in submitted URLs list
-  i = 0
-  while (i < urlsList.length) {
-    for (let j = 0; j < urlsList.length; j++) {
-      if (i !== j && urlsList[i].trim() === urlsList[j].trim()) {
-        errorArray[j] = 'URL was duplicated or already inserted'
-        notInsertedArray.push(urlsList[j])
-      } else if (!values.includes(urlsList[j].trim())) {
-        values.push(urlsList[j].trim())
-      }
-    }
-    i++
+    index++
   }
 
   return new Promise((resolve, reject) => {
-    if (notInsertedArray.length < 1 && values.length >= 2) {
-      urlsProjectRepository.insertAll(values).then(() => { resolve() }).catch((erreur) => { reject(erreur) })
+    if (notInsertedArray.length === 0 && !systemError) {
+      urlsProjectRepository.insertAll(projectName, urlList)
+        .then(() => resolve())
+        .catch((error) => { reject(error) })
+    } else if (systemError) {
+      reject(new SystemError())
     } else {
       reject(errorArray)
     }

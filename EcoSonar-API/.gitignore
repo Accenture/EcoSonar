@@ -13,3 +13,4 @@ pgdata
 .env
 package-lock.json
 userJourney/
+.vscode

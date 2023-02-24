@@ -12,38 +12,33 @@ const UrlsProjectRepository = function () {
    * @param {*} values
    * @returns
    */
-  this.insertAll = async function (values) {
-    const project = values[0]
-    let varUrl, list, number
-    const tab = []
-    let indextab = 0
-    let a = 1
-    while (a < values.length) {
-      varUrl = values[a]
-      number = uniqid()
-      list = { idKey: number, projectName: project, urlName: varUrl }
-      tab[indextab] = list
-      indextab = indextab + 1
-      a = a + 1
+  this.insertAll = async function (projectName, urlList) {
+    const urlsProjects = []
+    for (const url of urlList) {
+      urlsProjects.push({
+        idKey: uniqid(),
+        projectName,
+        urlName: url
+      })
     }
     return new Promise((resolve, reject) => {
-      urlsprojects.insertMany(tab)
+      urlsprojects.insertMany(urlsProjects)
         .then(() => { resolve() })
         .catch((err) => {
-          console.log(err)
+          console.error('\x1b[31m%s\x1b[0m', err)
           if (err._message === 'urlsprojects validation failed') {
-            const nb = values.indexOf(err.errors.urlName.properties.value)
-            a = 0
-            const tabErreur = []
-            while (a < values.length - 1) {
-              if (a + 1 !== nb) {
-                tabErreur[a] = ''
+            const indexError = urlList.indexOf(err.errors.urlName.properties.value)
+            const errors = []
+            let index = 0
+            while (index < urlsProjects.length) {
+              if (index === indexError) {
+                errors[index] = 'Url has an invalid syntax'
               } else {
-                tabErreur[a] = ' Url has an invalid syntax'
+                errors[index] = ''
               }
-              a++
+              index++
             }
-            reject(tabErreur)
+            reject(errors)
           } else {
             const systemError = new SystemError()
             reject(systemError)
@@ -134,11 +129,11 @@ const UrlsProjectRepository = function () {
    * @param {urlName} url to find user flow
    * @returns
    */
-  this.getUserFlow = async function (urlName) {
+  this.getUserFlow = async function (projectName, urlName) {
     let systemError = null
     let result
     try {
-      result = await urlsprojects.findOne({ urlName }, { idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
+      result = await urlsprojects.findOne({ projectName, urlName }, { idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error.message)
       console.log(`Error when retrieving user flow for ${urlName}`)
@@ -158,10 +153,10 @@ const UrlsProjectRepository = function () {
    * @param {urlName} url to delete user flow
    * @returns
    */
-  this.deleteUserFlow = async function (urlName) {
+  this.deleteUserFlow = async function (projectName, urlName) {
     let systemError = null
     try {
-      await urlsprojects.updateOne({ urlName }, { $unset: { userFlow: '' } })
+      await urlsprojects.updateOne({ projectName, urlName }, { $unset: { userFlow: '' } })
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error.message)
       systemError = new SystemError()

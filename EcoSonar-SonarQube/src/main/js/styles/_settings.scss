@@ -7,7 +7,9 @@ $light-grey: #bbb;
 $medium-grey: #e6e6e6;
 $dark-grey: #333;
 $grey: #666;
+$light-blue: #3990CF;
 $blue: #236a97;
+$transparent-light-blue: #D0EBFF;
 $red: #a4030f;
 $red-error: #ad0000;
 $red-background: #ffc5c5;
@@ -375,29 +377,6 @@ input[type='text'].is-invalid {
   line-height: 16px;
 }
 
-.button-red {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  vertical-align: middle;
-  height: 24px;
-  line-height: 22px;
-  padding: 0 8px;
-  border: 1px solid $blue;
-  border-radius: 2px;
-  box-sizing: border-box;
-  background: transparent;
-  color: $blue;
-  font-weight: $medium-weight;
-  font-size: $small-font;
-  text-decoration: none;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-  border-color: $red-error;
-  color: $red-error;
-}
-
 .nowrap,
 table.nowrap td,
 td.nowrap,
@@ -636,7 +615,6 @@ small {
 }
 
 .request-tool {
-  width: 400px;
   margin-top: 2vh;
   width: 350px;
   left: 50%;
@@ -725,6 +703,7 @@ small {
 .overview-measures-aside {
   flex-basis: 210px;
   box-sizing: border-box;
+  padding-left: 0;
 }
 
 // Accessibility
@@ -738,4 +717,18 @@ small {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+.loader {
+  margin: auto;
+  border: 5px solid $light-grey;
+  border-radius: 50%;
+  border-top: 5px solid $grey;
+  width: 50px;
+  height: 50px;
+  animation: spinner 2s linear infinite;
+}
+
+@keyframes spinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

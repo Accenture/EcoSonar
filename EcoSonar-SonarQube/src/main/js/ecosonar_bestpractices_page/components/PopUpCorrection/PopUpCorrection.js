@@ -23,8 +23,8 @@ export default function PopUpCorrection (props) {
     event.currentTarget.blur()
     props.setCorrectionPage(false)
   }
-  function checkTool (tool) {
-    if (tool !== 'W3C validator') return title
+  function checkTool (toolToCheck) {
+    if (toolToCheck !== 'W3C validator') return title
   }
 
   return (
@@ -44,9 +44,9 @@ export default function PopUpCorrection (props) {
           <h2 className='correction-title'>{title}</h2>
         </div>
         <div className='modal-body'>
-          <div className='modal-body-title'>
+          <p className='modal-body-title'>
             {checkTool(tool)}
-            </div>
+          </p>
           <div className='style-correction'>
             <Markup content={correction} />
           </div>

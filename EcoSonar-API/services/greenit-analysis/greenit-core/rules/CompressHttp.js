@@ -21,7 +21,7 @@ rulesManager.registerRule({
     }
     if (compressibleResourcesSize > 0) {
       this.compressRatio = compressibleResourcesCompressedSize / compressibleResourcesSize * 100
-      if (this.compressRatio > 100) {
+      if (this.compressRatio === 100) {
         this.score = 100
       } else if (this.compressRatio >= 99.38) {
         this.score = 75

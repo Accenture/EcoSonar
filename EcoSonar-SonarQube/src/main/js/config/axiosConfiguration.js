@@ -1,4 +1,4 @@
-const axios = require('axios')
+import axios from 'axios'
 
 const baseUrlHosted = process.env.REACT_APP_BASE_URL_ECOSONAR_API || ''
 

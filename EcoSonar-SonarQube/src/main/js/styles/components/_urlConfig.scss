@@ -22,7 +22,6 @@
       font-weight: 700;
       line-height: normal;
       overflow-wrap: break-word;
-      font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     }
   }
   .modal-body-config {
@@ -104,4 +103,25 @@
   .basic-button {
     margin-left: 5%;
   }
+}
+
+.button-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  height: 24px;
+  line-height: 22px;
+  padding: 0 8px;
+  border: 1px solid $blue;
+  border-radius: 2px;
+  box-sizing: border-box;
+  background: transparent;
+  font-weight: $medium-weight;
+  font-size: $small-font;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  border-color: $red-error;
+  color: $red-error;
 }

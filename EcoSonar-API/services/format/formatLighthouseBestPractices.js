@@ -93,8 +93,8 @@ FormatLighthouseBestPractices.prototype.returnFormattedPerformance = function (r
     let numberOfNotApplicableOrInformative = 0
 
     while (i < reports.length) {
-      if (reports[i].lighthousePerformanceBestPractices[element].scoreDisplayMode === 'notApplicable' || reports[i].lighthousePerformanceBestPractices[element].scoreDisplayMode === 'informative') {
-        numberOfNotApplicableOrInformative = numberOfNotApplicableOrInformative + 1
+      if (reports[i].lighthousePerformanceBestPractices[element].scoreDisplayMode === undefined || reports[i].lighthousePerformanceBestPractices[element].scoreDisplayMode === 'notApplicable' || reports[i].lighthousePerformanceBestPractices[element].scoreDisplayMode === 'informative') {
+        numberOfNotApplicableOrInformative++
       }
       if (reports[i].lighthousePerformanceBestPractices[element].scoreDisplayMode !== 'notApplicable') {
         // Audited metrics averaging
@@ -169,8 +169,8 @@ FormatLighthouseBestPractices.prototype.returnFormattedAccessibility = function 
     let numberOfNotApplicableOrInformative = 0
 
     while (i < reports.length) {
-      if (reports[i].lighthouseAccessibilityBestPractices[element].scoreDisplayMode === 'notApplicable' || reports[i].lighthouseAccessibilityBestPractices[element].scoreDisplayMode === 'informative') {
-        numberOfNotApplicableOrInformative = numberOfNotApplicableOrInformative + 1
+      if (reports[i].lighthouseAccessibilityBestPractices[element].scoreDisplayMode === undefined || reports[i].lighthouseAccessibilityBestPractices[element].scoreDisplayMode === 'notApplicable' || reports[i].lighthouseAccessibilityBestPractices[element].scoreDisplayMode === 'informative') {
+        numberOfNotApplicableOrInformative++
       }
       if (reports[i].lighthouseAccessibilityBestPractices[element].scoreDisplayMode !== 'notApplicable') {
         // Audited metrics averaging

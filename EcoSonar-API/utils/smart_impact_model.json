@@ -1,0 +1,43 @@
+{
+  "domSize": {
+    "bootupTime": 19.662409886444955,
+    "totalByteWeight": 15.003906517021786,
+    "unusedCssRules": 14.768843418657482
+  },
+  "nbRequest": {
+    "styleSheets": 33.103473292856044,
+    "domainsNumber": 25.12833701025915,
+    "dontResizeImageInBrowser": 15.0,
+    "externalizeCss": 13.990933784848176
+  },
+  "responsesSize": {
+    "externalizeJs": 16.581818637711322,
+    "httpRequests": 15.83266600028013,
+    "domainsNumber": 15.350690656664673
+  },
+  "largestContentfulPaint": {
+    "jsValidate": 17.108583269223242,
+    "dontResizeImageInBrowser": 14.581080890532533,
+    "usesLongCacheTtl": 8.280933805639853
+  },
+  "cumulativeLayoutShift": {
+    "styleSheets": 21.971432792250557,
+    "httpRequests": 17.60721532598987,
+    "httpError": 16.579757938833424
+  },
+  "firstContentfulPaint": {
+    "unusedCssRules": 39.899582954361684,
+    "totalByteWeight": 35.90600812483714,
+    "useStandardTypefaces": 24.194408920801173
+  },
+  "speedIndex": {
+    "httpRequests": 53.09898653355165
+  },
+  "totalBlockingTime": {
+    "httpRequests": 39.85322914548336,
+    "domainsNumber": 19.655331762967478
+  },
+  "interactive": {
+    "httpRequests": 16.509467723978254
+  }
+}

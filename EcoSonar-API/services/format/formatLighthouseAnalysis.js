@@ -10,19 +10,22 @@ FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (an
       dateAnalysis: analysis.dateLighthouseAnalysis,
       largestContentfulPaint: {
         displayValue: analysis.largestContentfulPaint.displayValue.toFixed(1) + ' s',
-        complianceLevel: setComplianceLevel(analysis.largestContentfulPaint.score)
+        complianceLevel: setComplianceLevel(analysis.largestContentfulPaint.score),
+        score: analysis.largestContentfulPaint.score
       },
       cumulativeLayoutShift: {
         displayValue: analysis.cumulativeLayoutShift.displayValue.toFixed(3),
-        complianceLevel: setComplianceLevel(analysis.cumulativeLayoutShift.score)
+        complianceLevel: setComplianceLevel(analysis.cumulativeLayoutShift.score),
+        score: analysis.cumulativeLayoutShift.score
       },
       firstContentfulPaint: {
         displayValue: analysis.firstContentfulPaint.displayValue.toFixed(1) + ' s',
-        complianceLevel: setComplianceLevel(analysis.firstContentfulPaint.score)
+        complianceLevel: setComplianceLevel(analysis.firstContentfulPaint.score),
+        score: analysis.firstContentfulPaint.score
       },
-      speedIndex: { displayValue: analysis.speedIndex.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.speedIndex.score) },
-      totalBlockingTime: { displayValue: analysis.totalBlockingTime.displayValue.toFixed(0) + ' ms', complianceLevel: setComplianceLevel(analysis.totalBlockingTime.score) },
-      interactive: { displayValue: analysis.interactive.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.interactive.score) }
+      speedIndex: { displayValue: analysis.speedIndex.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.speedIndex.score), score: analysis.speedIndex.score },
+      totalBlockingTime: { displayValue: analysis.totalBlockingTime.displayValue.toFixed(0) + ' ms', complianceLevel: setComplianceLevel(analysis.totalBlockingTime.score), score: analysis.totalBlockingTime.score },
+      interactive: { displayValue: analysis.interactive.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.interactive.score), score: analysis.interactive.score }
     }
   } catch (err) {
     console.log(err)
@@ -92,19 +95,22 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
         dateAnalysis,
         largestContentfulPaint: {
           displayValue: calculateAverageScore(largestContentfulPaint.displayValue, 1) + ' s',
-          complianceLevel: setComplianceLevel(calculateAverageScore(largestContentfulPaint.score))
+          complianceLevel: setComplianceLevel(calculateAverageScore(largestContentfulPaint.score)),
+          score: calculateAverageScore(largestContentfulPaint.score, 1)
         },
         cumulativeLayoutShift: {
           displayValue: calculateAverageScore(cumulativeLayoutShift.displayValue, 3),
-          complianceLevel: setComplianceLevel(calculateAverageScore(cumulativeLayoutShift.score))
+          complianceLevel: setComplianceLevel(calculateAverageScore(cumulativeLayoutShift.score)),
+          score: calculateAverageScore(cumulativeLayoutShift.score, 1)
         },
         firstContentfulPaint: {
           displayValue: calculateAverageScore(firstContentfulPaint.displayValue, 1) + ' s',
-          complianceLevel: setComplianceLevel(calculateAverageScore(firstContentfulPaint.score))
+          complianceLevel: setComplianceLevel(calculateAverageScore(firstContentfulPaint.score)),
+          score: calculateAverageScore(firstContentfulPaint.score, 1)
         },
-        speedIndex: { displayValue: calculateAverageScore(speedIndex.displayValue, 1) + ' s', complianceLevel: setComplianceLevel(calculateAverageScore(speedIndex.score)) },
-        totalBlockingTime: { displayValue: calculateAverageScore(totalBlockingTime.displayValue, 0) + ' ms', complianceLevel: setComplianceLevel(calculateAverageScore(totalBlockingTime.score)) },
-        interactive: { displayValue: calculateAverageScore(interactive.displayValue, 1) + ' s', complianceLevel: setComplianceLevel(calculateAverageScore(interactive.score)) }
+        speedIndex: { displayValue: calculateAverageScore(speedIndex.displayValue, 1) + ' s', complianceLevel: setComplianceLevel(calculateAverageScore(speedIndex.score)), score: calculateAverageScore(speedIndex.score, 1) },
+        totalBlockingTime: { displayValue: calculateAverageScore(totalBlockingTime.displayValue, 0) + ' ms', complianceLevel: setComplianceLevel(calculateAverageScore(totalBlockingTime.score)), score: calculateAverageScore(totalBlockingTime.score, 1) },
+        interactive: { displayValue: calculateAverageScore(interactive.displayValue, 1) + ' s', complianceLevel: setComplianceLevel(calculateAverageScore(interactive.score)), score: calculateAverageScore(interactive.score, 1) }
       }
       indexAnalysis = indexAnalysis + 1
     }
@@ -197,14 +203,14 @@ FormatLighthouseAnalysis.prototype.formatDeploymentsForGraphs = function (deploy
 
   // Finally we calculate the average for each date
   for (const i of finalDeployment) {
-    i.performanceScore = Math.ceil(i.performanceScore / i.numberOfValues)
-    i.accessibilityScore = Math.ceil(i.accessibilityScore / i.numberOfValues)
-    i.largestContentfulPaint = Math.ceil(i.largestContentfulPaint / i.numberOfValues)
-    i.cumulativeLayoutShift = Math.ceil(i.cumulativeLayoutShift / i.numberOfValues)
-    i.firstContentfulPaint = Math.ceil(i.firstContentfulPaint / i.numberOfValues)
-    i.speedIndex = Math.ceil(i.speedIndex / i.numberOfValues)
-    i.totalBlockingTime = Math.ceil(i.totalBlockingTime / i.numberOfValues)
-    i.interactive = Math.ceil(i.interactive / i.numberOfValues)
+    i.performanceScore = Math.round(i.performanceScore / i.numberOfValues)
+    i.accessibilityScore = Math.round(i.accessibilityScore / i.numberOfValues)
+    i.largestContentfulPaint = Math.round(i.largestContentfulPaint / i.numberOfValues)
+    i.cumulativeLayoutShift = Math.round(i.cumulativeLayoutShift / i.numberOfValues)
+    i.firstContentfulPaint = Math.round(i.firstContentfulPaint / i.numberOfValues)
+    i.speedIndex = Math.round(i.speedIndex / i.numberOfValues)
+    i.totalBlockingTime = Math.round(i.totalBlockingTime / i.numberOfValues)
+    i.interactive = Math.round(i.interactive / i.numberOfValues)
     delete i.numberOfValues
   }
 

@@ -63,12 +63,13 @@ export default function UrlList (props) {
     </table>
   )
 
+  const urlListBody = urlList.length === 0 ? noUrl : filledTab
   return (
     <div>
       {crawler}
       {error && urlList.length === 0
         ? emptyTabWithError
-        : (urlList.length === 0 ? noUrl : filledTab)
+        : urlListBody
       }
     </div>
   )

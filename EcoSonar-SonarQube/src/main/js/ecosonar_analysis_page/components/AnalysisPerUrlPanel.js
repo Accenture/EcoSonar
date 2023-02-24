@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { getAnalysisUrlConfiguration } from '../../services/ecosonarService'
 import GraphPanelForUrl from './GraphPanel/GraphPanelForUrl'
 import GreenItPanelPerUrl from './GreenItPanel/GreenItPanelPerUrl'
@@ -31,19 +31,6 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
       interactiveUrl: [],
       speedIndexUrl: [],
       totalBlockingTimeUrl: [],
-      selectedGraph: '',
-      reqSelected: false,
-      ecoindexSelected: false,
-      domSelected: false,
-      pageSelected: false,
-      performanceSelected: false,
-      accessibilitySelected: false,
-      cumulativeLayoutShiftSelected: false,
-      firstContentfulPaintSelected: false,
-      largestContentfulPaintSelected: false,
-      interactiveSelected: false,
-      speedIndexSelected: false,
-      totalBlockingTimeSelected: false,
       ariaAlertForAccessibility: false
     }
   }
@@ -97,11 +84,6 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
             speedIndexUrl: res.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.speedIndex]),
             totalBlockingTimeUrl: res.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.totalBlockingTime])
           })
-          if (res.deployments.greenit && res.deployments.greenit.length > 0) {
-            this.setState({ selectedGraph: 'ecoindex', ecoindexSelected: true, performanceSelected: false })
-          } else {
-            this.setState({ selectedGraph: 'performance', performanceSelected: true, ecoindexSelected: false })
-          }
         }
       })
       .catch((result) => {
@@ -109,24 +91,19 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
           this.setState({ error: result.message, loading: false })
         }
       })
-  };
+  }
 
   handleAccessibilityAlert = () => {
     this.setState({ ariaAlertForAccessibility: false })
     this.setState({ ariaAlertForAccessibility: true })
-  };
+  }
 
   handleChange = async (event) => {
     await this.setState({ selectedUrl: event.target.value })
 
     this.getAnalysis()
     this.handleAccessibilityAlert()
-  };
-
-  handleAccessibilityAlert = () => {
-    this.setState({ ariaAlertForAccessibility: false })
-    this.setState({ ariaAlertForAccessibility: true })
-  };
+  }
 
   render () {
     return (
@@ -137,6 +114,7 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
           loading={this.state.loading}
           greenItLastAnalysis={this.state.greenItLastAnalysis}
           projectName={this.state.projectName}
+          urlName={this.state.selectedUrl}
           foundAnalysis={this.state.foundAnalysis}
           foundUrl={this.state.foundUrl}
           selectedUrl={this.state.selectedUrl}
@@ -151,7 +129,6 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
           loading={this.state.loading}
           foundAnalysis={this.state.foundAnalysis}
           error={this.state.error}
-          selectedGraph={this.state.selectedGraph}
           ecoUrl={this.state.ecoUrl}
           reqUrl={this.state.reqUrl}
           domUrl={this.state.domUrl}
@@ -164,19 +141,6 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
           interactiveUrl={this.state.interactiveUrl}
           speedIndexUrl={this.state.speedIndexUrl}
           totalBlockingTimeUrl={this.state.totalBlockingTimeUrl}
-          reqSelected={this.state.reqSelected}
-          domSelected={this.state.domSelected}
-          pageSelected={this.state.pageSelected}
-          ecoindexSelected={this.state.ecoindexSelected}
-          performanceSelected={this.state.performanceSelected}
-          accessibilitySelected={this.state.accessibilitySelected}
-          cumulativeLayoutShiftSelected={this.state.cumulativeLayoutShiftSelected}
-          firstContentfulPaintSelected={this.state.firstContentfulPaintSelected}
-          largestContentfulPaintSelected={this.state.largestContentfulPaintSelected}
-          interactiveSelected={this.state.interactiveSelected}
-          speedIndexSelected={this.state.speedIndexSelected}
-          totalBlockingTimeSelected={this.state.totalBlockingTimeSelected}
-          handleChangeGraphs={this.handleChangeGraphs}
           w3cAnalysis={this.state.w3cAnalysis}
         />
       </div>

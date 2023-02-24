@@ -1,5 +1,4 @@
 import React from 'react'
-import LoadingIcon from '../../images/LoadingIcon.svg'
 import { getUrlsConfiguration } from '../../services/configUrlService'
 import { crawl } from '../../services/crawlerService'
 import AddUrlForm from './AddUrlForm'
@@ -31,7 +30,7 @@ export default class ConfigurationPage extends React.PureComponent {
     })
     getUrlsConfiguration(this.props.project.key)
       .then((urls) => {
-        this.setState({ urls: urls })
+        this.setState({ urls })
         this.setState({
           loading: false
         })
@@ -50,13 +49,13 @@ export default class ConfigurationPage extends React.PureComponent {
     this.setState({
       openCreate: true
     })
-  };
+  }
 
   handleCreateClose = () => {
     this.setState({
       openCreate: false
     })
-  };
+  }
 
   handleDeleteSubmit = (index) => {
     this.setState({
@@ -64,20 +63,20 @@ export default class ConfigurationPage extends React.PureComponent {
       deleting: true,
       indexToDelete: index
     })
-  };
+  }
 
   onCloseDelete = () => {
     this.setState({
       deleting: false,
       error: ''
     })
-  };
+  }
 
   deletedUrlState = () => {
     const urlsUpdated = this.state.urls.slice()
     urlsUpdated.splice(this.state.indexToDelete, 1)
     this.setState({ deleting: false, urls: urlsUpdated })
-  };
+  }
 
   addNewUrls = (urlsAdded) => {
     this.setState({
@@ -86,7 +85,8 @@ export default class ConfigurationPage extends React.PureComponent {
     this.setState({ crawledUrls: [] })
     this.setState({ displayCrawler: false })
     this.setState({ hasCrawled: false })
-  };
+    this.setState({ error: '' })
+  }
 
   setMainUrl = async (url) => {
     this.setState({ crawlerLoading: true })
@@ -95,13 +95,13 @@ export default class ConfigurationPage extends React.PureComponent {
       this.setState({ crawledUrls: response })
       this.setState({ hasCrawled: true })
     })
-  };
+  }
 
   setDisplayCrawler = () => {
     this.setState({ displayCrawler: !this.state.displayCrawler })
     this.setState({ crawledUrls: [] })
     this.setState({ hasCrawled: false })
-  };
+  }
 
   checkUrl = () => {
     if (!this.state.displayCrawler) {
@@ -125,7 +125,7 @@ export default class ConfigurationPage extends React.PureComponent {
         </div>
       )
     }
-  };
+  }
 
   render () {
     return (
@@ -155,18 +155,16 @@ export default class ConfigurationPage extends React.PureComponent {
             EcoSonar will then analyse all pages of your web app and will guide you to set up practices optimizing ressources.
           </p>
         </div>
-          {!this.state.loading ? this.checkUrl() : <img src={LoadingIcon} alt='Loading icon' />}
+          {!this.state.loading ? this.checkUrl() : <div className="loader"></div>}
 
           {this.state.deleting && (
-            <div className='boxed-group'>
-              <DeleteUrlForm
-                urlList={this.state.urls}
-                index={this.state.indexToDelete}
-                projectName={this.state.projectName}
-                deletedUrlState={this.deletedUrlState}
-                onCloseDelete={this.onCloseDelete}
-              />
-            </div>
+            <DeleteUrlForm
+              urlList={this.state.urls}
+              index={this.state.indexToDelete}
+              projectName={this.state.projectName}
+              deletedUrlState={this.deletedUrlState}
+              onCloseDelete={this.onCloseDelete}
+            />
           )}
       </div>
       </main>

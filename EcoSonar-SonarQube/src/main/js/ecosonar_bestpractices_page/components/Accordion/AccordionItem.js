@@ -4,7 +4,7 @@ import AccordionDescriptionOtherTools from './AccordionDescriptionOtherTools'
 import AccordionTitle from './AccordionTitle'
 
 export default function AccordionItem (props) {
-  const { practice, staticData, isFolded, setIsFolded, index } = props
+  const { practice, staticData, isFolded, setIsFolded } = props
   const [isActive, setIsActive] = useState(false)
 
   useEffect(() => {
@@ -16,34 +16,21 @@ export default function AccordionItem (props) {
     if (isFolded) setIsFolded(false)
   }
 
-  function switchOnKeyDown (e) {
-    if (e.type === 'keydown') {
-      unFoldAndChangeIsActive()
-    }
-  }
-
   return (
     <li className='accordion-item'>
-      <div
-        className='accordion-toggle'
-        onClick={() => {
-          unFoldAndChangeIsActive()
-        }}
-        onKeyDown={switchOnKeyDown}
-        role='button'
-        aria-expanded={isFolded}
-        aria-controls={`${staticData.title}-accordion-content`}
-        tabIndex={index}
-      >
+      <div className='accordion' aria-label={staticData.title} role='region' >
         <AccordionTitle
           title= {staticData.title}
-          content= {staticData.content}
           staticTitleData={staticData.titleData}
+          staticTitleDataSuccess={staticData.titleDataSuccess}
           compliance={practice.compliance}
           correction={staticData.correction}
           auditedMetric={practice.auditedMetric}
           tool={practice.tool}
+          score={practice.averageScore}
           isActive={isActive}
+          isFolded={isFolded}
+          unFoldAndChangeIsActive={unFoldAndChangeIsActive}
         />
       </div>
       {!isFolded && isActive && (

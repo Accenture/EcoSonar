@@ -58,7 +58,7 @@ FormatW3cAnalysis.prototype.formatDeploymentsForGraphs = function (formattedDepl
       }
     }
 
-    totalw3cPractices = this.formatW3c(totalw3cPractices)
+    totalw3cPractices = formatW3c(totalw3cPractices)
     const score = this.calculateScore(totalw3cPractices)
     duplicatedDeployments.push({ score, dateAnalysis: duplicatedValuesArray[0].dateAnalysis })
   }
@@ -94,7 +94,7 @@ FormatW3cAnalysis.prototype.w3cLastAnalysisFormatted = function (latestW3cAnalys
       }
     }
 
-    w3cMetricArray = this.formatW3c(w3cMetricArray)
+    w3cMetricArray = formatW3c(w3cMetricArray)
     score = this.calculateScore(w3cMetricArray)
 
     for (const practice of w3cMetricArray) {
@@ -104,15 +104,8 @@ FormatW3cAnalysis.prototype.w3cLastAnalysisFormatted = function (latestW3cAnalys
       if (practice.type === 'fatal error') totalFatalError += 1
     }
 
-    // TODO : Grade aren't currently used for the type of errors. We are looking for more data gathering and analysis to get the right ratio for error/grade
-    // const grades = this.setErrorTypeGrade(w3c.totalInfo, w3c.totalWarning, w3c.totalError, w3c.totalFatalError)
-    // w3c.totalInfoGrade = grades.infoGrade
-    // w3c.totalWarningGrade = grades.warningGrade
-    // w3c.totalErrorGrade = grades.errorGrade
-    // w3c.totalFatalErrorGrade = grades.fatalErrorGrade
-
     // Setting the returned object
-    w3c.score = Math.ceil(score)
+    w3c.score = Math.round(score)
     w3c.grade = formatCompliance.getGrade(w3c.score)
     w3c.dateAnalysis = latestW3cAnalysis[0].dateW3cAnalysis
     w3c.totalWarning = totalWarning
@@ -155,71 +148,12 @@ FormatW3cAnalysis.prototype.calculateScore = function (errorsList) {
   return score
 }
 
-// TODO : Currently this function isn't in use. It's waiting for further development and more data analysis to match the right total/grade ratio for each type of error.
-/**
- *
- * @param {Number} totalInfo
- * @param {Number} totalWarning
- * @param {Number} totalError
- * @param {Number} totalFatalError
- * @returns the grades for each category of error
- */
-FormatW3cAnalysis.prototype.setErrorTypeGrade = function (totalInfo, totalWarning, totalError, totalFatalError) {
-  let infoGrade, warningGrade, errorGrade, fatalErrorGrade
-  if (totalInfo >= 100) {
-    infoGrade = 'G'
-  } else if (totalInfo >= 30) {
-    infoGrade = 'E'
-  } else if (totalInfo >= 20) {
-    infoGrade = 'D'
-  } else if (totalInfo >= 1) {
-    infoGrade = 'C'
-  } else if (totalInfo === 0) {
-    infoGrade = 'A'
-  }
-
-  // Total warning
-  if (totalWarning >= 30) {
-    warningGrade = 'G'
-  } else if (totalWarning >= 15) {
-    warningGrade = 'E'
-  } else if (totalWarning >= 10) {
-    warningGrade = 'D'
-  } else if (totalWarning >= 1) {
-    warningGrade = 'C'
-  } else if (totalWarning === 0) {
-    warningGrade = 'A'
-  }
-
-  // Total error
-  if (totalError >= 10) {
-    errorGrade = 'G'
-  } else if (totalError >= 5) {
-    errorGrade = 'E'
-  } else if (totalError >= 2) {
-    errorGrade = 'D'
-  } else if (totalError >= 1) {
-    errorGrade = 'C'
-  } else if (totalError === 0) {
-    errorGrade = 'A'
-  }
-
-  // Total fatal error
-  if (totalFatalError > 0) {
-    fatalErrorGrade = 'G'
-  } else if (totalFatalError === 0) {
-    fatalErrorGrade = 'A'
-  }
-  const grades = { infoGrade, warningGrade, errorGrade, fatalErrorGrade }
-  return grades
-}
-
 /**
  *
  * @param {*} a list of w3c errors
  * @returns  a list of w3c errors without duplicate error
  */
-FormatW3cAnalysis.prototype.formatW3c = function (errorsList) {
+function formatW3c (errorsList) {
   const errorsListWithoutDuplicat = []
   let match = false
   let i

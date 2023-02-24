@@ -5,7 +5,13 @@ class ProcedureService { }
 
 ProcedureService.prototype.saveProcedure = async function (projectName, selectedProcedure) {
   // selected procedure can be equal to 'quick wins', 'highest impact', 'smart impact', 'score impact'
-  const projectExist = await projectsRepository.getProjectSettings(projectName)
+  let projectExist
+  await projectsRepository.getProjectSettings(projectName)
+    .then((result) => {
+      projectExist = result
+    }).catch(() => {
+      projectExist = null
+    })
   let allUrls = []
   if (projectExist === null) {
     allUrls = await urlsProjectRepository.findAll(projectName, true)

@@ -25,33 +25,38 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
   const timeout = 10000
   let step; let element; let promises
   for (step of steps) {
-    switch (step.type) {
-      case 'navigate':
-        promises = []
-        promises.push(page.waitForNavigation())
-        await page.goto(step.url)
-        await Promise.all(promises)
-        break
-      case 'click':
-        element = await waitForSelectors(step.selectors, page, { timeout, visible: true })
-        if (step.offsetX && step.offsetY) {
-          await element.click({
-            offset: {
-              x: step.offsetX,
-              y: step.offsetY
-            }
-          })
-        } else {
-          await element.click({})
-        }
+    try {
+      switch (step.type) {
+        case 'navigate':
+          promises = []
+          promises.push(page.waitForNavigation())
+          await page.goto(step.url)
+          await Promise.all(promises)
+          break
+        case 'click':
+          element = await waitForSelectors(step.selectors, page, { timeout, visible: true })
+          if (step.offsetX && step.offsetY) {
+            await element.click({
+              offset: {
+                x: step.offsetX,
+                y: step.offsetY
+              }
+            })
+          } else {
+            await element.click({})
+          }
 
-        break
-      case 'change':
-        element = await waitForSelectors(step.selectors, page, { timeout, visible: true })
-        await applyChange(step.value, element)
-        break
-      default:
-        break
+          break
+        case 'change':
+          element = await waitForSelectors(step.selectors, page, { timeout, visible: true })
+          await applyChange(step.value, element)
+          break
+        default:
+          break
+      }
+    } catch (error) {
+      console.log('USER JOURNEY : An error occured when launching user flow for url ' + url + ' in step ' + step.type)
+      console.log(error.message)
     }
   }
   await page.waitForNavigation()
@@ -101,8 +106,8 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
   return lighthouseResults.steps[0]
 }
 
-UserJourneyService.prototype.insertUserFlow = async function (url, userFlow) {
-  const urlsProject = await urlsProjectRepository.getUserFlow(url)
+UserJourneyService.prototype.insertUserFlow = async function (projectName, url, userFlow) {
+  const urlsProject = await urlsProjectRepository.getUserFlow(projectName, url)
   if (urlsProject === null) {
     console.log('UPDATE USER FLOW - Url not found')
     throw new Error('Url not found')
@@ -114,25 +119,25 @@ UserJourneyService.prototype.insertUserFlow = async function (url, userFlow) {
   }
 }
 
-UserJourneyService.prototype.getUserFlow = async function (url) {
-  const urlsProject = await urlsProjectRepository.getUserFlow(url)
+UserJourneyService.prototype.getUserFlow = async function (projectName, url) {
+  const urlsProject = await urlsProjectRepository.getUserFlow(projectName, url)
   return new Promise((resolve, reject) => {
     if (urlsProject === null || urlsProject.userFlow === undefined) {
       console.log('GET USER FLOW - Url flow not found')
-      reject(new Error('Your project does not have user flow saved into database.'))
+      reject(new Error('The page to audit does not have any user flow saved into database.'))
     } else {
       resolve(Object.fromEntries(urlsProject.userFlow))
     }
   })
 }
 
-UserJourneyService.prototype.deleteUserFlow = async function (url) {
-  const urlsProject = await urlsProjectRepository.getUserFlow(url)
+UserJourneyService.prototype.deleteUserFlow = async function (projectName, url) {
+  const urlsProject = await urlsProjectRepository.getUserFlow(projectName, url)
   if (urlsProject === null) {
     console.log('UPDATE USER FLOW - Url not found')
     throw new Error('Url not found')
   } else {
-    urlsProjectRepository.deleteUserFlow(url)
+    urlsProjectRepository.deleteUserFlow(projectName, url)
   }
 }
 

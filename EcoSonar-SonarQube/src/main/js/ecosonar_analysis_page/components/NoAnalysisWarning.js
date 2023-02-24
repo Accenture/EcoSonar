@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import errors from '../../utils/errors.json'
 import formatError from '../../format/formatError'
 

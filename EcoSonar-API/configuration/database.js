@@ -1,9 +1,11 @@
 const mongoose = require('mongoose')
 const { retrievePassword } = require('./retrieveDatabasePasswordFromCloudProvider')
 
-class DataBase {
+mongoose.set('strictQuery', false)
+
+class Database {
 }
-DataBase.prototype.connection = async function () {
+Database.prototype.connection = async function () {
   let connectionString
   let user
   let password
@@ -45,5 +47,5 @@ DataBase.prototype.connection = async function () {
   }
 }
 
-const bdd = new DataBase()
-module.exports = bdd
+const database = new Database()
+module.exports = database

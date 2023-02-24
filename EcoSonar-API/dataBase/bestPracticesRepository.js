@@ -79,22 +79,26 @@ const BestPracticesRepository = function () {
   this.findAll = async function (projectNameReq) {
     let hasNoUrl = false
     let systemError = null
-    let resultats
+    let results = []
+    let latestBestPracticeReports = []
     try {
       const resList = await urlsprojects.find({ projectName: projectNameReq }, { idKey: 1 })
       if (resList.length === 0) {
         hasNoUrl = true
       } else {
-        // create a list of idKey
         let i = 0
         const listIdKey = []
         while (i < resList.length) {
           listIdKey[i] = resList[i].idKey
           i++
         }
-        resultats = await bestpractices
+        results = await bestpractices
           .find({ idUrl: listIdKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
-          .sort({ dateAnalysisBestPractices: -1 })
+          .sort({ dateAnalysisBestPractices: 1 })
+        const latestBestPracticeDate = new Date(
+          Math.max(...results.map(element => { return new Date(element.dateAnalysisBestPractices) }))
+        )
+        latestBestPracticeReports = results.filter(element => element.dateAnalysisBestPractices.getTime() === latestBestPracticeDate.getTime())
       }
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error)
@@ -107,7 +111,7 @@ const BestPracticesRepository = function () {
       } else if (hasNoUrl) {
         reject(new Error('No analysis found for project' + projectNameReq))
       } else {
-        resolve(resultats)
+        resolve(latestBestPracticeReports)
       }
     })
   }
@@ -121,13 +125,13 @@ const BestPracticesRepository = function () {
   this.find = async function (projectName, urlName) {
     let hasNoUrl = false
     let systemError = null
-    let resultats
+    let result
     try {
       const resList = await urlsprojects.find({ projectName, urlName }, { idKey: 1 })
       if (resList.length < 1) {
         hasNoUrl = true
       } else {
-        resultats = await bestpractices
+        result = await bestpractices
           .find({ idUrl: resList[0].idKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
           .sort({ dateAnalysisBestPractices: -1 })
           .limit(1)
@@ -143,7 +147,7 @@ const BestPracticesRepository = function () {
       } else if (hasNoUrl) {
         reject(new Error(`No analysis found for url ${urlName} into project ${projectName}`))
       } else {
-        resolve(resultats)
+        resolve(result)
       }
     })
   }

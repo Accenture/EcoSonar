@@ -1,53 +1,64 @@
 import React, { useEffect, useState } from 'react'
-import LoadingIcon from '../../images/LoadingIcon.svg'
 import { getBestPractices, getBestPracticesForUrl } from '../../services/bestpracticesService'
+import { getProcedure, addProcedure } from '../../services/procedureService'
 import { getUrlsConfiguration } from './../../services/configUrlService'
-import AccordionManager from './Accordion/AccordionManager'
-import BestPracticesFilters from './BestPracticesFilters/BestPracticesFilters'
-import { allTools, auditTypes, defaultSelectedComplianceLevel, greenITTool, lighthouseAccessibility, lighthousePerformanceTool, w3cValidator, setTools } from './BestPracticesFilters/Filters'
+import ProcedureChoice from './Procedure/ProcedureChoice'
+import AccessibilityAlert from '../../utils/AccessibilityAlert'
+import BestPracticesBody from './BestPracticesBody'
 
 export default function BestPracticesPage (props) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [saveProcedureError, setSaveProcedureError] = useState('')
   const [isFolded, setIsFolded] = useState(false)
-
-  const [selectedUrl, setSelectedUrl] = useState('All')
   const [bestPracticesEcodesign, setBestPracticesEcodesign] = useState({})
   const [bestPracticesAccessibility, setBestPracticesAccessibility] = useState({})
   const [dateAnalysisBestPractices, setDateAnalysisBestPractices] = useState('')
-  const [auditTools, setAuditTools] = useState([allTools, greenITTool, lighthouseAccessibility, lighthousePerformanceTool, w3cValidator])
-
+  const [selectedProcedure, setSelectedProcedure] = useState('')
+  const [selectedOption, setSelectedOption] = useState('')
+  const [savedProcedure, setSavedProcedure] = useState('')
+  const [editProcedureMode, setEditProcedureMode] = useState(false)
+  const [ariaAlertForAccessibility, setAriaAlertForAccessibility] = useState(false)
   const [urls, setUrls] = useState([])
-  const [selectedAuditTypes, setSelectedAuditTypes] = useState('All')
-  const [selectedAuditTools, setSelectedAuditTools] = useState('All')
-  const [selectedComplianceLevel, setSelectedComplianceLevel] = useState(defaultSelectedComplianceLevel)
+  const [selectedUrl, setSelectedUrl] = useState('All')
 
   const ariaHidden = true
 
   useEffect(() => {
-    getBestPractices(props.project.key)
-      .then((data) => {
-        setResultData(data)
+    setLoading(true)
+    getProcedure(props.project.key)
+      .then((procedure) => {
+        setSavedProcedure(procedure.procedure)
+        setEditProcedureMode(false)
+        getUrlsConfiguration(props.project.key)
+          .then((data) => {
+            data.unshift('All')
+            setUrls(data)
+          })
+          .catch((result) => {
+            if (result instanceof Error) {
+              setError(result.message)
+              setLoading(false)
+            }
+          })
+        getBestPractices(props.project.key)
+          .then((data) => {
+            setResultData(data)
+            setLoading(false)
+          })
+          .catch((result) => {
+            if (result instanceof Error) {
+              setError(result.message)
+            }
+            setLoading(false)
+          })
       })
       .catch((result) => {
-        if (result instanceof Error) {
+        if (result instanceof Error && result.message === '') {
+          setEditProcedureMode(true)
+        } else if (result instanceof Error) {
           setError(result.message)
         }
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-    getUrlsConfiguration(props.project.key)
-      .then((data) => {
-        data.unshift('All')
-        setUrls(data)
-      })
-      .catch((result) => {
-        if (result instanceof Error) {
-          setError(result.message)
-        }
-      })
-      .finally(() => {
         setLoading(false)
       })
   }, [])
@@ -85,6 +96,64 @@ export default function BestPracticesPage (props) {
     }
   }
 
+  function selectProcedure (name) {
+    setSelectedProcedure(name)
+    setSelectedOption('')
+    setSaveProcedureError('')
+  }
+
+  function changeSelected (state) {
+    setSelectedOption(state)
+    if (state === 'yes') {
+      setSelectedProcedure('smartImpact')
+    } else {
+      setSelectedProcedure('quickWins')
+    }
+  }
+
+  function changeProcedure () {
+    setEditProcedureMode(true)
+  }
+  function cancel () {
+    setSelectedOption('')
+    setSelectedProcedure('')
+    setEditProcedureMode(false)
+  }
+
+  function confirm () {
+    setLoading(true)
+    addProcedure(props.project.key, selectedProcedure)
+      .then(() => {
+        setSavedProcedure(selectedProcedure)
+        setEditProcedureMode(false)
+        getUrlsConfiguration(props.project.key)
+          .then((data) => {
+            data.unshift('All')
+            setUrls(data)
+          })
+          .catch((result) => {
+            if (result instanceof Error) {
+              setError(result.message)
+            }
+          })
+        getBestPractices(props.project.key)
+          .then((data) => {
+            setResultData(data)
+            setLoading(false)
+          })
+          .catch((result) => {
+            if (result instanceof Error) {
+              setError(result.message)
+              setLoading(false)
+            }
+          })
+      })
+      .catch((err) => {
+        if (err instanceof Error) {
+          setSaveProcedureError(err.message)
+        }
+      })
+  }
   function setResultData (data) {
     setBestPracticesEcodesign(data.ecodesign)
 
@@ -93,15 +162,14 @@ export default function BestPracticesPage (props) {
     setDateAnalysisBestPractices(`${formattedDate3.toDateString()} - ${formattedDate3.toLocaleTimeString([], { hour12: false })}`)
   }
 
-  function changeAuditType (newAuditType) {
-    setSelectedAuditTypes(newAuditType)
-    const newAuditTool = setTools(newAuditType)
-    setAuditTools(newAuditTool)
-    setSelectedAuditTools(newAuditTool[0].label)
-  }
+  function handleAccessibilityAlert () {
+    setAriaAlertForAccessibility(false)
+    setAriaAlertForAccessibility(true)
+  };
 
-  function changeAuditTools (newAuditTool) {
-    setSelectedAuditTools(newAuditTool)
+  function handleCloseAll () {
+    setIsFolded(!isFolded)
+    handleAccessibilityAlert()
   }
 
   return (
@@ -116,52 +184,42 @@ export default function BestPracticesPage (props) {
           ressources.
         </p>
       </div>
-      <div className='best-practices'>
-        <BestPracticesFilters
-          auditTypes={auditTypes}
-          auditTools={auditTools}
-          selectedAuditTools={selectedAuditTools}
-          selectedComplianceArray={selectedComplianceLevel}
-          selectedUrl={selectedUrl}
-          urls={urls}
-          setSelectedAuditTypes={changeAuditType}
-          setSelectedAuditTools={changeAuditTools}
-          setSelectedComplianceArray={(newValue) => setSelectedComplianceLevel(newValue)}
-          changeSelectedUrl={changeSelectedUrl}
-        />
-        {loading
-          ? < img src={LoadingIcon} alt='Loading icon' />
-          : (
-            <>
-              <label className='switch' htmlFor='checkbox' >
-                <input
-                  type='checkbox'
-                  checked={isFolded}
-                  aria-checked={isFolded}
-                  tabIndex={0}
-                  aria-labelledby="checkbox"
-                  onChange={() => setIsFolded(!isFolded)}
-                  id='checkbox' />
-                <div></div>
-                Close all
-              </label>
-              {error
-                ? <div className='best-practice-error'>
-                  <p className='text-danger'>{error}</p>
-                </div>
-                : <AccordionManager
-                  selectedAuditTypes={selectedAuditTypes}
-                  selectedAuditTools={selectedAuditTools}
-                  selectedComplianceLevel={selectedComplianceLevel}
-                  ecoDesignData={bestPracticesEcodesign}
-                  accessibilityData={bestPracticesAccessibility}
-                  isFolded={isFolded}
-                  setIsFolded={setIsFolded}
-                />
-              }
-            </>
-            )}
-      </div>
+      {ariaAlertForAccessibility && <AccessibilityAlert />}
+      {editProcedureMode
+        ? (
+          <ProcedureChoice
+            loading = {loading}
+            saveProcedureError = {saveProcedureError}
+            error = {error}
+            selectedProcedure = {selectedProcedure}
+            selectProcedure = {selectProcedure}
+            selectedOption = {selectedOption}
+            cancel = {cancel}
+            confirm = {confirm}
+            changeSelected = {changeSelected}
+            savedProcedure = {savedProcedure}
+          />
+          )
+        : (
+            <div className='best-practices'>
+              {loading
+                ? <div className="loader"></div>
+                : <BestPracticesBody
+                    isFolded={isFolded}
+                    setIsFolded={setIsFolded}
+                    handleCloseAll={handleCloseAll}
+                    error={error}
+                    urls={urls}
+                    selectedUrl={selectedUrl}
+                    changeSelectedUrl={changeSelectedUrl}
+                    bestPracticesEcodesign={bestPracticesEcodesign}
+                    bestPracticesAccessibility={bestPracticesAccessibility}
+                    savedProcedure={savedProcedure}
+                    changeProcedure={changeProcedure}
+                    />
+                  }
+            </div>
+          )}
     </main>
   )
 }

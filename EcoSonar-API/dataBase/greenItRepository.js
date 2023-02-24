@@ -104,7 +104,7 @@ const GreenItRepository = function () {
   this.findAnalysisProject = async function (projectNameReq) {
     let stringErr = null
     let systemError = null
-    let deployments, lastAnalysis, resultats
+    let deployments, results
     try {
       const resList = await urlsprojects.find({ projectName: projectNameReq }, { idKey: 1 })
       if (resList.length === 0) {
@@ -119,11 +119,12 @@ const GreenItRepository = function () {
         }
         deployments = await greenits.find({ idUrlGreen: listIdKey }, { ecoIndex: 1, nbRequest: 1, domSize: 1, responsesSize: 1, dateGreenAnalysis: 1 }).sort({ dateGreenAnalysis: 1 })
         if (deployments.length !== 0) {
-          lastAnalysis = await greenits.find({ idUrlGreen: listIdKey, dateGreenAnalysis: deployments[deployments.length - 1].dateGreenAnalysis })
-          resultats = { deployments, lastAnalysis }
+          const dateLastAnalysis = deployments[deployments.length - 1].dateGreenAnalysis
+          const lastAnalysis = deployments.filter((greenitAnalysis) => greenitAnalysis.dateGreenAnalysis.getTime() === dateLastAnalysis.getTime())
+          results = { deployments, lastAnalysis }
         } else {
           console.log('no greenit analysis found for ' + projectNameReq)
-          resultats = { deployments: [], lastAnalysis: null }
+          results = { deployments: [], lastAnalysis: null }
         }
       }
     } catch (error) {
@@ -137,7 +138,55 @@ const GreenItRepository = function () {
       } else if (stringErr !== null) {
         reject(new Error(stringErr))
       } else {
-        resolve(resultats)
+        resolve(results)
+      }
+    })
+  }
+  /**
+   * find EcoIndex from last analysis for one Project
+   * @param {project Name} projectNameReq
+   * @returns
+   */
+  this.findScoreProject = async function (projectNameReq) {
+    let stringErr = null
+    let systemError = null
+    let analysis
+    let result = {}
+    try {
+      const resList = await urlsprojects.find({ projectName: projectNameReq }, { idKey: 1 })
+      if (resList.length === 0) {
+        stringErr = 'url or project :' + projectNameReq + ' not found'
+      } else {
+        // create a list of idKey
+        let i = 0
+        const listIdKey = []
+        while (i < resList.length) {
+          listIdKey[i] = resList[i].idKey
+          i++
+        }
+        analysis = await greenits.find({ idUrlGreen: listIdKey }, { ecoIndex: 1, dateGreenAnalysis: 1 }).sort({ dateGreenAnalysis: 1 })
+
+        if (analysis.length !== 0) {
+          const dateLastAnalysis = analysis[analysis.length - 1].dateGreenAnalysis
+          const lastAnalysis = analysis.filter((greenitAnalysis) => greenitAnalysis.dateGreenAnalysis.getTime() === dateLastAnalysis.getTime())
+          result = { scores: lastAnalysis }
+        } else {
+          console.log('no greenit analysis found for ' + projectNameReq)
+          result = { scores: null }
+        }
+      }
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
+      console.log('error during generation of ' + projectNameReq + ' analysis')
+      systemError = new SystemError()
+    }
+    return new Promise((resolve, reject) => {
+      if (systemError !== null) {
+        reject(systemError)
+      } else if (stringErr !== null) {
+        reject(new Error(stringErr))
+      } else {
+        resolve(result)
       }
     })
   }

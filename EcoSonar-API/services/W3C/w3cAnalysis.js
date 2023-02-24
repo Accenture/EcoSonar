@@ -84,7 +84,6 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) 
 
         try {
           await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
-          // const html = await page.content()
           const html = await page.evaluate(() => document.querySelector('*').outerHTML)
 
           htmlResults.push({ url, html })

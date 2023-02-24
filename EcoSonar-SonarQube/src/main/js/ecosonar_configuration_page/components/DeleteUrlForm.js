@@ -1,6 +1,5 @@
 import FocusTrap from 'focus-trap-react'
 import React, { useEffect } from 'react'
-import LoadingIcon from '../../images/LoadingIcon.svg'
 import { deleteUrlFromProject } from '../../services/configUrlService'
 
 export default function DeleteUrlForm (props) {
@@ -70,12 +69,12 @@ export default function DeleteUrlForm (props) {
         <footer className="modal-footer-config">
           {isSubmitting && (
             <div className="loading">
-              <img src={LoadingIcon} alt="Loading icon" />
+              <div className="loader"></div>
             </div>
           )}
           {errorMessageDelete !== '' && <p className="text-danger" role="alert">{errorMessageDelete}</p>}
           <button
-            className="button-red"
+            className="button-delete"
             disabled={isSubmitting}
             type="submit"
             onClick={handleSubmit}

@@ -21,49 +21,48 @@ export default function AccessibleArray (props) {
   let accessibleArray
 
   function formatDate (string) {
-    const formattedDate = new Date(string).toLocaleDateString()
-    return formattedDate
+    return new Date(string).toLocaleDateString()
   }
 
   switch (selectedGraph) {
     case 'ecoindex':
-      accessibleArray = ecoUrl
+      accessibleArray = ecoUrl !== undefined ? ecoUrl : []
       break
     case 'request':
-      accessibleArray = reqUrl
+      accessibleArray = reqUrl !== undefined ? reqUrl : []
       break
     case 'dom':
-      accessibleArray = domUrl
+      accessibleArray = domUrl !== undefined ? domUrl : []
       break
     case 'page':
-      accessibleArray = pageUrl
+      accessibleArray = pageUrl !== undefined ? pageUrl : []
       break
     case 'performance':
-      accessibleArray = performanceUrl
+      accessibleArray = performanceUrl !== undefined ? performanceUrl : []
       break
     case 'accessibility':
-      accessibleArray = accessibilityUrl
+      accessibleArray = accessibilityUrl !== undefined ? accessibilityUrl : []
       break
     case 'cumulative':
-      accessibleArray = cumulativeLayoutShiftUrl
+      accessibleArray = cumulativeLayoutShiftUrl !== undefined ? cumulativeLayoutShiftUrl : []
       break
     case 'firstcontentfulpaint':
-      accessibleArray = firstContentfulPaintUrl
+      accessibleArray = firstContentfulPaintUrl !== undefined ? firstContentfulPaintUrl : []
       break
     case 'largestcontentfulpaint':
-      accessibleArray = largestContentfulPaintUrl
+      accessibleArray = largestContentfulPaintUrl !== undefined ? largestContentfulPaintUrl : []
       break
     case 'interactive':
-      accessibleArray = interactiveUrl
+      accessibleArray = interactiveUrl !== undefined ? interactiveUrl : []
       break
     case 'speedindex':
-      accessibleArray = speedIndexUrl
+      accessibleArray = speedIndexUrl !== undefined ? speedIndexUrl : []
       break
     case 'totalblockingtime':
-      accessibleArray = totalBlockingTimeUrl
+      accessibleArray = totalBlockingTimeUrl !== undefined ? totalBlockingTimeUrl : []
       break
     case 'w3c':
-      accessibleArray = w3cAnalysis
+      accessibleArray = w3cAnalysis !== undefined ? w3cAnalysis : []
       break
     default:
       accessibleArray = []

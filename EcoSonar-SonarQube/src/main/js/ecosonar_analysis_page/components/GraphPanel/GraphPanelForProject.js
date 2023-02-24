@@ -7,14 +7,14 @@ import PerformanceGraph from '../Graphs/PerformanceGraph'
 import AccessibilityGraph from '../Graphs/AccessibilityGraph'
 import CumulativeGraph from '../Graphs/CumulativeGraph'
 import FirstContentfulPaintGraph from '../Graphs/FirstContentfulPaintGraph'
-import LargestContentfulPaintGraph from '../Graphs/LargestContentfulGraph'
+import LargestContentfulPaintGraph from '../Graphs/LargestContentfulPaintGraph'
 import InteractiveGraph from '../Graphs/InteractiveGraph'
 import SpeedIndexGraph from '../Graphs/SpeedIndexGraph'
 import TotalBlockingTimeGraph from '../Graphs/TotalBlockingTimeGraph'
 import { GraphContext } from '../../../context/GraphContext'
-import handleChangeGraphs from './GraphManager'
 import AccessibleArray from './AccessibleArray'
-import W3cGraph from '../Graphs/W3c'
+import W3cGraph from '../Graphs/W3cGraph'
+import SelectGraphPanel from './SelectGraphPanel'
 
 export default function GraphPanelForProject (props) {
   const {
@@ -54,53 +54,24 @@ export default function GraphPanelForProject (props) {
         <div className='display-flex-row'>
           <div className='display-flex-column flex-1'>
             <div aria-hidden='true' className='overview-panel-padded display-flex-column flex-1'>
-              <div className='position-relative'>
-                <label htmlFor='graphs'>Select a metric to view its evolution during deployments:</label>
-                <select className='select-button' name='graphs' id='graphs' value={selectedGraph} onChange={(event) => handleChangeGraphs(event, setSelectedGraph)}>
-                <optgroup label='List of graphs'>
-
-                  {ecoAnalysis.length > 0 && <option key='ecoindex' value='ecoindex'>
-                    EcoIndex
-                  </option>}
-                  {reqAnalysis.length > 0 && <option key='request' value='request'>
-                    Number of Requests
-                  </option>}
-                  {domAnalysis.length > 0 && <option key='dom' value='dom'>
-                    Size of the Dom
-                  </option>}
-                  {pageAnalysis.length > 0 && <option key='page' value='page'>
-                    Size of the page
-                  </option>}
-                  {performanceAnalysis.length > 0 && <option key='performance' value='performance'>
-                    Lighthouse Performance Score
-                  </option>}
-                  {accessibilityAnalysis.length > 0 && <option key='accessibility' value='accessibility'>
-                    Lighthouse Accessibility Score
-                  </option>}
-                  {cumulativeLayoutshiftAnalysis.length > 0 && <option key='cumulative' value='cumulative'>
-                    Cumulative Layout Shift Score
-                  </option>}
-                  {firstContentfulPaintAnalysis.length > 0 && <option key='firstcontentfulpaint' value='firstcontentfulpaint'>
-                    First Contentful Paint Score
-                  </option>}
-                  {largestContentfulPaintAnalysis.length > 0 && <option key='largestcontentfulpaint' value='largestcontentfulpaint'>
-                    Largest Contentful Paint Score
-                  </option>}
-                  {interactiveAnalysis.length > 0 && <option key='interactive' value='interactive'>
-                    Time to Interactive Score
-                  </option>}
-                  {speedIndexAnalysis.length > 0 && <option key='speedindex' value='speedindex'>
-                    Speed Index Score
-                  </option>}
-                  {totalBlockingTimeAnalysis.length > 0 && <option key='totalblockingtime' value='totalblockingtime'>
-                    Total Blocking Time Score
-                  </option>}
-                  {allowW3c === 'true' && w3cAnalysis.length > 0 && <option key='w3c' value='w3c'>
-                    W3C Score
-                  </option>}
-                  </optgroup>
-                </select>
-              </div>
+              <SelectGraphPanel
+              selectedGraph={selectedGraph}
+              setSelectedGraph={setSelectedGraph}
+              ecoAnalysis={ecoAnalysis}
+              reqAnalysis={reqAnalysis}
+              domAnalysis={domAnalysis}
+              pageAnalysis={pageAnalysis}
+              performanceAnalysis={performanceAnalysis}
+              accessibilityAnalysis={accessibilityAnalysis}
+              cumulativeLayoutshiftAnalysis={cumulativeLayoutshiftAnalysis}
+              firstContentfulPaintAnalysis={firstContentfulPaintAnalysis}
+              largestContentfulPaintAnalysis={largestContentfulPaintAnalysis}
+              interactiveAnalysis={interactiveAnalysis}
+              speedIndexAnalysis={speedIndexAnalysis}
+              totalBlockingTimeAnalysis={totalBlockingTimeAnalysis}
+              allowW3c={allowW3c}
+              w3cAnalysis={w3cAnalysis}
+              />
               <div className='activity-graph-container flex-grow display-flex-column display-flex-stretch display-flex-justify-center'>
                 <div>
                 {selectedGraph === 'request' && <RequestGraph reqAnalysis={reqAnalysis} />}
@@ -116,12 +87,13 @@ export default function GraphPanelForProject (props) {
                 {selectedGraph === 'speedindex' && <SpeedIndexGraph speedIndexAnalysis={speedIndexAnalysis} />}
                 {selectedGraph === 'totalblockingtime' && <TotalBlockingTimeGraph totalBlockingTimeAnalysis={totalBlockingTimeAnalysis} />}
                 {selectedGraph === 'w3c' && <W3cGraph w3cAnalysis={w3cAnalysis} />}
-                </div></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>)}
         <div className='graph-accessibility-button'>
-              <button active='false' className='basic-button' onClick={() => handleDisplayArrayForAccessibility()}>
+              <button className='basic-button' onClick={() => handleDisplayArrayForAccessibility()}>
                 Display as a table
               </button>
             </div>

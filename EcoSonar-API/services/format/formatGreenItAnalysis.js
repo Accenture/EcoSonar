@@ -45,12 +45,12 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
       j++
     }
     analysis = {
-      domSize: { displayValue: Math.ceil(domSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('domSize', Math.ceil(domSize / count)) },
-      nbRequest: { displayValue: Math.ceil(nbRequest / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('nbRequest', nbRequest / count) },
+      domSize: { displayValue: Math.round(domSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('domSize', Math.round(domSize / count)) },
+      nbRequest: { displayValue: Math.round(nbRequest / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('nbRequest', nbRequest / count) },
       dateAnalysis,
-      responsesSize: { displayValue: Math.ceil(responsesSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', Math.ceil(responsesSize / count)) },
-      responsesSizeUncompress: Math.ceil(responsesSizeUncompress / count),
-      ecoIndex: Math.ceil(ecoIndex / count),
+      responsesSize: { displayValue: Math.round(responsesSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', Math.round(responsesSize / count)) },
+      responsesSizeUncompress: Math.round(responsesSizeUncompress / count),
+      ecoIndex: Math.round(ecoIndex / count),
       grade: formatCompliance.getGrade(ecoIndex / count)
     }
     return analysis
@@ -94,10 +94,10 @@ FormatGreenItAnalysis.prototype.formatDeploymentsForGraphs = function (deploymen
 
   // Finally we calculate the average for each date
   for (const i of finalDeployment) {
-    i.domSize = Math.ceil(i.domSize / i.numberOfValues)
-    i.nbRequest = Math.ceil(i.nbRequest / i.numberOfValues)
-    i.responsesSize = Math.ceil(i.responsesSize / i.numberOfValues)
-    i.ecoIndex = Math.ceil(i.ecoIndex / i.numberOfValues)
+    i.domSize = Math.round(i.domSize / i.numberOfValues)
+    i.nbRequest = Math.round(i.nbRequest / i.numberOfValues)
+    i.responsesSize = Math.round(i.responsesSize / i.numberOfValues)
+    i.ecoIndex = Math.round(i.ecoIndex / i.numberOfValues)
     delete i.numberOfValues
   }
 

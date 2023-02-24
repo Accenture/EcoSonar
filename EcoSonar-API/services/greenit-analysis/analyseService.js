@@ -51,22 +51,13 @@ async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projec
       const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
       if (loginSucceeded) {
         // analyse each page
-        report = await createGreenITReports(browser, [url], autoscroll)
+        report = await createGreenITReports(browser, projectName, [url], autoscroll)
         reports = reports.concat(report)
       }
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error.message)
     } finally {
-      // close browser
-      const pages = await browser.pages()
-      await Promise.all(pages.map(function (page) {
-        if (!page.isClosed()) {
-          return page.close()
-        } else {
-          return Promise.resolve()
-        }
-      })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error.message))
-      await browser.close()
+      await closeBrowser(browser)
     }
   }
 
@@ -94,23 +85,26 @@ async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName
     const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
     if (loginSucceeded) {
       // analyse each page
-      reports = await createGreenITReports(browser, urlList, autoscroll)
+      reports = await createGreenITReports(browser, projectName, urlList, autoscroll)
     }
   } catch (error) {
     console.error('\x1b[31m%s\x1b[0m', error)
   } finally {
-    // close browser
-    const pages = await browser.pages()
-    await Promise.all(pages.map(function (page) {
-      if (!page.isClosed()) {
-        return page.close()
-      } else {
-        return Promise.resolve()
-      }
-    })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error))
-    await browser.close()
+    await closeBrowser(browser)
   }
   return reports
+}
+
+async function closeBrowser (browser) {
+  const pages = await browser.pages()
+  await Promise.all(pages.map(function (page) {
+    if (!page.isClosed()) {
+      return page.close()
+    } else {
+      return Promise.resolve()
+    }
+  })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error.message))
+  await browser.close()
 }
 
 module.exports = {

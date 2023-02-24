@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import FocusTrap from 'focus-trap-react'
 import React, { useEffect, useState } from 'react'
-import LoadingIcon from '../../images/LoadingIcon.svg'
 import { insertUrlsConfiguration } from '../../services/configUrlService'
 import UrlField from './UrlField'
 
@@ -133,7 +132,7 @@ export default function AddUrlForm (props) {
           <footer className='modal-footer-config'>
             {isSubmitting && (
               <div className='loading'>
-                <img src={LoadingIcon} alt='Loading icon' />
+                <div className="loader"></div>
               </div>
             )}
             {globalError !== '' && (

@@ -60,6 +60,7 @@ const ProjectsRepository = function () {
       projects.create({ projectName, login: loginMap, proxy })
         .then(() => { resolve() })
         .catch((error) => {
+          console.error('PROJECTS REPOSITORY - login creation failed')
           console.error('\x1b[31m%s\x1b[0m', error)
           const systemError = new SystemError()
           reject(systemError)
@@ -81,6 +82,7 @@ const ProjectsRepository = function () {
       projects.updateOne({ projectName }, { login: loginMap, proxy })
         .then(() => { resolve() })
         .catch((error) => {
+          console.error('PROJECTS REPOSITORY - login update failed')
           console.error('\x1b[31m%s\x1b[0m', error)
           const systemError = new SystemError()
           reject(systemError)
@@ -106,6 +108,8 @@ const ProjectsRepository = function () {
     return new Promise((resolve, reject) => {
       if (systemError !== null) {
         reject(systemError)
+      } else if (result === null) {
+        reject(new Error('Procedure is not defined in project ', projectName))
       } else {
         resolve(result)
       }

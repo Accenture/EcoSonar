@@ -1,9 +1,9 @@
 const http = require('http')
 const app = require('./routes/app')
-const bdd = require('./configuration/database')
+const database = require('./configuration/database')
 
 // connection BDD
-bdd.connection()
+database.connection()
 
 const normalizePort = val => {
   const portServer = parseInt(val, 10)

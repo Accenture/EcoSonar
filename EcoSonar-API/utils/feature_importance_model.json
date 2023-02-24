@@ -1,0 +1,100 @@
+{
+  "domSize": {
+    "bootupTime": 19.662409886444955,
+    "totalByteWeight": 15.003906517021786,
+    "unusedCssRules": 14.768843418657482,
+    "unusedJavascript": 9.704966361895512,
+    "offscreenImages": 9.365640096323782,
+    "noDocumentWrite": 6.372585345402158,
+    "usesResponsiveImages": 6.253858574327436,
+    "usesHttp2": 6.182815829195169,
+    "legacyJavascript": 5.132252881626586,
+    "usesLongCacheTtl": 4.1743396280330805,
+    "usesTextCompression": 2.3014043102432526,
+    "usesPassiveEventListeners": 1.0769771508288162
+  },
+  "nbRequest": {
+    "styleSheets": 33.103473292856044,
+    "domainsNumber": 25.12833701025915,
+    "dontResizeImageInBrowser": 15.0,
+    "externalizeCss": 13.990933784848176,
+    "useStandardTypefaces": 8.945203204693254,
+    "noRedirect": 2.329474348087844,
+    "usesLongCacheTtl": 1.5025783592555322
+  },
+  "responsesSize": {
+    "externalizeJs": 16.581818637711322,
+    "httpRequests": 15.83266600028013,
+    "domainsNumber": 15.350690656664673,
+    "externalizeCss": 6.603985106374298,
+    "styleSheets": 4.072014892544604,
+    "useETags": 3.9739637954500346,
+    "dontResizeImageInBrowser": 3.598132863959179,
+    "bootupTime": 3.2652497291228038,
+    "totalByteWeight": 3.163392058242117,
+    "useStandardTypefaces": 3.153193339276408,
+    "usesLongCacheTtl": 3.109697948290915,
+    "unusedCssRules": 2.836289373102517,
+    "compressHttp": 2.7884396477147058,
+    "mainthreadWorkBreakdown": 2.4654760652883234,
+    "unusedJavascript": 2.4097171086675986,
+    "modernImageFormats": 2.183092808026873,
+    "usesHttp2": 2.1273507052258553,
+    "addExpiresOrCacheControlHeaders": 1.9015873110075905,
+    "usesOptimizedImages": 1.882307658482605
+  },
+  "largestContentfulPaint": {
+    "jsValidate": 17.108583269223242,
+    "dontResizeImageInBrowser": 14.581080890532533,
+    "usesLongCacheTtl": 8.280933805639853,
+    "bootupTime": 7.816124134778297,
+    "useStandardTypefaces": 7.372600379234084,
+    "domSize": 7.155051598929801,
+    "unusedJavascript": 6.581128416220354,
+    "modernImageFormats": 6.552878096808855,
+    "useETags": 6.447798711868027,
+    "externalizeCss": 3.637456544665106,
+    "minifiedJs": 3.4223141769888734,
+    "legacyJavascript": 3.234062927808311,
+    "httpRequests": 2.603454924617179,
+    "usesResponsiveImages": 1.6360533250714349,
+    "domainsNumber": 1.3223930227584928
+  },
+  "cumulativeLayoutShift": {
+    "styleSheets": 21.971432792250557,
+    "httpRequests": 17.60721532598987,
+    "httpError": 16.579757938833424,
+    "bootupTime": 14.334588061709958,
+    "usesOptimizedImages": 11.038929566865338,
+    "printStyleSheet": 10.41790903837903,
+    "domSize": 8.050167275971832
+  },
+  "firstContentfulPaint": {
+    "unusedCssRules": 39.899582954361684,
+    "totalByteWeight": 35.90600812483714,
+    "useStandardTypefaces": 24.194408920801173
+  },
+  "speedIndex": {
+    "httpRequests": 53.09898653355165,
+    "dontResizeImageInBrowser": 31.25976299611366,
+    "useStandardTypefaces": 15.64125047033469
+  },
+  "totalBlockingTime": {
+    "httpRequests": 39.85322914548336,
+    "domainsNumber": 19.655331762967478,
+    "externalizeCss": 11.969842808478326,
+    "bootupTime": 11.615473290416963,
+    "mainthreadWorkBreakdown": 6.669171351731371,
+    "minifiedJs": 3.6556134487608327,
+    "noRedirect": 3.334653157751196,
+    "domSize": 3.246685034410464
+  },
+  "interactive": {
+    "httpRequests": 16.509467723978254,
+    "bootupTime": 8.476770248668085,
+    "dontResizeImageInBrowser": 7.7894597671355825,
+    "domainsNumber": 7.767817969236133,
+    "externalizeCss": 5.254264389173461,
+    "httpError": 5.1879526992073774
+  }
+}

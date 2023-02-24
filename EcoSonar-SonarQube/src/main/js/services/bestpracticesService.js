@@ -24,8 +24,8 @@ export function getBestPractices (projectName) {
 export function getBestPracticesForUrl (projectName, urlName) {
   return new Promise((resolve, reject) => {
     axiosInstance.post('/api/bestPractices/url', {
-      projectName: projectName,
-      urlName: urlName
+      projectName,
+      urlName
     })
       .then((response) => {
         console.log('BEST PRACTICES SERVICE - GET : best practices for ' + urlName + ' retrieved')

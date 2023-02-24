@@ -1,6 +1,5 @@
 
 const formatCompliance = require('../../services/format/formatCompliance')
-
 class FormatBestPracticesForProject { }
 
 FormatBestPracticesForProject.prototype.addScores = function (totalScore, score, numberOfValues) {

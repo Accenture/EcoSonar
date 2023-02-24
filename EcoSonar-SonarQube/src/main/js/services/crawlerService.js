@@ -4,7 +4,7 @@ import errors from '../utils/errors.json'
 
 export function crawl (projectName, mainUrl) {
   return new Promise((resolve, reject) => {
-    axiosInstance.post('/api/crawl', { projectName: projectName, mainUrl: mainUrl }, { timeout: 600000 })
+    axiosInstance.post('/api/crawl', { projectName, mainUrl }, { timeout: 600000 })
       .then((response) => {
         console.log('CRAWLER SERVICE - URL retrieved')
         resolve(response.data)

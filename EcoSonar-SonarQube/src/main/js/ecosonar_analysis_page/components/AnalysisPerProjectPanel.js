@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import GreenItPanelPerProject from './GreenItPanel/GreenItPanelPerProject'
 import LightHousePanelPerProject from './LighthousePanel/LighthousePanelPerProject'
 import GraphPanelForProject from './GraphPanel/GraphPanelForProject'

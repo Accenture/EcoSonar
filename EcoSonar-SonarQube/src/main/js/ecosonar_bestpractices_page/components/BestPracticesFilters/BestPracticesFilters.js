@@ -6,6 +6,7 @@ export default function BestPracticesFilters (props) {
   const {
     auditTypes,
     auditTools,
+    selectedAuditTypes,
     selectedAuditTools,
     selectedComplianceArray,
     selectedUrl,
@@ -26,13 +27,15 @@ export default function BestPracticesFilters (props) {
             name='audit-type'
             id='audit-type'
             onChange={(event) => setSelectedAuditTypes(event.target.value)}
-            aria-label='Select audit type'
+            value={selectedAuditTypes}
           >
-            {auditTypes.map((auditType) => (
-              <option key={auditType.key} value={auditType.label}>
-                {auditType.label}
-              </option>
-            ))}
+          <optgroup label='List of audit type'>
+              {auditTypes.map((auditType) => (
+                <option key={auditType.key} value={auditType.label}>
+                  {auditType.label}
+                </option>
+              ))}
+          </optgroup>
           </select>
         </div>
         <div className='best-practice-filters-selector'>
@@ -42,14 +45,15 @@ export default function BestPracticesFilters (props) {
             name='audit-tool'
             id='audit-tool'
             onChange={(event) => setSelectedAuditTools(event.target.value)}
-            aria-label='Select audit tool'
             value={selectedAuditTools}
           >
-            {auditTools.map((auditTool) => (
-              <option key={auditTool.key} value={auditTool.label}>
-                {auditTool.label}
-              </option>
-            ))}
+          <optgroup label='List of audit tool'>
+              {auditTools.map((auditTool) => (
+                <option key={auditTool.key} value={auditTool.label}>
+                  {auditTool.label}
+                </option>
+              ))}
+          </optgroup>
           </select>
         </div>
         <div className='dropdown-checkboxes'>
@@ -67,18 +71,20 @@ export default function BestPracticesFilters (props) {
           <label htmlFor='project-or-url'>Select all URLs from project or a specific URL :</label>
           <select
             className='select-button url'
-            title={selectedUrl}
             name='project-or-url'
             id='project-or-url'
             onChange={changeSelectedUrl}
+            value={selectedUrl}
           >
-            {urls.map((url, index) => {
-              return (
-                <option key={index} value={url}>
-                  {url}
-                </option>
-              )
-            })}
+          <optgroup label='List of URLs'>
+              {urls.map((url, index) => {
+                return (
+                  <option key={index} value={url}>
+                    {url}
+                  </option>
+                )
+              })}
+          </optgroup>
           </select>
         </div>
       </form>

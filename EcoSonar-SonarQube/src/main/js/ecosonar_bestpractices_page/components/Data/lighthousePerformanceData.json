@@ -60,7 +60,7 @@
     "title": "Avoids an excessive DOM size",
     "description": "Lighthouse flags pages with DOM trees that: \n Warns when the body element has more than ~800 nodes. \n Errors when the body element has more than ~1,400 nodes.\n Be careful EcoSonar rules are more strict : you should have less than 475 nodes to reach a B Score.",
     "correction": "<div class='correction-text'>A large DOM will increase memory usage, cause longer style calculations, and produce costly layout reflows.<br><br> Best practices n°12 from '115 bonnes pratiques d'écoconception web v4'<br><br> See :<br><a target='_blank' href='https://web.dev/dom-size/'>Avoid an excessive DOM size</a><br><a target='_blank' href='https://developers.google.com/web/fundamentals/performance/rendering/reduce-the-scope-and-complexity-of-style-calculations'>Reduce the scope and complexity of style calculations</a> <br><a target='_blank' href='https://developers.google.com/speed/articles/reflow'>Minimizing browser reflow</a> </div>",
-    "titleData": "{0} elements in average"
+    "titleData": "{0} elements on average"
   },
   "usesLongCacheTtl": {
     "title": "Serve static assets with an efficient cache policy",
@@ -132,7 +132,7 @@
     "title": "Avoid enormous network payloads",
     "description": "Lighthouse shows the total size in kibibytes (KiB) of all resources requested by your page. The largest requests are presented first.",
     "correction": "<div class='correction-text'>Large network payloads cost users real money and are highly correlated with long load times.<br><br>Government Regulation:<br> <a target='_blank' href='https://ecoresponsable.numerique.gouv.fr/publications/referentiel-general-ecoconception/critere/6.4/'>RGESN 6.4 : Has the digital service implemented compression techniques on all transferred resources under its control?</a><br><br>  See :<br><a target='_blank' href='https://web.dev/total-byte-weight/'>Avoid enormous network payloads</a><br><a target='_blank' href='https://gtmetrix.com/avoid-enormous-network-payloads.html'>Lighthouse: Avoid enormous network payloads</a></div>",
-    "titleData": "Total size was {0} KiB in average"
+    "titleData": "Requests size was {0} KiB on average"
   },
   "noDocumentWrite": {
     "title": "Avoids document.write()",

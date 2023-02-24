@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import * as React from 'react'
+import React from 'react'
 
 export default function BestPracticesTabs (props) {
   const { state, tabs } = props

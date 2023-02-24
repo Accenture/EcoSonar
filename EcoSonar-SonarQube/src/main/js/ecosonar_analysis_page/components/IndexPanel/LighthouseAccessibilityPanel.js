@@ -1,6 +1,5 @@
 import classNames from 'classnames'
-import * as React from 'react'
-import LoadingIcon from '../../../images/LoadingIcon.svg'
+import React from 'react'
 import HelpIcon from '../../../images/HelpIcon.svg'
 import { setPanelColor } from './PanelColorSetting'
 
@@ -13,7 +12,7 @@ export default function LighthouseAccessibilityPanel (props) {
     <div className="ecoindex-panel">
       <h2 className="ecoindex-title">
         Lighthouse Accessibility Score
-        <text className="tooltip little-spacer-left" role='tooltip' tabIndex={0}>
+        <div role='textbox' className="tooltip little-spacer-left" tabIndex={0}>
           <img src={HelpIcon} alt="" />
           <p className="tooltiptext ecoIndex-tool">
             The Lighthouse Accessibility score is a weighted average of all
@@ -29,42 +28,45 @@ export default function LighthouseAccessibilityPanel (props) {
             aren&apos;t included in the table because they don&apos;t affect
             your score.
           </p>
-        </text>
+        </div>
       </h2>
       <div className="ecoindex-panel-content">
         {loading
           ? (
           <div>
-            <img src={LoadingIcon} alt="Loading icon" />
+            <div className="loader"></div>
           </div>
             )
           : (
-          <>
-            {undefinedStatus
-              ? (
-              <div className="ecoindex-badge undefined">
-                <h3 className="ecoindex-badge-title">Undefined</h3>
-                <p className="small">
-                  Lighthouse Accessibility Score for project could not be
-                  calculated
-                </p>
-              </div>
-                )
-              : (
-              <div className={classNames('ecoindex-badge', panelColor)}>
-                <h3 className="ecoindex-badge-title">
-                  {analysis.accessComplianceLevel}
-                </h3>
-                <p className="small">
-                  Lighthouse Accessibility Score for project (average from all
-                  pages) is                <span className="score"> {analysis.accessScore}</span>
-
-                </p>
-              </div>
-                )}
-          </>
+              LighthouseAccessibilityPanelBody(undefinedStatus, panelColor, analysis)
             )}
       </div>
     </div>
   )
+}
+function LighthouseAccessibilityPanelBody (undefinedStatus, panelColor, analysis) {
+  return <>
+    {undefinedStatus
+      ? (
+        <div className="ecoindex-badge undefined">
+          <h3 className="ecoindex-badge-title">Undefined</h3>
+          <p className="small">
+            Lighthouse Accessibility Score for project could not be
+            calculated
+          </p>
+        </div>
+        )
+      : (
+        <div className={classNames('ecoindex-badge', panelColor)}>
+          <h3 className="ecoindex-badge-title">
+            {analysis.accessComplianceLevel}
+          </h3>
+          <p className="small">
+            Lighthouse Accessibility Score for project (average from all
+            pages) is <span className="score"> {analysis.accessScore}</span>
+
+          </p>
+        </div>
+        )}
+  </>
 }

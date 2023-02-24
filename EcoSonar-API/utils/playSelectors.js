@@ -14,7 +14,13 @@ async function clickOnElement (element, step) {
 async function waitForSelectors (selectors, frame, options) {
   for (const selector of selectors) {
     try {
-      return await waitForSelector(selector, frame, options)
+      if (!selector.length) {
+        throw new Error('Empty selector provided to waitForSelector')
+      } else if (Array.isArray(selector)) {
+        return await waitForSelector(selector, frame, options)
+      } else {
+        return await waitForSelector([selector], frame, options)
+      }
     } catch (err) {
       console.error(err.message)
     }
@@ -23,12 +29,6 @@ async function waitForSelectors (selectors, frame, options) {
 }
 
 async function waitForSelector (selector, frame, options) {
-  if (!Array.isArray(selector)) {
-    selector = [selector]
-  }
-  if (!selector.length) {
-    throw new Error('Empty selector provided to waitForSelector')
-  }
   let element = null
   for (let i = 0; i < selector.length; i++) {
     const part = selector[i]

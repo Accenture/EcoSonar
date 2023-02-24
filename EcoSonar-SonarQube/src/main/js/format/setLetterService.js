@@ -1,26 +1,21 @@
 import React from 'react'
-import A from '../images/A.svg'
-import B from '../images/B.svg'
-import C from '../images/C.svg'
-import D from '../images/D.svg'
-import E from '../images/E.svg'
-import F from '../images/F.svg'
-import G from '../images/G.svg'
 
-export function setLetter (value) {
-  if (value === 'A') {
-    return <img className="image-score" src={A} alt="Compliant, type A" />
-  } else if (value === 'B') {
-    return <img className="image-score" src={B} alt="Compliant, type B" />
-  } else if (value === 'C') {
-    return <img className="image-score" src={C} alt="Almost compliant, type C" />
-  } else if (value === 'D') {
-    return <img className="image-score" src={D} alt="Almost compliant, type D" />
-  } else if (value === 'E') {
-    return <img className="image-score" src={E} alt="Not compliant, type E" />
-  } else if (value === 'F') {
-    return <img className="image-score" src={F} alt="Not compliant, type F" />
+export function setLetter (compliance, lighthousePanel) {
+  if (compliance === 'A') {
+    return (<div className={lighthousePanel ? 'compliance good-level compliance-light' : 'compliance good-level'}><p className='text-compliance'>A</p></div>)
+  } else if (compliance === 'B') {
+    return (<div className={lighthousePanel ? 'compliance good-level compliance-light' : 'compliance good-level'}><p className='text-compliance'>B</p></div>)
+  } else if (compliance === 'C') {
+    return (<div className={lighthousePanel ? 'compliance intermed-level compliance-light' : 'compliance intermed-level'}><p className='text-compliance'>C</p></div>)
+  } else if (compliance === 'D') {
+    return (<div className={lighthousePanel ? 'compliance intermed-level compliance-light' : 'compliance intermed-level'}><p className='text-compliance'>D</p></div>)
+  } else if (compliance === 'E') {
+    return (<div className={lighthousePanel ? 'compliance bad-level compliance-light' : 'compliance bad-level'}><p className='text-compliance'>E</p></div>)
+  } else if (compliance === 'F') {
+    return (<div className={lighthousePanel ? 'compliance bad-level compliance-light' : 'compliance bad-level'}><p className='text-compliance'>F</p></div>)
+  } else if (compliance === 'G') {
+    return (<div className={lighthousePanel ? 'compliance bad-level compliance-light' : 'compliance bad-level'}><p className='text-compliance'>G</p></div>)
   } else {
-    return <img className="image-score" src={G} alt="Extremely not compliant, type G" />
+    return (<div className={lighthousePanel ? 'compliance na-level compliance-light' : 'compliance na-level'}><p className='text-compliance'>N.A</p></div>)
   }
 }

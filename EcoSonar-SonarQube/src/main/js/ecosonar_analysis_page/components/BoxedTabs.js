@@ -9,7 +9,6 @@ export default function BoxedTabs (props) {
       {tabs.map(({ key, label, panelName }, i) => (
         <button
           className={classNames('tab', { 'tab-active': selected === key, 'tab-inactive': selected !== key })}
-          active={(selected === key).toString()}
           key={i}
           onClick={() => selected !== key && props.onSelect(key)}
           type="button"
@@ -30,7 +29,7 @@ export default function BoxedTabs (props) {
             }
           }}
           >
-          <div className={classNames({ 'active-border': selected === key })} active={(selected === key).toString()} />
+          <div className={classNames({ 'active-border': selected === key })} />
           {label}
         </button>
       ))}

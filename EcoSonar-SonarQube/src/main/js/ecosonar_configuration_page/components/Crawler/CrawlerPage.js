@@ -1,5 +1,4 @@
 import React from 'react'
-import LoadingIcon from '../../../images/LoadingIcon.svg'
 import { insertUrlsConfiguration } from '../../../services/configUrlService'
 import CrawledUrlItem from './CrawledUrlItem'
 
@@ -16,9 +15,9 @@ export default function CrawlerPage (props) {
 
   const handleChangeCheckedUrls = (checkedUrl) => {
     if (!checkedUrls.includes(checkedUrl)) {
-      setCheckedUrls((checkedUrls) => [...checkedUrls, checkedUrl])
+      setCheckedUrls((checkedUrlList) => [...checkedUrlList, checkedUrl])
     } else {
-      setCheckedUrls((checkedUrls) => checkedUrls.filter((url) => url !== checkedUrl))
+      setCheckedUrls((checkedUrlList) => checkedUrlList.filter((urlObject) => urlObject !== checkedUrl))
     }
   }
 
@@ -34,9 +33,9 @@ export default function CrawlerPage (props) {
       })
   }
 
-  function compareArray (crawledUrls, checkedUrls) {
-    for (let i = 0; i < crawledUrls.length; i++) {
-      if (crawledUrls[i] !== checkedUrls[i]) {
+  function compareArray (crawledUrlsObject, checkedUrlsObject) {
+    for (let i = 0; i < crawledUrlsObject.length; i++) {
+      if (crawledUrlsObject[i] !== checkedUrlsObject[i]) {
         return false
       }
     }
@@ -70,8 +69,8 @@ export default function CrawlerPage (props) {
               type='text'
               onChange={handleChangeSetUrl}
               id='webhook-url'
-              placeholder='add the base URL or homepage from my website'
-              aria-label='add the base URL or homepage from my website'
+              placeholder='add the homepage from my website'
+              aria-label='add the homepage from my website'
             />
 
             <div className='crawler-buttons'>
@@ -85,7 +84,7 @@ export default function CrawlerPage (props) {
           </div>
           {crawlerLoading && (
             <div className='crawler-loading'>
-              <img src={LoadingIcon} alt='' />
+              <div className="loader"></div>
               <p>Ecosonar crawler is running. Process can take several minutes according to the size of the website. Leave this page open.</p>
             </div>
           )}
@@ -114,8 +113,8 @@ export default function CrawlerPage (props) {
                   ></input>
                 </td>
               </tr>
-              {crawledUrls.map((url, index) => {
-                return <CrawledUrlItem key={'url-' + index} index={index} url={url} handleChangeCheckedUrls={handleChangeCheckedUrls} checkedUrls={checkedUrls} setAllChecked={setAllChecked} />
+              {crawledUrls.map((crawledUrl, index) => {
+                return <CrawledUrlItem key={'url-' + index} index={index} url={crawledUrl} handleChangeCheckedUrls={handleChangeCheckedUrls} checkedUrls={checkedUrls} setAllChecked={setAllChecked} />
               })}
             </tbody>
           </table>

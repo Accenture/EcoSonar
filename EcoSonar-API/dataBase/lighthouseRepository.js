@@ -203,6 +203,76 @@ const LighthouseRepository = function () {
       }
     })
   }
+
+  /**
+   * find Lighthouse Scores for one Project
+   * @param {project Name} projectNameReq
+   * @returns
+   */
+  this.findScoreProject = async function (projectNameReq) {
+    let stringErr = null
+    let systemError = null
+    let deployments, result
+    try {
+      const resList = await urlsprojects.find(
+        { projectName: projectNameReq },
+        { idKey: 1 }
+      )
+      if (resList.length === 0) {
+        stringErr = 'url or project :' + projectNameReq + ' not found'
+      } else {
+        // create a list of idKey
+        let i = 0
+        const listIdKey = []
+        while (i < resList.length) {
+          listIdKey[i] = resList[i].idKey
+          i++
+        }
+
+        deployments = await lighthouses
+          .find(
+            { idUrlLighthouse: listIdKey },
+            {
+              performance: 1,
+              accessibility: 1,
+              dateLighthouseAnalysis: 1
+            }
+          )
+          .sort({ dateLighthouseAnalysis: 1 })
+
+        if (deployments.length !== 0) {
+          const dateLastAnalysis =
+            deployments[deployments.length - 1].dateLighthouseAnalysis
+          const lastDeployment = deployments.filter(
+            (deployment) =>
+              deployment.dateLighthouseAnalysis.getTime() ===
+              dateLastAnalysis.getTime()
+          )
+          result = {
+            scores: lastDeployment
+          }
+        } else {
+          console.log('no lighthouse analysis found for ' + projectNameReq)
+          result = { scores: null }
+        }
+      }
+    } catch (error) {
+      console.error('\x1b[31m%s\x1b[0m', error)
+      console.log(
+        'error during generation of ' + projectNameReq + ' lighthouse analysis'
+      )
+      systemError = new SystemError()
+    }
+    return new Promise((resolve, reject) => {
+      if (systemError !== null) {
+        reject(systemError)
+      } else if (stringErr !== null) {
+        reject(new Error(stringErr))
+      } else {
+        resolve(result)
+      }
+    })
+  }
 }
 
 const lighthouseRepository = new LighthouseRepository()
