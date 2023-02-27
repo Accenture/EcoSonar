@@ -67,8 +67,6 @@ RetrieveBestPracticesService.prototype.getProjectAnalysis = async function (proj
           // sorting
           if (procedure === 'highestImpact') {
             res = bestPracticesSorting.sortByHighestImpact(res)
-          } else if (procedure === 'smartImpact') {
-            res = bestPracticesSorting.sortBySmartImpact(res)
           } else if (procedure === 'quickWins') {
             res = bestPracticesSorting.sortByQuickWins(res)
           }

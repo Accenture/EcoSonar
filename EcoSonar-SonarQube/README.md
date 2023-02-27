@@ -2,10 +2,10 @@
 
 ## Introduction 
 This plugin aims to embed EcoSonar Audits, Recommendations as well as Configuration. 
-It fulfills two purposes :
+It fulfills three purposes :
 - enable automatic trigger of EcoSonar Analysis each time a Sonarqube analysis is done
-- adding EcoSonar audit reports directly into Sonarqube projet User Interface
-
+- static code analysis with green coding rules implemented by EcoCode project
+- add EcoSonar audit reports directly into Sonarqube projet User Interface
 
 ## Getting Started
 
@@ -44,11 +44,18 @@ Go to the downloaded Sonarqube folder  `extensions/plugins/` and paste the JAR.
 
 To finally launch Sonarqube with the plugin, run the shell script: `bin/windows-x86-64/StartSonar.bat`.
 
- ![Ecosonar Plugin Sonarqube](./images/ecosonar-plugin.webp)
+ ![Ecosonar Plugin Sonarqube](../images/ecosonar-plugin.webp)
 
 The Sonarqube instance startup logs are located in the file `logs/web.log` 
 
 Official documentation about installing a SonarQube plugin: https://docs.sonarqube.org/latest/setup/install-plugin/.
 
 ### Our tip
+
 Set up a CI/CD pipeline to build the executable and automatically add it in the configuration of the Sonarqube server deployed with a script.
+
+### Development of new features in EcoSonar Sonarqube plugin
+
+Check this link : https://docs.sonarqube.org/latest/extend/developing-plugin/
+
+Otherwise feel free to use our code as example with respect of licence.

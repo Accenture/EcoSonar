@@ -3,18 +3,19 @@
 EcoSonar API is an audit aggregator that will use the following open-source audit tools:
 - GreenIT-Analysis CLI (https://github.com/cnumr/GreenIT-Analysis-cli)
 - Google Lighthouse with a npm package (https://github.com/GoogleChrome/lighthouse/blob/HEAD/docs/readme.md#using-programmatically) 
-- W3C Validator with a npm package (https://www.npmjs.com/package/html-validator) 
+- W3C Validator with a npm package (https://www.npmjs.com/package/html-validator). This Audit is using right now an external API to audit websites thus can only audit public pages. By default, W3C Validator is disabled for those reasons. However, if you agree to use this external API, please check this section [Enable W3C validator Analysis](#w3c-validator)
+
 Once the EcoSonar API is called, it will trigger the three analysis and store them into a MongoDB Database. 
-Then, the API can allow you to retrieve pre-formatted audit results using json format. A custom Sonarque Plugin has been created to display the audit diretly within the Sonarqube instance. The API can also be used with any other interface that can handle json formats.
+Then, the API can allow you to retrieve pre-formatted audit results using json format. A custom Sonarque Plugin has been created to display the audit directly within the Sonarqube instance. The API can also be used with any other interface that can handle json formats.
 
 # Summary
 - [To start with](#to-start-with)
   - [Node.js](#nodejs)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
+    - [Prerequisites](#prerequisites-node)
+    - [Installation](#installation-node)
   - [Docker](#docker)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
+    - [Prerequisites](#prerequisites-docker)
+    - [Installation](#installation-api)
     - [Our advice for Server Deployment](#docker-deployment)
   - [MongoDB Database](#mongodb-database)
     - [Installation](#installation)
@@ -31,25 +32,26 @@ Then, the API can allow you to retrieve pre-formatted audit results using json f
   - [Setup User flow](#user-flow)
 - [Authentication Configuration](#auth)
   - [When you have a simple login flow](#simple-login)
-    - [EcoSonar V2.3 and below](#old-version)
+    - [EcoSonar V2.3 and below](#old-version-login)
       - [CSS Selectors](#css-slectors)
-    - [EcoSonar V3.0 and above](#new-version)
+    - [EcoSonar V3.0 and above](#new-version-login)
   - [More complicated Login flows](#complicated-login)
-    - [EcoSonar V2.3 and below](#old-version)
-    - [EcoSonar V3.0 and above](#new-version)
+    - [EcoSonar V2.3 and below](#old-version-login-complicated)
+    - [EcoSonar V3.0 and above](#new-version-login-complicated)
 - [Proxy Configuration](#proxy)
-  - [EcoSonar V2.3 and below](#old-version)
-  - [EcoSonar V3.0 and above](#new-version)
+  - [EcoSonar V2.3 and below](#old-version-proxy)
+  - [EcoSonar V3.0 and above](#new-version-proxy)
 - [User Flow](#user-flow)
   - [User Flow Creation](#creation)
     - [First method : using Chrome Recorder](#chrome-recorder)
     - [Second method : creating your own User Flow JSON](#custom-user-flow)
   - [User Flow Integration](#integration)
-    - [EcoSonar V2.3 and below](#old-version)
-    - [EcoSonar V3.0 and above](#new-version)
+    - [EcoSonar V2.3 and below](#old-version-user-flow)
+    - [EcoSonar V3.0 and above](#new-version-user-flow)
   - [User Flow Verification](#verification)
 - [Usage Rights](#usage-rights)
 
+<a name="to-start-with"></a>
 # To start with
 
 To use the tool, you must first check the prerequisites and complete the installation steps.
@@ -60,11 +62,14 @@ For this, two different ways to use it:
 
 In both cases, it will be necessary to set up a new MongoDB database.
 
+<a name="nodejs"></a>
 ## Node.js
 
+<a name="prerequisites-node"></a>
 ### Prerequisites
- - Node.js https://nodejs.org/fr/ (at least v14, v16 is recommended)
+ - Node.js https://nodejs.org/fr/ (at least v16)
 
+<a name="installation-node"></a>
 ### Installation
 1. Retrieve source code : 
 ```
@@ -83,12 +88,15 @@ npm start
 
 API can be reached at: http://localhost:3000
 
+<a name="docker"></a>
 ## Docker
 
+<a name="prerequisites-docker"></a>
 ### Prerequisites
  - Docker Desktop for Windows (Note : a licence is now required if you need to use Docker Desktop at an Enterprise Level)
  - Docker Installed if you are using Mac or Linux
 
+<a name="installation-api"></a>
 ### Installation
 
 1. Retrieve source code : 
@@ -102,11 +110,12 @@ API can be reached at: http://localhost:3000
  ```
 4. Launch a Docker Server :
 ```
-docker run -p 3000:3000 --name containerName imageName
+docker container run -d -p 8080:3000 imageName
 ```
 
 API can be reached at: http://localhost:3000
 
+<a name="docker-deployment"></a>
 #### Our advice for Server Deployment
 Instead, we recommend setting up a CI/CD pipeline with the following steps:
 1. Build the Docker image
@@ -115,18 +124,22 @@ Instead, we recommend setting up a CI/CD pipeline with the following steps:
 4. Deploy the server using the newly imported image and correct API configuration
 5. Start the server
 
+<a name="mongodb-database"></a>
 ## MongoDB Database
 
+<a name="installation"></a>
 ### Installation
 
 If the MongoDB database is already created, you can skip this step.
 
+<a name="mongodb-creation"></a>
 #### Create a MongoDB Database
 You will need to choose the most adequate MongoDB database according to your infrastructure.
 By default, we have implemented connection with MongoDB Atlas and Azure CosmosDB. For any other MongoDB Database, you will need to set up a new database connection in the file `configuration/database.js`.
  - MongoDB Atlas : https://www.mongodb.com/cloud/atlas/register?utm_content=rlsapostreg&utm_source=google&utm_campaign=gs_emea_rlsamulti_search_brand_dsa_atlas_desktop_rlsa_postreg&utm_term=&utm_medium=cpc_paid_search&utm_ad=b&utm_ad_campaign_id=14412646473&adgroup=131761130372&gclid=EAIaIQobChMIgIeti_OA9AIVmOlRCh3O6gdGEAAYASAAEgJfHvD_BwE
  - Azure CosmosDB : https://azure.microsoft.com/en-us/products/cosmos-db/#overview
 
+<a name="mongodb-atlas"></a>
 ##### Create a MongoDB Atlas Database
 
 1. Open MongoDB Cloud : https://www.mongodb.com/fr-fr/cloud
@@ -143,11 +156,13 @@ By default, we have implemented connection with MongoDB Atlas and Azure CosmosDB
     - version 4.0 or later
     - close
 
+<a name="mongo-setup"></a>
 ### Add Environment setup
 
 If you want to run locally the EcoSonar API, you can add an `.env` file at the root of the project, it will contain the local environment variables of the project.
 Then choose among the variables below the ones required and add it into `.env` file.
 
+<a name="database-env-var"></a>
 #### Database configuration : MongoDB Atlas or CosmosDB
 Add the following environment variables in your Application Configuration:
   - ECOSONAR_ENV_DB_TYPE : MongoDB Type Chosen to store EcoSonar audits. ECOSONAR_ENV_DB_TYPE can take two attributes by default : `MongoDB_Atlas` and `CosmosDB`.
@@ -157,6 +172,7 @@ Add the following environment variables in your Application Configuration:
   - ECOSONAR_ENV_DB_PORT (port used by your MongoDB database)
   - ECOSONAR_ENV_CLOUD_PROVIDER : Cloud Provider used to deploy EcoSonar API. By default, this parameter can take two values : `AZURE` or `local`. It will be used to retrieve the database password.
 
+<a name="database-config"></a>
 #### Other database configuration possible
 
 If you are not using the same MongoDB database than us, you can develop your own.
@@ -165,6 +181,7 @@ We would be very happy if you want to share this new set up in a Pull Request in
 
 and `configuration/retrieveDatabasePasswordFromCloud.js` for another vault solution.
 
+<a name="database-password"></a>
 ##### Password Configuration
 We highly recommend you to store you database password in a Vault for better security.
 
@@ -177,34 +194,44 @@ We highly recommend you to store you database password in a Vault for better sec
 
 3. if you wish to use a different way to store your password, you can have add a new function in the file `configuration/retrieveDatabasePasswordFromCloud.js` to retrieve your secret. Then modify the file `configuration/database.js` accordingly to retrieve the password.
 
+<a name="api-endpoints"></a>
 # API Endpoints
 
-You can use for example Postman to send HTTP POST/GET requests to the API.
-You can find in the Github Repository `docs` the Postman Collection with the list of available endpoints.
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9592977-29c7010f-0efd-4063-b76a-5b0f455b1829?action=collection%2Ffork&collection-url=entityId%3D9592977-29c7010f-0efd-4063-b76a-5b0f455b1829%26entityType%3Dcollection%26workspaceId%3Df7ed92ee-00aa-4dc1-95aa-9f7d2da44e68)
 
+For documentation on available API : https://github.com/Accenture/EcoSonar/blob/main/API.md
+
+
+<a name="api-config"></a>
 # API Configuration
 
+<a name="cors"></a>
 ## CORS Setup
 To improve API Security, CORS options need to be configured to allow any other application to send requests to the API.
 To configure it, you can add the following environment variable in your Application Configuration to allow requests coming from your frontend interface:
   - ECOSONAR_ENV_SONARQUBE_SERVER_URL : url of the Sonarqube Server instantiated or any other frontend interface
 
+<a name="w3c-validator"></a>
 ## Enable W3C validator Analysis
 W3C Validator needs to make a request to an external API to audit your url. It means that only 'public' pages can be audited right now. We have raised an issue to the team in charge of W3C Auditor to be able to audit also pages protected by authentication. To be continued...
 In the environment variable, you can set the following parameter to request an audit through the external API or not:
 - ECOSONAR_ENV_ALLOW_EXTERNAL_API, take `true`or `false`
 
+<a name="user-flow"></a>
 ## Setup User flow 
 If your projects require to set up a user flow to access some of your web pages, you should then enable this parameter to run audits on dedicated browser to ensure cookies are correctly configured. However, it will increase the audit time of your project.
 - ECOSONAR_ENV_USER_JOURNEY_ENABLED, take `true`or `false`
 
+<a name="auth"></a>
 # Authentication Configuration
 
 In order to audit pages that can be accessed only through an authentication service (intranet pages for example),
 you need to add authentication credentials into EcoSonar API to allow auditing dedicated pages.
 
+<a name="simple-login"></a>
 ## When you have a simple login flow : username, password and click on a button
 
+<a name="old-version-login"></a>
 ### EcoSonar V2.3 and below
 To implement that, you can create a YAML file login.yaml at the root of the folder `EcoSonar-API` and use the following format
 if the CSS selector of you input field is `input[name=username]` or `input[type=email]`, password field `input[name=password]`, `input[type=password]`, `input[id=password]` and button `button[type=submit]` : 
@@ -224,6 +251,8 @@ loginButtonSelector: CSS_Selector_Button
 usernameSelector: CSS_Selector_Login
 passwordSelector: CSS_Selector_Password
 ```
+
+<a name="css-slectors"></a>
 #### CSS Selectors
 
 CSS Selectors are patterns in HTML code to apply some style (doc ). For exemple, to find the css selector of  loginButtonSelector:
@@ -237,6 +266,7 @@ More Information :
 documentation: https://github.com/cnumr/GreenIT-Analysis-cli/blob/072987f7d501790d1a6ccc4af6ec06937b52eb13/README.md#commande
 code: https://github.com/cnumr/GreenIT-Analysis-cli/blob/072987f7d501790d1a6ccc4af6ec06937b52eb13/cli-core/analysis.js#L198
 
+<a name="new-version-login"></a>
 ### EcoSonar V3.0 and above
 
 You can directly configure your login credentials at a project level in the API.
@@ -267,11 +297,12 @@ or
     }
 }
 ```
-
+<a name="complicated-login"></a>
 ## More complicated Login flows
 
 When the Username and password are not in the same page, or you need other user inputs to complete authentication
 
+<a name="old-version-login-complicated"></a>
 ### EcoSonar V2.3 and below 
 If the authentication of the website required steps or a page change, you must follow these requirements:
 
@@ -318,6 +349,7 @@ steps:
         - "#signin-button"
 ```
 
+<a name="new-version-login-complicated"></a>
 ### EcoSonar V3.0 and above
 
 You can use directly to configure your login credentials at a project level in the API.
@@ -333,11 +365,13 @@ You can use the Endpoint "Save Login and Proxy" and enter the following body:
 }
 ```
 
+<a name="proxy"></a>
 # Proxy Configuration 
 
 For some websites, you may need to configure a proxy in order to access it.
 You need to seperate the analysis that are made with or without a proxy into several EcoSonar projects.
 
+<a name="old-version-proxy"></a>
 ## EcoSonar V2.3 and below 
 To implement that, you can create a YAML file proxy.yaml at the root of the repo.
 Please find below the configuration format :
@@ -355,6 +389,7 @@ port : port of your proxy
 
 projectName : list of EcoSonar Projects (corresponding to Sonarqube projectKey) that needs a proxy to audit pages registered. If no projectName has been added but proxy.yaml file exists, then proxy will be applied by default to all your projects.
 
+<a name="new-version-proxy"></a>
 ## EcoSonar V3.0 and above
 
 You can directly configure your login credentials at a project level in the API.
@@ -370,13 +405,16 @@ You can use the Endpoint "Save Login and Proxy" and enter the following body:
 }
 ```
 
+<a name="user-flow"></a>
 # User Flow 
 
 In order to audit some pages, sometimes you may need to go through a user flow to get access to that page (for exemple fill in a form). Otherwise, if you don't have the context, the page can not be accessed.
 We have added this functionality into EcoSonar.
 
+<a name="creation"></a>
 ## User Flow Creation
 
+<a name="chrome-recorder"></a>
 ### First method : using Chrome Recorder
 
 If your business allows to use Chrome Browser, we hightly recommend you to use this method.
@@ -409,6 +447,7 @@ Once you have validated your userflow, you can export this User Flow using the e
 
  ![Chrome Recorder User flow export](../images/save-chrome-recorder.webp)
 
+<a name="custom-user-flow"></a>
 ### Second method : creating your own User Flow JSON
 
 If you are not allowed to use Chrome Browser, you can edit manually the user flow JSON file created by Chrome Recorder.
@@ -458,8 +497,10 @@ It should have "type" = "navigate" and "url" the url you want to go to
 3. Click on a button 
 "type" = "click",  "selectors" : list of CSS Selectors to find the right button
 
+<a name="integration"></a>
 ## User Flow Integration
 
+<a name="old-version-user-flow"></a>
 ### EcoSonar v2.3 and below
 
 Once you have been able to define the JSON file matching to your user flow, you can followed instructions:
@@ -469,6 +510,7 @@ Once you have been able to define the JSON file matching to your user flow, you 
 3. Deploy EcoSonar-API with all relevant user flows.
 4. Launch a new EcoSonar audit to verify there are no technical errors in the logs application. Correct them if needed.
 
+<a name="new-version-user-flow"></a>
 ### EcoSonar v3.0 and above
 
 With version 3.0, you can directly configure the user flow in the API provided (no longer need to reboot the instance)
@@ -483,11 +525,13 @@ You can use the Endpoint "Save User Flow" and enter the following body:
 }
 ```
 
+<a name="verification"></a>
 ## User Flow Verification
 
 To verify pages you audit are the correct ones, we suggest you to use both Chrome extensions : Green-IT Analysis (https://chrome.google.com/webstore/detail/greenit-analysis/mofbfhffeklkbebfclfaiifefjflcpad?hl=fr) and Google Lighthouse (https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk?hl=fr) and compare results from these extensions to the EcoSonar audits. There should be almost identical.
 If that is not the case, do not hesitate to contact us to help you.
 
+<a name="usage-rights"></a>
 # Usage Rights
 
 This tool uses an API that does not allow its use for commercial purposes.

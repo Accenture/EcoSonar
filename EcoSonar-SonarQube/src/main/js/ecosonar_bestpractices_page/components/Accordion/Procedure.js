@@ -6,9 +6,7 @@ export default function Procedure (props) {
   const [procedureName, setProcedureName] = useState('')
 
   useEffect(() => {
-    if (procedure === 'smartImpact') {
-      setProcedureName('Smart Impact')
-    } else if (procedure === 'scoreImpact') {
+    if (procedure === 'scoreImpact') {
       setProcedureName('Score Impact')
     } else if (procedure === 'highestImpact') {
       setProcedureName('Highest Impact')
@@ -23,9 +21,6 @@ export default function Procedure (props) {
         <p className='procedure'>{procedureName}</p>
         <button onClick={() => changeProcedureFct()} className='button-procedure' aria-label='change procedure'>< img src={SettingsIcon} alt='Change procedure' /></button>
       </div>
-      {procedure === 'smartImpact' && (
-        <p className='procedure-desc'>This procedure classifies the best practices with the highest impact and the ones to easily implement in your project.</p>
-      )}
       {procedure === 'scoreImpact' && (
         <p className='procedure-desc'>This procedure classifies the best practices according to their level of implementation in the project.</p>
       )}

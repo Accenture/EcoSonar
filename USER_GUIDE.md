@@ -31,8 +31,12 @@ Thanks to a configuration popup, you can enter manually the pages to audit. This
 
 ## Launching an EcoSonar Analysis
 
-If your Sonarqube project is linked to a Code Repository with the Continuous and Integration Pipeline, then the EcoSonar analysis will be launched in the same time of Sonarqube analyis and will audit the pages you have registered. After at least one analysis, you will be able to see the dashboard representing the scores of your application.
-If you do not wish to correlate a Sonarqube analysis and an EcoSonar audit, you can run also an EcoSonar audit throughout the API provided. Please check at our Postman collection to retrieve the right API calls.
+If your Sonarqube project is linked to a Code Repository with the Continuous and Integration Pipeline, then the EcoSonar analysis will be launched at the same time of Sonarqube analyis and will audit the pages you have registered. After the analysis has ended, you will be able to see the dashboard representing the scores of your application.
+If you do not wish to correlate a Sonarqube analysis and an EcoSonar audit, you can run also an EcoSonar audit throughout the API provided.
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9592977-29c7010f-0efd-4063-b76a-5b0f455b1829?action=collection%2Ffork&collection-url=entityId%3D9592977-29c7010f-0efd-4063-b76a-5b0f455b1829%26entityType%3Dcollection%26workspaceId%3Df7ed92ee-00aa-4dc1-95aa-9f7d2da44e68)
+
+Check for the Request called `Launch an EcoSonar Analysis`
 
 ## Retrieve an EcoSonar Analysis of your project
 
@@ -60,14 +64,82 @@ In this first panel, you will find an average of all metrics from your website (
 
 ![EcoSonar Audit per page](./images/ecosonar-audit-per-page.webp)
 
+If you want to share with external people, the last audit made for your website, you have the possibility to export the results into an Excel file by clicking on the `Excel Export` button.
+
+![EcoSonar Export](./images/ecosonar-export.webp)
+
+You will retrieve in the first sheet of the Excel the audit summary for your project.
+
+![EcoSonar Export Project](./images/ecosonar-export-project.webp)
+
+And then, each sheet will summarize audit results for each page of your website declared in EcoSonar
+
+![EcoSonar Export Project](./images/ecosonar-export-url.webp)
+
 ## Retrieve EcoSonar recommendations 
 
 The last page in the EcoSonar tool is the EcoSonar Best Practices.
 
 ![EcoSonar Best Practices Page Access](./images/ecosonar-best-practices-access.webp)
 
-EcoSonar lists now audits from ecodesign and accessibility best practices coming from both audit tools Green-IT Analysis and Google Lighthouse. Each list of best practices is sorted by level of implementation, a score from 0 to 100 that we convert into a compliance letter from A to G. For each practices, you will find a description with the key metric analysed with the score you need to reach to get an A Score. Below, you will find details of the analysis and what can be corrected. To help developers to implement the best practice, we have added a solution guide with solution examples as well as documentations to learn more about it. We are currently updating the documentation to add redirection to official ecodesign and accessibility referentials.
+EcoSonar lists now audits from ecodesign and accessibility best practices coming from :
+- Green-IT Analysis and Google Lighthouse Performance for ecodesign purposes
+- Google Lighthouse Accessibility & W3C Validator for accessibility purposes
 
-![EcoSonar Best Practices Page](./images/ecosonar-best-practices.webp)
+![EcoSonar Best Practices Page Ecodesign](./images/ecosonar-best-practices.webp)
+
+![EcoSonar Best Practices Page Accessibility](./images/ecosonar-best-practices-accessibility.webp)
+
+For each recommendation, you can find the following information:
+- Title of the Best Practice
+- Level of implementation (a letter from A to G) : represents if the best practice has been implemented or not in your project (a score from 0 to 100 is also available through the API)
+- Measured metric in your project/page related to the best practice. The level of implementation has been set by comparing this value to ecodesign standards.
+- The metric goal : what to reach in order to have an `A` score for this best practice
+- The list of issues in your project
+- Documentation related to the best practice to help you solve it
+
+![EcoSonar Best Practices Details](./images/ecosonar-details-best-practices.webp)
 
 ![EcoSonar Best Practices Correction](./images/ecosonar-best-practices-correction.webp)
+
+When first arriving to this page, you will have the choose the right Procedure.
+A procedure in EcoSonar is a sorting algorithm that will sort your ecodesign best practices according the 3 different configuration:
+- `Score Impact` : best practices will be sorted by descending order of implementation (best practices not implemented returned first)
+- `Highest Impact` : best practices will be sorted by order of impact to improve EcoSonar scores (best practices most efficient returned first)
+- `Quick Wins` : best practices will be sorted by ascending order of difficulty (best practices easy to implement returned first)
+
+Choose the one that will better fit with your priorities. We suggest you if you are new to ecodesign to start with the procedure `Quick Wins` to implement the easiest best practices first and understand the logic.
+
+![EcoSonar Procedure Page](./images/ecosonar-procedure-page.webp)
+
+Once your procedure chosen, feel free to use and discover the several audits made for your website with the available filters:
+- Type of audit : `ecodesign` or `accessibility`
+- Audit Tool : `Green-IT Analysis`, `Google Lighthouse Performance`, `Google Lighthouse Accessibility` or `W3C Validator`
+- Levels : `A`, `B`, `C`, `D`, `E`, `F`, `G` and `N.A` (by default `A` and `N.A` best practices will not be displayed)
+- Project or specific url : you can choose to display recommendations specific to url or the aggregation throughout the project
+
+![EcoSonar Audit Filters](./images/ecosonar-audit-filters.webp)
+
+## Retrieve Green Coding Rules to implement
+
+EcoSonar now integrates Ecocode green coding rules to help you code greener. This functionality comes in addition to default coding rules audited through a SonarQube analysis. Right now, 3 languages are supportes : Java, PHP and Python.
+
+Let's take as example a Java project.
+
+Your CICD pipeline integrate a SonarQube analysis and is directly linked to your Git Repository. During this step, SonarQube will audit your static code and let you know what are the code smells it could detect. Thank to Ecocode, SonarQube will now also audit your code for non-green coding rules added into your code. For more details on rules integrated, please check this document : https://github.com/green-code-initiative/ecoCode/blob/main/docs/rules/web-matrix.md
+
+After the analysis, you can check in SonarQube interface the list of issues detected into your code. Please go in your project and select the tab `Issues`.
+
+![EcoSonar Access to issues](./images/ecosonar-issues.webp)
+
+You will find in this page the list of all code smells SonarQube has detected into your code. To look for code smells specific to eco-design, you can filter using the tag `eco-design`.
+
+![EcoSonar ecodesign issues](./images/ecosonar-ecodesign-issues.webp)
+
+When you want to resolve a code smell, you can click directly into it and it will redirect you to the file and the line that is not compliant.
+
+![EcoSonar Code Smell](./images/ecosonar-code-smell.webp)
+
+To get some documentation on how to solve the code smell, you can click on the link `Why is this an issue ?` and a pop up will be displayed to explain why is this issue an ecodesign best practice and example of compliant and non-compliant code to help you in your implementation.
+
+![EcoSonar Code Smell Correction](./images/ecosonar-code-smell-correction.webp)

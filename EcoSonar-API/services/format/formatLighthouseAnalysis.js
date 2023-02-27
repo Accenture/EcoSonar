@@ -10,22 +10,34 @@ FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (an
       dateAnalysis: analysis.dateLighthouseAnalysis,
       largestContentfulPaint: {
         displayValue: analysis.largestContentfulPaint.displayValue.toFixed(1) + ' s',
-        complianceLevel: setComplianceLevel(analysis.largestContentfulPaint.score),
-        score: analysis.largestContentfulPaint.score
+        score: analysis.largestContentfulPaint.score,
+        complianceLevel: setComplianceLevel(analysis.largestContentfulPaint.score)
       },
       cumulativeLayoutShift: {
         displayValue: analysis.cumulativeLayoutShift.displayValue.toFixed(3),
-        complianceLevel: setComplianceLevel(analysis.cumulativeLayoutShift.score),
-        score: analysis.cumulativeLayoutShift.score
+        score: analysis.cumulativeLayoutShift.score,
+        complianceLevel: setComplianceLevel(analysis.cumulativeLayoutShift.score)
       },
       firstContentfulPaint: {
         displayValue: analysis.firstContentfulPaint.displayValue.toFixed(1) + ' s',
-        complianceLevel: setComplianceLevel(analysis.firstContentfulPaint.score),
-        score: analysis.firstContentfulPaint.score
+        score: analysis.firstContentfulPaint.score,
+        complianceLevel: setComplianceLevel(analysis.firstContentfulPaint.score)
       },
-      speedIndex: { displayValue: analysis.speedIndex.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.speedIndex.score), score: analysis.speedIndex.score },
-      totalBlockingTime: { displayValue: analysis.totalBlockingTime.displayValue.toFixed(0) + ' ms', complianceLevel: setComplianceLevel(analysis.totalBlockingTime.score), score: analysis.totalBlockingTime.score },
-      interactive: { displayValue: analysis.interactive.displayValue.toFixed(1) + ' s', complianceLevel: setComplianceLevel(analysis.interactive.score), score: analysis.interactive.score }
+      speedIndex: {
+        displayValue: analysis.speedIndex.displayValue.toFixed(1) + ' s',
+        score: analysis.speedIndex.score,
+        complianceLevel: setComplianceLevel(analysis.speedIndex.score)
+      },
+      totalBlockingTime: {
+        displayValue: analysis.totalBlockingTime.displayValue.toFixed(0) + ' ms',
+        score: analysis.totalBlockingTime.score,
+        complianceLevel: setComplianceLevel(analysis.totalBlockingTime.score)
+      },
+      interactive: {
+        displayValue: analysis.interactive.displayValue.toFixed(1) + ' s',
+        score: analysis.interactive.score,
+        complianceLevel: setComplianceLevel(analysis.interactive.score)
+      }
     }
   } catch (err) {
     console.log(err)
@@ -36,7 +48,6 @@ FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (an
 
 FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = function (res) {
   let analysis
-  let indexAnalysis = 0
   let j = 0
   let count, performance, dateAnalysis, accessibility, largestContentfulPaint, cumulativeLayoutShift, firstContentfulPaint, speedIndex, totalBlockingTime, interactive
 
@@ -89,30 +100,48 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
         j++
       }
 
+      largestContentfulPaint.score = calculateAverageScore(largestContentfulPaint.score)
+      cumulativeLayoutShift.score = calculateAverageScore(cumulativeLayoutShift.score)
+      firstContentfulPaint.score = calculateAverageScore(firstContentfulPaint.score)
+      speedIndex.score = calculateAverageScore(speedIndex.score)
+      totalBlockingTime.score = calculateAverageScore(totalBlockingTime.score)
+      interactive.score = calculateAverageScore(interactive.score)
+
       analysis = {
         performance: { displayValue: Math.trunc(parseFloat(calculateAverageScore(performance.score))), complianceLevel: setComplianceLevel(calculateAverageScore(performance.score)) },
         accessibility: { displayValue: Math.trunc(parseFloat(calculateAverageScore(accessibility.score))), complianceLevel: setComplianceLevel(calculateAverageScore(accessibility.score)) },
         dateAnalysis,
         largestContentfulPaint: {
           displayValue: calculateAverageScore(largestContentfulPaint.displayValue, 1) + ' s',
-          complianceLevel: setComplianceLevel(calculateAverageScore(largestContentfulPaint.score)),
-          score: calculateAverageScore(largestContentfulPaint.score, 1)
+          score: largestContentfulPaint.score,
+          complianceLevel: setComplianceLevel(largestContentfulPaint.score)
         },
         cumulativeLayoutShift: {
           displayValue: calculateAverageScore(cumulativeLayoutShift.displayValue, 3),
-          complianceLevel: setComplianceLevel(calculateAverageScore(cumulativeLayoutShift.score)),
-          score: calculateAverageScore(cumulativeLayoutShift.score, 1)
+          score: cumulativeLayoutShift.score,
+          complianceLevel: setComplianceLevel(cumulativeLayoutShift.score)
         },
         firstContentfulPaint: {
           displayValue: calculateAverageScore(firstContentfulPaint.displayValue, 1) + ' s',
-          complianceLevel: setComplianceLevel(calculateAverageScore(firstContentfulPaint.score)),
-          score: calculateAverageScore(firstContentfulPaint.score, 1)
+          score: firstContentfulPaint.score,
+          complianceLevel: setComplianceLevel(firstContentfulPaint.score)
         },
-        speedIndex: { displayValue: calculateAverageScore(speedIndex.displayValue, 1) + ' s', complianceLevel: setComplianceLevel(calculateAverageScore(speedIndex.score)), score: calculateAverageScore(speedIndex.score, 1) },
-        totalBlockingTime: { displayValue: calculateAverageScore(totalBlockingTime.displayValue, 0) + ' ms', complianceLevel: setComplianceLevel(calculateAverageScore(totalBlockingTime.score)), score: calculateAverageScore(totalBlockingTime.score, 1) },
-        interactive: { displayValue: calculateAverageScore(interactive.displayValue, 1) + ' s', complianceLevel: setComplianceLevel(calculateAverageScore(interactive.score)), score: calculateAverageScore(interactive.score, 1) }
+        speedIndex: {
+          displayValue: calculateAverageScore(speedIndex.displayValue, 1) + ' s',
+          score: speedIndex.score,
+          complianceLevel: setComplianceLevel(speedIndex.score)
+        },
+        totalBlockingTime: {
+          displayValue: calculateAverageScore(totalBlockingTime.displayValue, 0) + ' ms',
+          score: totalBlockingTime.score,
+          complianceLevel: setComplianceLevel(totalBlockingTime.score)
+        },
+        interactive: {
+          displayValue: calculateAverageScore(interactive.displayValue, 1) + ' s',
+          score: interactive.score,
+          complianceLevel: setComplianceLevel(interactive.score)
+        }
       }
-      indexAnalysis = indexAnalysis + 1
     }
     return analysis
   } catch (err) {

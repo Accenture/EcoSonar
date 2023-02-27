@@ -1,6 +1,6 @@
 {
   "name": "ecosonar-api",
-  "version": "3.0.0",
+  "version": "3.1",
   "description": "Ecodesign and accessibility tool to help developpers minimize carbon footprint of their web-application",
   "repository": {
     "type": "git",

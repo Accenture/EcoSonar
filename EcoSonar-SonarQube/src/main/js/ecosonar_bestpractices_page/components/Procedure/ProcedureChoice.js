@@ -8,10 +8,8 @@ export default function ProcedureChoice (props) {
     error,
     selectedProcedure,
     selectProcedure,
-    selectedOption,
     cancel,
     confirm,
-    changeSelected,
     savedProcedure
   } = props
   return (
@@ -22,11 +20,9 @@ export default function ProcedureChoice (props) {
               error={error}
               selectedProcedure={selectedProcedure}
               selectProcedure={selectProcedure}
-              selectedOption={selectedOption}
               saveProcedureError={saveProcedureError}
               savedProcedure={savedProcedure}
               cancel={cancel}
-              changeSelected={changeSelected}
               confirm={confirm} />
           }
       </div>

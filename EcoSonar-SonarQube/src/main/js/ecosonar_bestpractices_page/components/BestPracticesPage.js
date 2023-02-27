@@ -15,7 +15,6 @@ export default function BestPracticesPage (props) {
   const [bestPracticesAccessibility, setBestPracticesAccessibility] = useState({})
   const [dateAnalysisBestPractices, setDateAnalysisBestPractices] = useState('')
   const [selectedProcedure, setSelectedProcedure] = useState('')
-  const [selectedOption, setSelectedOption] = useState('')
   const [savedProcedure, setSavedProcedure] = useState('')
   const [editProcedureMode, setEditProcedureMode] = useState(false)
   const [ariaAlertForAccessibility, setAriaAlertForAccessibility] = useState(false)
@@ -98,24 +97,14 @@ export default function BestPracticesPage (props) {
 
   function selectProcedure (name) {
     setSelectedProcedure(name)
-    setSelectedOption('')
     setSaveProcedureError('')
-  }
-
-  function changeSelected (state) {
-    setSelectedOption(state)
-    if (state === 'yes') {
-      setSelectedProcedure('smartImpact')
-    } else {
-      setSelectedProcedure('quickWins')
-    }
   }
 
   function changeProcedure () {
     setEditProcedureMode(true)
   }
+
   function cancel () {
-    setSelectedOption('')
     setSelectedProcedure('')
     setEditProcedureMode(false)
   }
@@ -193,10 +182,8 @@ export default function BestPracticesPage (props) {
             error = {error}
             selectedProcedure = {selectedProcedure}
             selectProcedure = {selectProcedure}
-            selectedOption = {selectedOption}
             cancel = {cancel}
             confirm = {confirm}
-            changeSelected = {changeSelected}
             savedProcedure = {savedProcedure}
           />
           )

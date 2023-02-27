@@ -109,7 +109,7 @@ const ProjectsRepository = function () {
       if (systemError !== null) {
         reject(systemError)
       } else if (result === null) {
-        reject(new Error('Procedure is not defined in project ', projectName))
+        reject(new Error('Procedure is not defined in project ' + projectName))
       } else {
         resolve(result)
       }

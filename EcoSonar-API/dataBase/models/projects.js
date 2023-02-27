@@ -8,7 +8,7 @@ const projectsSchema = new Schema({
   },
   procedure: {
     type: String,
-    enum: ['quickWins', 'highestImpact', 'smartImpact', 'scoreImpact']
+    enum: ['quickWins', 'highestImpact', 'scoreImpact']
   },
   login: {
     type: Map

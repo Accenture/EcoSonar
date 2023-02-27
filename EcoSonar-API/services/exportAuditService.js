@@ -1,5 +1,5 @@
 const exceljs = require('exceljs')
-const analysisService = require('./analysisService')
+const retrieveAnalysisService = require('./retrieveAnalysisService')
 const urlConfigurationService = require('./urlConfigurationService')
 const SystemError = require('../utils/SystemError')
 
@@ -20,7 +20,7 @@ ExportAuditService.prototype.exportAudit = async function (projectName) {
       console.log('EXPORT EXCEL - No url retrieved for project ' + projectName)
     })
   // get project analysis
-  await analysisService.getProjectAnalysis(projectName)
+  await retrieveAnalysisService.getProjectAnalysis(projectName)
     .then((results) => {
       analysis = results
     }).catch((error) => {
@@ -105,7 +105,7 @@ ExportAuditService.prototype.exportAudit = async function (projectName) {
     formatExcelSheet('', 0, workbook, projectName, analysisGreenit, analysisW3c, lighthouseAccessibility, lighthousePerformance, lighthouseMetrics, dateLastAnalysis)
     // url pages
     for (const [index, url] of urls.entries()) {
-      await analysisService.getUrlAnalysis(projectName, url)
+      await retrieveAnalysisService.getUrlAnalysis(projectName, url)
         .then((res) => {
           analysisGreenit = res.lastAnalysis.greenit
           analysisW3c = res.lastAnalysis.w3c

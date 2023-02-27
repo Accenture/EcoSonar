@@ -16,8 +16,7 @@ EnumAudits.prototype.procedures = function () {
   return {
     scoreImpact: 'scoreImpact',
     quickWins: 'quickWins',
-    highestImpact: 'highestImpact',
-    smartImpact: 'smartImpact'
+    highestImpact: 'highestImpact'
   }
 }
 

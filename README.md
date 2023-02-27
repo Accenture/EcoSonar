@@ -6,14 +6,17 @@ Our official website : https://ecosonar.org
 
 ## Main objectives of EcoSonar:
 -	Raising the awareness of Delivery teams to environmental issues: enabling development teams to take into account the environmental impact of digital technology during development and to promote knowledge of best eco-design practices
--	Helping developers to implement best eco-design practices: Use of SonarQube, a code analysis tool allowing the implementation of good development practices, in order to extend its functionalities to web eco-design. EcoSonar Audit is based on three open-source tools to analyze the application as it is rendered on a web browser (Google Lighthouse, Green-IT Analysis/EcoIndex and W3C Validator).
--	Get an environmental & performance monitoring solution
+-	Helping developers to implement best eco-design and accessiblity practices with: 
+    - Static Code Analysis with SonarQube, a code analysis tool and dedicated green coding rules with the addition of SonarQube Plugin EcoCode (https://www.ecocode.io/) 
+    - Dynamic Code Analysis with EcoSonar API using three open-source tools to analyze the application as it is rendered on a web browser (Google Lighthouse, Green-IT Analysis/EcoIndex and W3C Validator).
+-	Get an environmental & performance monitoring solution to allow continous improvement of delivery teams
 
 # Summary
 - [EcoSonar Architecture ](#archi)
 - [Prerequisites](#prerequisites)
     - [Infrastructure Requirements](#infra)
 - [EcoSonar Configuration](#configuration)
+- [EcoCode Configuration](#ecocode)
 - [Audit Tool](#audit)
     - [GreenIT-Analysis/EcoIndex](#greenit-cnumr)
     - [Google Lighthouse](#ligthhouse)
@@ -23,8 +26,14 @@ Our official website : https://ecosonar.org
 ## EcoSonar Architecture
 
 The EcoSonar tool consists of:
-- A containerized Node.js API: allows you to run a GreenIT-Analysis/EcoIndex, Google Lighthouse and W3C Validator analysis for a project containing a list of predefined urls; store and retrieve audits.
-- A Sonarqube plugin: launch an EcoSonar analysis by calling the API when a Sonarqube analysis is triggered; adding new pages of a Sonarqube project by retrieving data from the analysis (to learn more about setting up a Sonarqube plugin : https://docs.sonarqube.org/latest/extend/developing-plugin/)
+- A containerized Node.js API:
+    * run a GreenIT-Analysis/EcoIndex, Google Lighthouse and W3C Validator analysis for a project containing a list of predefined urls
+    * store audits in MongodB Database
+    * retrieve audits through API calls
+- A Sonarqube plugin: 
+    * launch an EcoSonar analysis by calling the API when a Sonarqube analysis is triggered
+    * adding new ecodesign coding rules in default Sonarqube configuration with EcoCode
+    * adding new pages in a Sonarqube project interface by retrieving data from the analysis (calls to EcoSonar API)
  
 ![Architecture](./images/ecosonar-architecture.webp)
 
@@ -52,6 +61,25 @@ For plugin only:
 
 For both folders `EcoSonar-API` and `EcoSonar-Sonarqube`, you will find two README.md to get more details on specific details about Ecosonar configuration.
 
+## Ecocode Configuration
+
+When using Sonarqube as code analysis, a default Quality Profile is set up for each language. If you want to use EcoCode rules related to ecodesign, you will have to :
+- create a new Quality Profile based on the default one : click on the Setting icon for the languge you wish to extend and then Click on `Extend` and create the new Quality Profile
+
+![EcoSonar Quality Profile Creation](./images/java-quality-profile.webp)
+
+- Click on `Activate more` to add new rules to the Quality Profile
+
+![EcoSonar Quality Profile Set up](./images/ecosonar-add-rules.webp)
+
+- In the list of rules, filter using the tag `eco-design`. You should have now displayed all rules integrated with Ecocode SonarQube plugin. For each of them, click on the button `Activate` to add them in your Quality Profile
+
+![EcoSonar Quality Profile Activate Rules](./images/ecosonar-activate-rules.webp)
+
+- Go back in the `Quality Profile` page and set up the extended quality Profile as default one. SonarQube will now use this Quality Profile with ecodesign rules to audit your code.
+
+![EcoSonar Default Quality Profile](./images/ecosonar-default-quality-profile.webp)
+
 ## Audit Tool
 
 ### GreenIT-Analysis/EcoIndex
@@ -72,6 +100,10 @@ ensuring their quality, and it can save a lot of time and money. Validating Web 
 not well formatted, the browser will dynamically correct a certain number of elements to best display the pages causing problems. These dynamic corrections consume resources unnecessarily
 each time the pages concerned are loaded.
 
+### EcoCode
+
+EcoCode is a SonarQube plugin developed by a french open-source community called Green Code Initiative (https://github.com/green-code-initiative). Their goal is to share best practices of development, be aware of environmental responsibility when programming, and together construct rules and metrics for assigning to mobile and web applications an "environmental label". They have defined a list of green coding rules to be checked through a Sonarqube analysis in order to reduce RAM or CPU usage of software application. For more details : https://www.ecocode.io/
+
 ## About
 
 To get more info on EcoSonar, you can contact ecosonar-team@accenture.com and have a look at our new website : https://ecosonar.org.
@@ -85,8 +117,11 @@ or https://developers.google.com/web/tools/lighthouse for other kind of tools
 
 For W3C Validator : https://w3.validator.com 
 
+For Ecocode : https://www.ecocode.io/
+
 EcoSonar has been conceived with respect of the licensing rights of the following repository :
-https://github.com/cnumr/GreenIT-Analysis-cli.
+https://github.com/cnumr/GreenIT-Analysis-cli
+and https://github.com/green-code-initiative/ecoCode
 
 GreenIT-Analysis licence : https://github.com/cnumr/GreenIT-Analysis-cli/blob/master/LICENSE
 
@@ -95,6 +130,8 @@ EcoIndex licence : https://creativecommons.org/licenses/by-nc-nd/2.0/fr/
 Google Lighthouse licence : https://github.com/GoogleChrome/lighthouse/blob/main/LICENSE
 
 W3C Validator licence : https://github.com/zrrrzzt/html-validator/blob/HEAD/LICENSE
+
+EcoCode licence : https://github.com/green-code-initiative/ecoCode/blob/main/LICENCE.md
 
 To know more on ecodesign best practices, EcoIndex Calculator and how an ecodesign website can be more efficient, please check these two articles from one of our colleagues:
 

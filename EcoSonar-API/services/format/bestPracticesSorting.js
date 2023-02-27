@@ -1,6 +1,5 @@
 const ecodesignMetric = require('../../utils/feature_importance_model.json')
 const quickWinsConfig = require('../../utils/quick_wins_configuration.json')
-const smartImpactModel = require('../../utils/smart_impact_model.json')
 class BestPracticesSorting { }
 
 BestPracticesSorting.prototype.sortByHighestImpact = function (list) {
@@ -38,27 +37,6 @@ BestPracticesSorting.prototype.sortByHighestImpact = function (list) {
   }
 
   addBestPracticesMissing(list, newList)
-  return newList
-}
-
-BestPracticesSorting.prototype.sortBySmartImpact = function (list) {
-  list = this.sortByQuickWins(list)
-  const newList = {
-    ecodesign: {},
-    dateAnalysisBestPractices: list.dateAnalysisBestPractices,
-    accessibility: list.accessibility
-  }
-  for (const metric in smartImpactModel) {
-    for (const practice in smartImpactModel[metric]) {
-      newList.ecodesign[practice] = list.ecodesign[practice]
-    }
-  }
-  for (const practice in list.ecodesign) {
-    if (newList.ecodesign[practice] === undefined) {
-      newList.ecodesign[practice] = list.ecodesign[practice]
-    }
-  }
-
   return newList
 }
 

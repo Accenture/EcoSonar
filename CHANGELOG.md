@@ -2,8 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## Version 3.1 , 27/03/2023
+
+### Added
+- Integrate EcoCode functionalities : https://www.ecocode.io/.
+EcoCode is a SonarQube plugin developed by a French Open-Source Community `Green Code Initiative` (https://github.com/green-code-initiative) that will add new code smells related to Ecodesign when realizing a SonarQbe audit. Languages covered now are Java, PHP and Python.
+- EcoSonar audit can now be exported into an Excel File to be able to share with external people the current status of the website
+- Ability to retrieve EcoSonar current Scores: EcoIndex, Lighthouse Performance & Accessibility and W3C Validator
+    - Request can be called in a CI/CD Pipeline to prevent production deployment if one of the scores is below a threshold
+- Ability to sort EcoSonar Recommandation for EcoDesign Part following 3 different configurations:
+    - `scoreImpact` : best practices will be sorted by descending order of implementation (best practices not implemented returned first)
+    - `quickWins` : best practices will be sorted by ascending order of difficulty (best practices easy to implement returned first)
+    - `highestImpact` : best practices will be sorted by order of impact to improve EcoSonar scores (best practices most efficient returned first)
+    Goal of this feature is to help delivery teams tackle recommendations according to their priorities.
+
+### Removed
+
+### Changed
+- BUG FIX: When an analysis from one of our tool failed, best practices were saved with default value (0) that could lead to reduce the effective score from the website for that best practice.
+- BUG FIX : App should not crashed if an invalid url has been inserted into the user flow configuration in the `navigate` step
+- BUG FIX : Getting User flow should be made with parameters : url and projectName if either the same url has been saved severed times into several EcoSonar projects.
+- Update EcoSonar dependencies
+- Improve EcoSonar Ecodesign and Accessibily Rate
+
+
+---
+---
 
 ## Version 3.0 , 09/12/2022
 

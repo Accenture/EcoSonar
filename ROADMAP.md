@@ -1,12 +1,9 @@
-# Roadmap by the end of december
+# Roadmap
 
-1) Recommendation algorithm to resolve your ecodesign best practices:
-- prioritize best practices with the highest impact on your scores thanks to our homemade feature importance model
-- prioritize easy-to-resolve best practices 
-- balanced prioritization between highest impact and easy-to-resolve best practices
+1) GHG Emissions Calculation using SCI Methodology (https://github.com/Green-Software-Foundation/sci/blob/main/Software_Carbon_Intensity/Software_Carbon_Intensity_Specification.md)
 
-2) Integration of EcoCode : https://www.ecocode.io/
+2) Integration of WebSite Analytics : weighted-average of EcoSonar scores according to page frequency, detection of pages not visited that could be decomissionned, etc.
 
-3) CI/CD configuration to prevent deploying into production if your score does not meet your expectation.
+3) More green coding rules
 
-Stay tuned...
+4) Investigation on added-value that LLM Models (such as GPT-3) could procure

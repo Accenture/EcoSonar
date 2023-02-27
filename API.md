@@ -1,4 +1,8 @@
 **EcoSonar API**
+
+New Postman Collection available with all endpoints : 
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9592977-29c7010f-0efd-4063-b76a-5b0f455b1829?action=collection%2Ffork&collection-url=entityId%3D9592977-29c7010f-0efd-4063-b76a-5b0f455b1829%26entityType%3Dcollection%26workspaceId%3Df7ed92ee-00aa-4dc1-95aa-9f7d2da44e68)
 ----
 
 **EcoSonar URL Configuration - GET URLs FROM PROJECT**
@@ -6,7 +10,7 @@
 
 * **URL**
 
-  /api/all?projectName=<PROJECT_NAME>
+  `/api/all?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -52,7 +56,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/insert 
+  `/api/insert`
 
 * **Method:**
 
@@ -77,7 +81,7 @@ EcoSonar API is not able to request to the MongoDB Database :
  
 * **Error Response:**
 
-When you have validation errors in the list of urls you want to insert (url not valid, or duplicated)
+When you have validation errors in the list of urls you want to insert (url invalid or duplicated), with the error index corresponding to the index url
 
   * **Code:** 400 BAD REQUEST  <br />
     **Content:** `{
@@ -95,11 +99,11 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar URL Configuration - DELETE URL IN PROJECT**
 ----
-You can delete urls only one at a time.
+You can delete one url at a time.
 
 * **URL**
 
-  /api/delete
+  `/api/delete`
 
 * **Method:**
 
@@ -142,11 +146,11 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/crawl
+  `/api/crawl`
 
 * **Method:**
 
-  `GET`
+  `POST`
   
 *  **URL Params**
 
@@ -180,11 +184,11 @@ EcoSonar API failed to launch crawler:
 
 **EcoSonar LAUNCH ANALYSIS**
 ----
-EcoSonar analysis is launched through this API call either directly or through Sonarqube pipeline. API Call is done asynchronously to avoid performance issue ( ~ 3 seconds to analyse one page)
+EcoSonar analysis is launched through this API call either directly with a curl command or Postman request or through a Sonarqube Analysis. API call is done asynchronously to avoid performance issue ( ~ 3 seconds to analyse one page)
 
 * **URL**
 
-  /api/greenit/insert
+  `/api/greenit/insert`
 
 * **Method:**
 
@@ -211,7 +215,7 @@ EcoSonar analysis is launched through this API call either directly or through S
 
 * **URL**
 
-  /api/project?projectName=<PROJECT_NAME>
+  `/api/project?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -237,7 +241,7 @@ EcoSonar analysis is launched through this API call either directly or through S
     "deployments": {
         "greenit": [
             {
-                "dateAnalysis": "2022-07-18T16:43:03.548Z",
+                "dateAnalysis": "2022-07-19T14:29:03.713Z",
                 "domSize": 0,
                 "nbRequest": 0,
                 "responsesSize": 0,
@@ -260,7 +264,7 @@ EcoSonar analysis is launched through this API call either directly or through S
         "w3c": [
             {
                 "score": 0,
-                "dateAnalysis": "2022-11-23T14:20:04.888Z"
+                "dateAnalysis": "2022-07-19T14:29:03.713Z"
             }
         ]
     },
@@ -278,10 +282,9 @@ EcoSonar analysis is launched through this API call either directly or through S
                 "displayValue": 0,
                 "complianceLevel": "G"
             },
+            "responsesSizeUncompress": 0,
             "ecoIndex": 0,
-            "grade": "G",
-            "waterConsumption": 0,
-            "greenhouseGasesEmission": 0
+            "grade": "G"
         },
         "lighthouse": {
             "performance": {
@@ -297,6 +300,7 @@ EcoSonar analysis is launched through this API call either directly or through S
                 "displayValue": "0",
                 "complianceLevel": "G"
             },
+            "dateAnalysis": "2023-02-20T13:01:07.977Z",
             "largestContentfulPaint": {
                 "score": 0,
                 "displayValue": "0 s",
@@ -329,8 +333,8 @@ EcoSonar analysis is launched through this API call either directly or through S
             "totalError": 0,
             "totalFatalError": 0,
             "score": 0,
-            "grade": "F",
-            "dateAnalysis": "2022-12-04T21:50:14.353Z"
+            "grade": "G",
+            "dateAnalysis": "2022-07-19T14:29:03.713Z"
         }
     }
 }`
@@ -341,10 +345,17 @@ When  no analysis has been done yet on your project
 
   * **Code:** 400 BAD REQUEST  <br />
     **Content:** `{
-    "error": "error during generation of PROJECT_NAME analysis"
+    "error": "No analysis found for PROJECT_NAME"
 }`
 
   OR
+
+When an error occured when generating the report
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Error during generation of PROJECT_NAME analysis"
+}`
 
 EcoSonar API is not able to request to the MongoDB Database :
 
@@ -355,7 +366,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/greenit/url
+  `/api/greenit/url`
 
 * **Method:**
 
@@ -392,7 +403,7 @@ EcoSonar API is not able to request to the MongoDB Database :
             {
                 "performanceScore": 0,
                 "accessibilityScore": 0,
-                "dateAnalysis": "2022-07-19T14:29:03.713Z",
+                "dateAnalysis": "2022-07-18T16:43:03.548Z",
                 "largestContentfulPaint": 0,
                 "cumulativeLayoutShift": 0,
                 "firstContentfulPaint": 0,
@@ -404,7 +415,7 @@ EcoSonar API is not able to request to the MongoDB Database :
         "w3c": [
             {
                 "score": 0,
-                "dateAnalysis": "2022-11-23T14:20:04.888Z"
+                "dateAnalysis": "2022-07-18T16:43:03.548Z"
             }
         ]
     },
@@ -473,8 +484,8 @@ EcoSonar API is not able to request to the MongoDB Database :
             "totalError": 0,
             "totalFatalError": 0,
             "score": 0,
-            "grade": "F",
-            "dateAnalysis": "2022-12-04T21:50:14.353Z"
+            "grade": "G",
+            "dateAnalysis": "2022-07-18T16:43:03.548Z"
         }
     }
 }`
@@ -494,13 +505,206 @@ EcoSonar API is not able to request to the MongoDB Database :
 
   * **Code:** 500 Internal Server Error <br />
 
+**EcoSonar ANALYSIS - GET PROJECT SCORES**
+----
+Retrieve current scores from EcoIndex, Lighthouse Performance and Accessibility and W3C Validator for the project
+
+* **URL**
+
+  `/api/ecosonar/scores?projectName=<PROJECT_NAME>`
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+    **Required:**
+  
+    `PROJECT_NAME=[string]`
+
+* **Data Params**
+
+    None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `
+    {
+      "ecoIndex": 0,
+      "perfScore": 0,
+      "accessibilityScore": 0,
+      "w3cScore": 0
+    }`
+
+* **Error Response:**
+
+When no analysis found for the project
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "No Analysis found for project PROJECT_NAME"
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar ANALYSIS - RETRIEVE ECOSONAR AUDIT IN EXCEL FORMAT FOR PROJECT**
+----
+Retrieve audits from GreenIt-Analysis, Google Lighthouse and W3C Validator aggregated per project in an Excel format.
+
+* **URL**
+
+`/api/export`
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+    None
+
+* **Data Params**
+
+  PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+  `{
+      "projectName" : "PROJECT_NAME"
+  }`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** Excel file with the exported audit for the project
+
+* **Error Response:**
+
+When an error occured during file generation
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Export Audit is not possible because urls were not inserted into project or analysis for project could not be retrieved"
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar ANALYSIS - SAVE PROCEDURE FOR THE PROJECT**
+----
+Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
+You have 3 different configurations available in EcoSonar:
+- `scoreImpact` : best practices will be sorted by descending order of implementation (best practices not implemented returned first)
+- `quickWins` : best practices will be sorted by ascending order of difficulty (best practices easy to implement returned first)
+- `highestImpact` : best practices will be sorted by order of impact to improve EcoSonar scores (best practices most efficient returned first)
+
+* **URL**
+
+`/api/procedure`
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+    None
+
+* **Data Params**
+
+  PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+  selected_procedure can take 3 values : `scoreImpact`, `quickWins`, `highestImpact`
+
+  `{
+    "projectName" : "PROJECT_NAME",
+    "selectedProcedure": "selected_procedure"
+  }`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `{
+      "procedure": "quickWins"
+    }`
+ 
+* **Error Response:**
+
+When no procedure have been registered for your project
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Procedure is not defined in project PROJECT_NAME"
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar ANALYSIS - RETRIEVE PROCEDURE SAVED FOR THE PROJECT**
+----
+Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
+This request will return you the procedure chosen for this project.
+
+* **URL**
+
+`/api/procedure?projectName=<PROJECT_NAME>`
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+    **Required:**
+  
+    `PROJECT_NAME=[string]`
+
+* **Data Params**
+
+    None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `{
+      "procedure": "quickWins"
+    }`
+ 
+* **Error Response:**
+
+When no procedure have been registered for your project
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": "Procedure is not defined in project PROJECT_NAME"
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
 **EcoSonar ANALYSIS - RETRIEVE BEST PRACTICES PER PROJECT**
 ----
 Retrieve audits from GreenIt-Analysis and Google Lighthouse aggregated per project.
 
 * **URL**
 
-/api/bestPractices/project?projectName=<PROJECT_NAME>
+`/api/bestPractices/project?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -586,7 +790,7 @@ Retrieve audits from GreenIt-Analysis and Google Lighthouse per url audited.
 
 * **URL**
 
-/api/bestPractices/url
+`/api/bestPractices/url`
 
 * **Method:**
 
@@ -672,7 +876,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/login/insert?projectName=<PROJECT_NAME>
+  `/api/login/insert?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -713,7 +917,7 @@ EcoSonar API is not able to save into the MongoDB Database :
 
 * **URL**
 
-  /api/login/find?projectName=<PROJECT_NAME>
+  `/api/login/find?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -759,7 +963,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/proxy/find?projectName=<PROJECT_NAME>
+  `/api/proxy/find?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -805,7 +1009,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/login?projectName=<PROJECT_NAME>
+  `/api/login?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -848,7 +1052,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/proxy?projectName=<PROJECT_NAME>
+  `/api/proxy?projectName=<PROJECT_NAME>`
 
 * **Method:**
 
@@ -879,7 +1083,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/user-flow/find
+  `/api/user-flow/find`
 
 * **Method:**
 
@@ -891,9 +1095,12 @@ None
 
 * **Data Params**
 
+    PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
 `
 {
-    "url": ""
+    "url": "",
+    "projectName: "PROJECT_NAME"
 }
 `
 
@@ -925,7 +1132,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/user-flow/insert
+  `/api/user-flow/insert`
 
 * **Method:**
 
@@ -975,7 +1182,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 * **URL**
 
-  /api/user-flow
+  `/api/user-flow`
 
 * **Method:**
 
