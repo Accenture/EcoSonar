@@ -31,11 +31,22 @@ mvn clean package
 
 To build the plugin JAR file:
 
+For Windows:
+
 ```
+set REACT_APP_BASE_URL_ECOSONAR_API=#EcoSonar-API-URL
+mvn clean package -Durl=#EcoSonar-API-URL
+```
+
+For Linux/Mac:
+
+```
+export REACT_APP_BASE_URL_ECOSONAR_API=#EcoSonar-API-URL
 mvn clean package -Durl=#EcoSonar-API-URL
 ```
 
 filling the url field will allow you to request directly the EcoSonar-API through environment variable. You do no longer need to modify EcoSonar code.
+#EcoSonar-API-URL should be replaced in local by `http://localhost:3000` and by the EcoSonar API Url for a deployed version.
 
 ### Install Sonarqube Plugin
 
