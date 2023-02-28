@@ -46,7 +46,7 @@ mvn clean package -Durl=#EcoSonar-API-URL
 ```
 
 filling the url field will allow you to request directly the EcoSonar-API through environment variable. You do no longer need to modify EcoSonar code.
-#EcoSonar-API-URL should be replaced in local by `http://localhost:3000` and by the EcoSonar API Url for a deployed version.
+EcoSonar-API-URL should be replaced in local by `http://localhost:3000` and by the EcoSonar API Url for a deployed version.
 
 ### Install Sonarqube Plugin
 
