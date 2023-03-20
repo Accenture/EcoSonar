@@ -19,36 +19,36 @@
 
 const DEBUG = true
 
-const compressibleImage = [
+const compressibleImageEcoSonar = [
   /^image\/bmp(;|$)/i,
   /^image\/svg\+xml(;|$)/i,
   /^image\/vnd\.microsoft\.icon(;|$)/i,
   /^image\/x-icon(;|$)/i
 ]
 
-const image = [
+const imageEcoSonar = [
   /^image\/gif(;|$)/i,
   /^image\/jpeg(;|$)/i,
   /^image\/png(;|$)/i,
   /^image\/tiff(;|$)/i
-].concat(compressibleImage)
+].concat(compressibleImageEcoSonar)
 
-const css = [
+const cssEcoSonar = [
   /^text\/css(;|$)/i
 ]
 
-const javascript = [
+const javascriptEcoSonar = [
   /^text\/javascript(;|$)/i,
   /^application\/javascript(;|$)/i,
   /^application\/x-javascript(;|$)/i
 ]
 
-const compressibleFont = [
+const compressibleFontEcoSonar = [
   /^font\/eot(;|$)/i,
   /^font\/opentype(;|$)/i
 ]
 
-const font = [
+const fontEcoSonar = [
   /^application\/x-font-ttf(;|$)/i,
   /^application\/x-font-opentype(;|$)/i,
   /^application\/font-woff(;|$)/i,
@@ -57,9 +57,9 @@ const font = [
   /^application\/vnd.ms-fontobject(;|$)/i,
   /^application\/font-sfnt(;|$)/i,
   /^font\/woff2(;|$)/i
-].concat(compressibleFont)
+].concat(compressibleFontEcoSonar)
 
-const manifest = [
+const manifestEcoSonar = [
   /^text\/cache-manifest(;|$)/i,
   /^application\/x-web-app-manifest\+json(;|$)/i,
   /^application\/manifest\+json(;|$)/i
@@ -67,7 +67,7 @@ const manifest = [
 
 // Mime types from H5B project recommendations
 // See https://github.com/h5bp/server-configs-apache/blob/master/dist/.htaccess#L741
-const compressible = [
+const compressibleEcoSonar = [
   /^text\/html(;|$)/i,
   /^text\/plain(;|$)/i,
   /^text\/xml(;|$)/i,
@@ -86,9 +86,9 @@ const compressible = [
   /^text\/vtt(;|$)/i,
   /^text\/x-component(;|$)/i,
   /^text\/x-cross-domain-policy(;|$)/i
-].concat(javascript, css, compressibleImage, compressibleFont, manifest)
+].concat(javascriptEcoSonar, cssEcoSonar, compressibleImageEcoSonar, compressibleFontEcoSonar, manifestEcoSonar)
 
-const audio = [
+const EcoSonar = [
   /^audio\/mpeg(;|$)/i,
   /^audio\/x-ms-wma(;|$)/i,
   /^audio\/vnd.rn-realaudio(;|$)/i,
@@ -96,7 +96,7 @@ const audio = [
   /^application\/ogg(;|$)/i
 ]
 
-const video = [
+const videoEcoSonar = [
   /^video\/mpeg(;|$)/i,
   /^video\/mp4(;|$)/i,
   /^video\/quicktime(;|$)/i,
@@ -106,16 +106,16 @@ const video = [
   /^video\/webm(;|$)/i
 ]
 
-const others = [
+const othersEcoSonar = [
   /^application\/x-shockwave-flash(;|$)/i,
   /^application\/octet-stream(;|$)/i,
   /^application\/pdf(;|$)/i,
   /^application\/zip(;|$)/i
 ]
 
-const staticResources = [].concat(image, javascript, font, css, audio, video, manifest, others)
+const staticResourcesEcoSonar = [].concat(imageEcoSonar, javascriptEcoSonar, fontEcoSonar, cssEcoSonar, EcoSonar, videoEcoSonar, manifestEcoSonar, othersEcoSonar)
 
-const httpCompressionTokens = [
+const httpCompressionTokensEcoSonar = [
   'br',
   'compress',
   'deflate',
@@ -128,12 +128,12 @@ const httpRedirectCodes = [301, 302, 303, 307]
 // utils for cache rule
 function isStaticRessource (resource) {
   const contentType = getResponseHeaderFromResource(resource, 'content-type')
-  return staticResources.some(value => value.test(contentType))
+  return staticResourcesEcoSonar.some(value => value.test(contentType))
 }
 
 function isFontResource (resource) {
   const contentType = getResponseHeaderFromResource(resource, 'content-type')
-  if (font.some(value => value.test(contentType))) return true
+  if (fontEcoSonar.some(value => value.test(contentType))) return true
   // if not check url , because sometimes content-type is set to text/plain
   if (contentType === 'text/plain' || contentType === '' || contentType === 'application/octet-stream') {
     const url = resource.request.url
@@ -195,12 +195,12 @@ function hasValidCacheHeaders (resource) {
 function isCompressibleResource (resource) {
   if (resource.response.content.size <= 150) return false
   const contentType = getResponseHeaderFromResource(resource, 'content-type')
-  return compressible.some(value => value.test(contentType))
+  return compressibleEcoSonar.some(value => value.test(contentType))
 }
 
 function isResourceCompressed (resource) {
   const contentEncoding = getResponseHeaderFromResource(resource, 'content-encoding')
-  return ((contentEncoding.length > 0) && (httpCompressionTokens.indexOf(contentEncoding.toLocaleLowerCase()) !== -1))
+  return ((contentEncoding.length > 0) && (httpCompressionTokensEcoSonar.indexOf(contentEncoding.toLocaleLowerCase()) !== -1))
 }
 
 // utils for ETags rule
