@@ -36,7 +36,7 @@ AuthenticationService.prototype.loginIfNeeded = async function (browser, project
 async function loginOnOnePage (page, loginInformations) {
   try {
     if (loginInformations.usernameSelector) {
-      await page.type(loginInformations.usernameSelector, loginInformations.password)
+      await page.type(loginInformations.usernameSelector, loginInformations.username)
     } else {
       await page.type('input[name=username], input[type=email]', loginInformations.username)
     }
