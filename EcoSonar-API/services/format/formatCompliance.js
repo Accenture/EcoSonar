@@ -1,8 +1,10 @@
 class FormatCompliance {}
 
-// EcoIndex -> Grade
-FormatCompliance.prototype.getGrade = function (score) {
-  if (score > 80) {
+// Lighthouse Metrics compliance Level
+FormatCompliance.prototype.getEcodesignGrade = function (score) {
+  if (score === 'N.A' || score === null) {
+    return 'N.A'
+  } else if (score > 80) {
     return 'A'
   } else if (score > 70) {
     return 'B'
@@ -18,20 +20,20 @@ FormatCompliance.prototype.getGrade = function (score) {
 }
 
 // Lighthouse Metrics compliance Level
-FormatCompliance.prototype.complianceLevel = function (score) {
+FormatCompliance.prototype.getAccessibilityGrade = function (score) {
   if (score === 'N.A' || score === null) {
     return 'N.A'
-  } else if (score > 80) {
+  } else if (score > 99) {
     return 'A'
-  } else if (score > 70) {
+  } else if (score > 90) {
     return 'B'
-  } else if (score > 55) {
+  } else if (score > 85) {
     return 'C'
-  } else if (score > 40) {
+  } else if (score > 75) {
     return 'D'
-  } else if (score > 25) {
+  } else if (score > 60) {
     return 'E'
-  } else if (score > 10) {
+  } else if (score > 50) {
     return 'F'
   } else return 'G'
 }

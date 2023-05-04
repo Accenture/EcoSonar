@@ -55,7 +55,7 @@ const ProjectsRepository = function () {
    * @returns
    */
   this.createLoginConfiguration = async function (projectName, loginCredentials, proxy) {
-    const loginMap = new Map(Object.entries(loginCredentials))
+    const loginMap = (loginCredentials !== undefined && loginCredentials !== null) ? new Map(Object.entries(loginCredentials)) : {}
     return new Promise((resolve, reject) => {
       projects.create({ projectName, login: loginMap, proxy })
         .then(() => { resolve() })
@@ -109,7 +109,7 @@ const ProjectsRepository = function () {
       if (systemError !== null) {
         reject(systemError)
       } else if (result === null) {
-        reject(new Error('Procedure is not defined in project ' + projectName))
+        reject(new Error(`Project Settings is not defined for project ${projectName}`))
       } else {
         resolve(result)
       }

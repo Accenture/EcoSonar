@@ -5,38 +5,38 @@ FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (an
   let formattedAnalysis
   try {
     formattedAnalysis = {
-      performance: { displayValue: analysis.performance.score, complianceLevel: setComplianceLevel(analysis.performance.score) },
-      accessibility: { displayValue: analysis.accessibility.score, complianceLevel: setComplianceLevel(analysis.accessibility.score) },
+      performance: { displayValue: analysis.performance.score, complianceLevel: formatCompliance.getEcodesignGrade(analysis.performance.score) },
+      accessibility: { displayValue: analysis.accessibility.score, complianceLevel: formatCompliance.getAccessibilityGrade(analysis.accessibility.score) },
       dateAnalysis: analysis.dateLighthouseAnalysis,
       largestContentfulPaint: {
         displayValue: analysis.largestContentfulPaint.displayValue.toFixed(1) + ' s',
         score: analysis.largestContentfulPaint.score,
-        complianceLevel: setComplianceLevel(analysis.largestContentfulPaint.score)
+        complianceLevel: formatCompliance.getEcodesignGrade(analysis.largestContentfulPaint.score)
       },
       cumulativeLayoutShift: {
         displayValue: analysis.cumulativeLayoutShift.displayValue.toFixed(3),
         score: analysis.cumulativeLayoutShift.score,
-        complianceLevel: setComplianceLevel(analysis.cumulativeLayoutShift.score)
+        complianceLevel: formatCompliance.getEcodesignGrade(analysis.cumulativeLayoutShift.score)
       },
       firstContentfulPaint: {
         displayValue: analysis.firstContentfulPaint.displayValue.toFixed(1) + ' s',
         score: analysis.firstContentfulPaint.score,
-        complianceLevel: setComplianceLevel(analysis.firstContentfulPaint.score)
+        complianceLevel: formatCompliance.getEcodesignGrade(analysis.firstContentfulPaint.score)
       },
       speedIndex: {
         displayValue: analysis.speedIndex.displayValue.toFixed(1) + ' s',
         score: analysis.speedIndex.score,
-        complianceLevel: setComplianceLevel(analysis.speedIndex.score)
+        complianceLevel: formatCompliance.getEcodesignGrade(analysis.speedIndex.score)
       },
       totalBlockingTime: {
         displayValue: analysis.totalBlockingTime.displayValue.toFixed(0) + ' ms',
         score: analysis.totalBlockingTime.score,
-        complianceLevel: setComplianceLevel(analysis.totalBlockingTime.score)
+        complianceLevel: formatCompliance.getEcodesignGrade(analysis.totalBlockingTime.score)
       },
       interactive: {
         displayValue: analysis.interactive.displayValue.toFixed(1) + ' s',
         score: analysis.interactive.score,
-        complianceLevel: setComplianceLevel(analysis.interactive.score)
+        complianceLevel: formatCompliance.getEcodesignGrade(analysis.interactive.score)
       }
     }
   } catch (err) {
@@ -106,40 +106,42 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
       speedIndex.score = calculateAverageScore(speedIndex.score)
       totalBlockingTime.score = calculateAverageScore(totalBlockingTime.score)
       interactive.score = calculateAverageScore(interactive.score)
+      performance.score = calculateAverageScore(performance.score)
+      accessibility.score = calculateAverageScore(accessibility.score)
 
       analysis = {
-        performance: { displayValue: Math.trunc(parseFloat(calculateAverageScore(performance.score))), complianceLevel: setComplianceLevel(calculateAverageScore(performance.score)) },
-        accessibility: { displayValue: Math.trunc(parseFloat(calculateAverageScore(accessibility.score))), complianceLevel: setComplianceLevel(calculateAverageScore(accessibility.score)) },
+        performance: { displayValue: Math.trunc(parseFloat(performance.score)), complianceLevel: formatCompliance.getEcodesignGrade(performance.score) },
+        accessibility: { displayValue: Math.trunc(parseFloat(accessibility.score)), complianceLevel: formatCompliance.getAccessibilityGrade(accessibility.score) },
         dateAnalysis,
         largestContentfulPaint: {
           displayValue: calculateAverageScore(largestContentfulPaint.displayValue, 1) + ' s',
           score: largestContentfulPaint.score,
-          complianceLevel: setComplianceLevel(largestContentfulPaint.score)
+          complianceLevel: formatCompliance.getEcodesignGrade(largestContentfulPaint.score)
         },
         cumulativeLayoutShift: {
           displayValue: calculateAverageScore(cumulativeLayoutShift.displayValue, 3),
           score: cumulativeLayoutShift.score,
-          complianceLevel: setComplianceLevel(cumulativeLayoutShift.score)
+          complianceLevel: formatCompliance.getEcodesignGrade(cumulativeLayoutShift.score)
         },
         firstContentfulPaint: {
           displayValue: calculateAverageScore(firstContentfulPaint.displayValue, 1) + ' s',
           score: firstContentfulPaint.score,
-          complianceLevel: setComplianceLevel(firstContentfulPaint.score)
+          complianceLevel: formatCompliance.getEcodesignGrade(firstContentfulPaint.score)
         },
         speedIndex: {
           displayValue: calculateAverageScore(speedIndex.displayValue, 1) + ' s',
           score: speedIndex.score,
-          complianceLevel: setComplianceLevel(speedIndex.score)
+          complianceLevel: formatCompliance.getEcodesignGrade(speedIndex.score)
         },
         totalBlockingTime: {
           displayValue: calculateAverageScore(totalBlockingTime.displayValue, 0) + ' ms',
           score: totalBlockingTime.score,
-          complianceLevel: setComplianceLevel(totalBlockingTime.score)
+          complianceLevel: formatCompliance.getEcodesignGrade(totalBlockingTime.score)
         },
         interactive: {
           displayValue: calculateAverageScore(interactive.displayValue, 1) + ' s',
           score: interactive.score,
-          complianceLevel: setComplianceLevel(interactive.score)
+          complianceLevel: formatCompliance.getEcodesignGrade(interactive.score)
         }
       }
     }
@@ -151,10 +153,6 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
   function calculateAverageScore (score, toFixParam) {
     return (score / count).toFixed(toFixParam)
   }
-}
-
-function setComplianceLevel (score) {
-  return formatCompliance.getGrade(score)
 }
 
 FormatLighthouseAnalysis.prototype.lighthouseAnalysisFormattedDeployments = function (res) {

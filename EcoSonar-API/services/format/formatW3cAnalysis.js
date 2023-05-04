@@ -106,7 +106,7 @@ FormatW3cAnalysis.prototype.w3cLastAnalysisFormatted = function (latestW3cAnalys
 
     // Setting the returned object
     w3c.score = Math.round(score)
-    w3c.grade = formatCompliance.getGrade(w3c.score)
+    w3c.grade = formatCompliance.getAccessibilityGrade(w3c.score)
     w3c.dateAnalysis = latestW3cAnalysis[0].dateW3cAnalysis
     w3c.totalWarning = totalWarning
     w3c.totalError = totalError

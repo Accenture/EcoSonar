@@ -51,7 +51,7 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
       responsesSize: { displayValue: Math.round(responsesSize / count), complianceLevel: ecoIndexCalculationService.setScoreLetter('responseSize', Math.round(responsesSize / count)) },
       responsesSizeUncompress: Math.round(responsesSizeUncompress / count),
       ecoIndex: Math.round(ecoIndex / count),
-      grade: formatCompliance.getGrade(ecoIndex / count)
+      grade: formatCompliance.getEcodesignGrade(ecoIndex / count)
     }
     return analysis
   } catch (err) {

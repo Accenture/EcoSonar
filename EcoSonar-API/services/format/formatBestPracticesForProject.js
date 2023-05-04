@@ -85,7 +85,7 @@ FormatBestPracticesForProject.prototype.formatResponse = function (auditedMetric
     response.compliance = 'N.A'
     response.averageScore = 'N.A'
   } else {
-    response.compliance = formatCompliance.getGrade(averageScore)
+    response.compliance = formatCompliance.getEcodesignGrade(averageScore)
     response.averageScore = Number(averageScore.toFixed(2))
   }
 

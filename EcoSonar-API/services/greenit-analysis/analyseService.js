@@ -3,7 +3,7 @@ const createGreenITReports = require('./greenit-analysis.js').createGreenITRepor
 const authenticationService = require('../authenticationService')
 
 async function analyse (urlList, autoscroll, projectName) {
-  let reports
+  let reports = []
   const browserArgs = [
     '--no-sandbox', // can't run inside docker without
     '--disable-setuid-sandbox', // but security issues
@@ -80,7 +80,7 @@ async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName
     }
   })
 
-  let reports
+  let reports = []
   try {
     const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
     if (loginSucceeded) {

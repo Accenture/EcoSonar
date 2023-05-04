@@ -32,9 +32,10 @@ UrlConfigurationService.prototype.insert = async function (projectName, urlList)
   const notInsertedArray = []
   const errorArray = []
   let systemError = false
+  let urlAlreadyAddedInProject
   // Retrieving URLs in database for project
-  const urlAlreadyAddedInProject = await urlsProjectRepository.findAll(projectName, true)
-    .then((urlList) => urlList.map((res) => res.urlName))
+  await urlsProjectRepository.findAll(projectName, true)
+    .then((urlListResult) => { urlAlreadyAddedInProject = urlListResult.map((res) => res.urlName) })
     .catch((error) => {
       if (error instanceof SystemError) {
         systemError = true

@@ -6,7 +6,7 @@
 
     <groupId>com.ls</groupId>
     <artifactId>ecosonar</artifactId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.2</version>
 
     <packaging>sonar-plugin</packaging>
 
@@ -23,39 +23,6 @@
             <version>8.0</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.sonarsource.sonarqube</groupId>
-            <artifactId>sonar-plugin-api-impl</artifactId>
-            <version>8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sonarsource.analyzer-commons</groupId>
-            <artifactId>sonar-analyzer-commons</artifactId>
-            <version>2.1.0.1111</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sonarsource.java</groupId>
-            <artifactId>sonar-java-plugin</artifactId>
-            <version>7.4.0.27839</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sonarsource.php</groupId>
-            <artifactId>sonar-php-plugin</artifactId>
-            <version>3.27.1.9352</version>
-            <type>sonar-plugin</type>
-        </dependency>
-        <dependency>
-            <groupId>org.sonarsource.python</groupId>
-            <artifactId>sonar-python-plugin</artifactId>
-            <version>3.24.0.10784</version>
-            <type>sonar-plugin</type>
-        </dependency>
     </dependencies>
 
     <build>
@@ -68,7 +35,7 @@
                 <configuration>
                     <pluginKey>ecosonar</pluginKey>
                     <pluginName>EcoSonar</pluginName>
-                    <pluginClass>com.ls.SustainabilityPlugin</pluginClass>
+                    <pluginClass>com.ls.EcoSonarPlugin</pluginClass>
                     <pluginDescription>Ecodesign Analysis of web applications</pluginDescription>
                 </configuration>
             </plugin>

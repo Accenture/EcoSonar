@@ -35,7 +35,6 @@ public class GreenITAnalysis implements ProjectSensor{
             String uri = baseUrlHosted + route;
             String projectKey = context.config().get("sonar.projectKey").orElse("");
             String body = "{\"projectName\":\"" + projectKey + "\"}";
-            logger.info(baseUrlHosted);
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()

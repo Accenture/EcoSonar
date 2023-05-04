@@ -6,7 +6,8 @@
     },
     "extends": [
         "standard",
-        "eslint:recommended"
+        "eslint:recommended",
+        "plugin:@ecocode/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": "latest"

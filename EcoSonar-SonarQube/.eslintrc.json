@@ -6,7 +6,8 @@
     "extends": [
         "plugin:react/recommended",
         "plugin:jsx-a11y/recommended",
-        "standard"
+        "standard",
+        "plugin:@ecocode/recommended"
     ],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
