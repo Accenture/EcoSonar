@@ -32,10 +32,10 @@ The EcoSonar tool consists of:
     * run a GreenIT-Analysis/EcoIndex, Google Lighthouse and W3C Validator analysis for a project containing a list of predefined urls
     * store audits in MongodB Database
     * retrieve audits through API calls
-- A Sonarqube plugin: 
+- Sonarqube plugins: 
     * launch an EcoSonar analysis by calling the API when a Sonarqube analysis is triggered
-    * adding new ecodesign coding rules in default Sonarqube configuration with EcoCode
     * adding new pages in a Sonarqube project interface by retrieving data from the analysis (calls to EcoSonar API)
+    * adding new ecodesign coding rules in default Sonarqube configuration with EcoCode
  
 ![Architecture](./images/ecosonar-architecture.webp)
 
@@ -50,7 +50,7 @@ Example of Architecture deployed on Azure:
 For plugin only:
 - Java 11
 - Maven 3.8.3
-- Sonarqube server minimum version 8.0 (for installation, documentation for a single-node instance: https://docs.sonarqube.org/latest/setup/install-server/ or documentation for cluster: https://docs.sonarqube.org/latest/setup/install-cluster/), no constraint on the edition type. Please check with your infrastructure team which edition are you allowed to use.
+- Sonarqube server minimum version 9.4 (for installation, documentation for a single-node instance: https://docs.sonarqube.org/latest/setup/install-server/ or documentation for cluster: https://docs.sonarqube.org/latest/setup/install-cluster/), no constraint on the edition type. Please check with your infrastructure team which edition are you allowed to use.
 
 <a name="infra"></a>
 ### Infrastructure Requirements
@@ -69,6 +69,10 @@ For both folders `EcoSonar-API` and `EcoSonar-Sonarqube`, you will find two READ
 <a name="ecocode-config"></a>
 ## Ecocode Configuration
 
+For specific details on Ecocode, please look at their Github repository : https://github.com/green-code-initiative/ecoCode.
+You will find here https://github.com/Accenture/EcoSonar/tree/main/EcoSonar-SonarQube/ecocode the EcoCode Sonarqube plugin that needs to be imported into your Sonarqube instance. To install plugins, you can follow the same instructions provided for EcoSonar plugin https://github.com/Accenture/EcoSonar/tree/main/EcoSonar-SonarQube#install-sonarqube-plugin and copy/paste the 3 jar files into the same `extensions/plugins/` folder.
+
+
 When using Sonarqube as code analysis, a default Quality Profile is set up for each language. If you want to use EcoCode rules related to ecodesign, you will have to :
 - create a new Quality Profile based on the default one : click on the Setting icon for the languge you wish to extend and then Click on `Extend` and create the new Quality Profile
 
@@ -78,13 +82,14 @@ When using Sonarqube as code analysis, a default Quality Profile is set up for e
 
 ![EcoSonar Quality Profile Set up](./images/ecosonar-add-rules.webp)
 
-- In the list of rules, filter using the tag `eco-design`. You should have now displayed all rules integrated with Ecocode SonarQube plugin. For each of them, click on the button `Activate` to add them in your Quality Profile
+- In the list of rules, filter using the tag `eco-design` or `ecocode`. You should have now displayed all rules integrated with Ecocode SonarQube plugin. To add them in your profile, click on `Bulk Change` and select `Active in ` your quality profile.
 
 ![EcoSonar Quality Profile Activate Rules](./images/ecosonar-activate-rules.webp)
 
 - Go back in the `Quality Profile` page and set up the extended quality Profile as default one. SonarQube will now use this Quality Profile with ecodesign rules to audit your code.
 
 ![EcoSonar Default Quality Profile](./images/ecosonar-default-quality-profile.webp)
+
 
 <a name="audit"></a>
 ## Audit Tool
