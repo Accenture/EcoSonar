@@ -67,7 +67,11 @@ LoginProxyConfigurationService.prototype.getLoginCredentials = async function (p
     await projectsRepository.getProjectSettings(projectName)
       .then((result) => {
         if (!(result === null || result.login === undefined)) {
-          loginInformations = result.login
+          loginInformations = {
+            authentication_url: result.login.get("authentication_url"),
+            username: result.login.get("username"),
+            password: result.login.get("password")
+          }
         }
       })
       .catch((errorRepository) => {
