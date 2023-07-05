@@ -12,8 +12,18 @@ Database.prototype.connection = async function () {
   let dbName
   let cluster
   const mongoDBType = process.env.ECOSONAR_ENV_DB_TYPE || ''
-
-  if (mongoDBType === 'MongoDB_Atlas') {
+  if (mongoDBType === 'MongoDB') {
+    // connection to local dataBase MongoDB for MongoDB API
+    cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
+    const port = process.env.ECOSONAR_ENV_DB_PORT || 27017
+    dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
+    connectionString = `mongodb://${cluster}:${port}/${dbName}`
+    mongoose.connect(connectionString,
+      { useNewUrlParser: true, useUnifiedTopology: true }
+    ).then(() => console.log('Connection to MongoDB successful'))
+      .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
+  } else if (mongoDBType === 'MongoDB_Atlas') {
+    // connection to dataBase MongoDB Atlas for MongoDB API
     user = process.env.ECOSONAR_ENV_USER || ''
     password = await retrievePassword()
     cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
