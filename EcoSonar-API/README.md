@@ -84,10 +84,15 @@ For any other MongoDB Database, you will need to set up a new database connectio
 ##### Create a MongoDB Community Server
 
 1. First you need to install MongoDB Server Community and it is recommended also to install MongoDB Compass for visualization purposes. You can select the following default setup:
+
  ![MongoDB Server Installation](../images/mongodb-install.webp)
+
 2. Once installation on your laptop is over, you can open MongoDB Compass. You can create a new connection with the default settings:
+
  ![MongoDB Database Creation](../images/mongodb-connstring.webp)
+
 3. Once you are connected, create a database called ‘EcoSonar’. You might also be required to set at least one collection during database initialization. If so, create collection called ‘bestpractices’. The other collections will be created automatically when you will first launch the API connected to the database.
+
  ![MongoDB Database Creation](../images/mongodb-dbcreate.webp)
 
 <a name="mongodb-atlas"></a>
@@ -179,20 +184,25 @@ Then choose among the variables below the ones required and add it into `.env` f
 #### Database configuration
 
 ##### MongoDB Community Server
+```
 ECOSONAR_ENV_DB_TYPE=’MongoDB’
 ECOSONAR_ENV_CLUSTER = 'localhost' or ‘127.0.0.1’
 ECOSONAR_ENV_DB_PORT = '27017'
 ECOSONAR_ENV_DB_NAME = 'EcoSonar'
+```
 
 ##### MongoDB Atlas
+```
 ECOSONAR_ENV_DB_TYPE= ‘MongoDB_Atlas’
 ECOSONAR_ENV_CLUSTER = #cluster
 ECOSONAR_ENV_DB_NAME = 'EcoSonar'
 ECOSONAR_ENV_USER = #user
 ECOSONAR_ENV_CLOUD_PROVIDER= ‘local’ (the password will be retrieved from the environment variables)
 ECOSONAR_ENV_PASSWORD = #password
+```
 
 ###### Azure CosmosDB
+```
 ECOSONAR_ENV_DB_TYPE= ‘CosmosDB’
 ECOSONAR_ENV_CLUSTER = #cluster
 ECOSONAR_ENV_DB_PORT = #port
@@ -202,6 +212,7 @@ ECOSONAR_ENV_CLOUD_PROVIDER= ‘AZURE’ (the password will be retrieved from th
 ECOSONAR_ENV_PASSWORD = #password (if ECOSONAR_ENV_CLOUD_PROVIDER=’local’)
 ECOSONAR_ENV_KEY_VAULT_NAME= #keyVaultName (if ECOSONAR_ENV_CLOUD_PROVIDER=’AZURE’)
 ECOSONAR_ENV_SECRET_NAME = #keyVaultSecretName (if ECOSONAR_ENV_CLOUD_PROVIDER=’AZURE’)
+```
 
 <a name="database-config"></a>
 ##### Other database configuration possible
@@ -215,18 +226,24 @@ and `EcoSonar-API/configuration/retrieveDatabasePasswordFromCloud.js` for anothe
 #### CORS Setup
 To improve API Security, CORS options need to be configured to allow any other application to send requests to the API.
 To configure it, you can add the following environment variable in your Application Configuration to allow requests coming from your frontend interface:
-  - ECOSONAR_ENV_SONARQUBE_SERVER_URL : url of the Sonarqube Server instantiated or any other frontend interface
+```
+ECOSONAR_ENV_SONARQUBE_SERVER_URL = url of the Sonarqube Server instantiated or any other frontend interface
+```
 
 <a name="w3c-validator"></a>
 #### Enable W3C validator Analysis
 W3C Validator needs to make a request to an external API to audit your url. It means that only 'public' pages can be audited right now. We have raised an issue to the team in charge of W3C Auditor to be able to audit also pages protected by authentication. To be continued...
 In the environment variable, you can set the following parameter to request an audit through the external API or not:
-- ECOSONAR_ENV_ALLOW_EXTERNAL_API, take `true`or `false`
+```
+ECOSONAR_ENV_ALLOW_EXTERNAL_API = take `true`or `false`
+```
 
 <a name="user-flow"></a>
 #### Setup User flow 
 If your projects require to set up a user flow to access some of your web pages, you should then enable this parameter to run audits on dedicated browser to ensure cookies are correctly configured. However, it will increase the audit time of your project.
-- ECOSONAR_ENV_USER_JOURNEY_ENABLED, take `true`or `false`
+```
+ECOSONAR_ENV_USER_JOURNEY_ENABLED = take `true`or `false`
+```
 
 <a name="api-endpoints"></a>
 # API Endpoints
