@@ -30,7 +30,7 @@
     "js-yaml": "^4.1.0",
     "lighthouse": "^9.6.8",
     "mongodb": "^5.0.1",
-    "mongoose": "^6.9.1",
+    "mongoose": " ^5.0.0",
     "puppeteer": "^18.2.1",
     "puppeteer-har": "^1.1.2",
     "uniqid": "^5.4.0",
