@@ -10,9 +10,12 @@ It fulfills three purposes :
 ## Getting Started
 
 ### Prerequisites
-- Java 11
-- Maven 3.8.3
-- SonarQube 8.0 or above, Community or other Sonarqube Editions : https://www.sonarqube.org/downloads/
+-	Sonarqube- minimum version 9.4
+https://docs.sonarqube.org/latest/setup/install-server/
+https://docs.sonarqube.org/latest/setup/install-cluster/
+No constraint on the edition type. Please check with your infrastructure team which edition are you allowed to use.
+-	If Sonarqube version is 9.9 or above, choose Java– version 17, otherwise Java – version 11
+-	Maven - 3.8.3
 
 ### Build the SonarQube Plugin
 
@@ -45,8 +48,7 @@ export REACT_APP_BASE_URL_ECOSONAR_API=#EcoSonar-API-URL
 mvn clean package -Durl=#EcoSonar-API-URL
 ```
 
-filling the url field will allow you to request directly the EcoSonar-API through environment variable. You do no longer need to modify EcoSonar code.
-EcoSonar-API-URL should be replaced in local by `http://localhost:3000` and by the EcoSonar API Url for a deployed version.
+EcoSonar-API-URL should be replaced in local by `http://localhost:3000` and by the EcoSonar API URL for a deployed version.
 
 ### Install Sonarqube Plugins
 
