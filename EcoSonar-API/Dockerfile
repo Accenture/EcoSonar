@@ -1,51 +1,70 @@
-# See : https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker
-FROM node:16-slim
+# Building application in mult-stage mode to produce slimmer Docker image
+FROM node:16-alpine as build
 
-# Uncomment if you need to configure proxy. 
+# Uncomment if you need to configure proxy.
 # You can init these variables by using --build-args during docker build
 # Example : docker build [...] --build-args http_proxy=http://<user>:<password>@<host>:<port>
-#ENV HTTP_PROXY=$http_proxy
-#ENV HTTPS_PROXY=$https_proxy
-#ENV NO_PROXY=$no_proxy
+# ENV HTTP_PROXY=$http_proxy
+# ENV HTTPS_PROXY=$https_proxy
+# ENV NO_PROXY=$no_proxy
 
-RUN apt-get update \
-    && apt-get install -y wget gnupg \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg \
-    fonts-kacst fonts-freefont-ttf libxss1 gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
-    libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 \
-    libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
-    libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates \
-    fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget\
-      --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+#RUN apk update && apk add --no-cache \
+RUN apk add --no-cache \
+    wget \
+    gnupg \
+    git \
+    build-base \
+    python3 \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
 
 # Create app directory
 WORKDIR /app
 
-# Bundle app source
+# Copy the entire source code to the build stage
 COPY . .
 
-# Uncomment if you need to configure proxy. 
-#RUN npm config set proxy $HTTP_PROXY 
+# Uncomment if you need to configure proxy.
+# RUN npm config set proxy $HTTP_PROXY
 
 # If you are building your code for production
 # RUN npm ci --only=production
 # otherwise run npm install
-RUN npm install \
-    && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
-    && mkdir -p /home/pptruser/Downloads \
-    && chown -R pptruser:pptruser /home/pptruser \
-    && chown -R pptruser:pptruser /app/
 
+# Updating dependencies before building the application
+RUN npm update && npm install && npm run build
+
+# Use a temporary directory to store built artifacts
+WORKDIR /tmp/app
+
+# Copy built artifacts from the build stage to the temporary directory
+RUN cp -r /app/package.json /app/server.js /app/builder.js /app/node_modules /app/routes /app/services /app/dataBase /app/utils /app/configuration .
+
+# Use a smaller base image for the final stage
+FROM node:16-alpine
+
+# Create app directory
+WORKDIR /app
+
+# Create a non-root user for running the application
+RUN addgroup -S pptruser && adduser -S -G pptruser pptruser
+
+# Change ownership to the non-root user
+RUN chown -R pptruser:pptruser /app
+
+# Set the non-root user as the default user
 USER pptruser
 
-# To avoid "Error: ENOENT: no such file or directory, open '/app/dist/bundle.js'"
-RUN npm i
-
+# Set the listening port 
 ENV PORT=3000
 EXPOSE 3000
 
-CMD ["npm", "start" ]
+# Copy build to the image
+COPY --from=build --chown=pptruser:pptruser /tmp/* .
+
+# Run the application
+CMD ["npm", "start"]
