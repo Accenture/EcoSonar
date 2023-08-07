@@ -17,6 +17,7 @@ API Documentation : https://github.com/Accenture/EcoSonar/blob/main/API.md
       - [Create a MongoDB Database](#mongodb-creation)
         - [Create a MongoDB Community Server](#mongodb-server) 
         - [Create a MongoDB Atlas Database](#mongodb-atlas)
+        - [Create MongoDB Collections](#mongodb-collections)
   - [Node.js](#nodejs)
     - [Prerequisites](#prerequisites-node)
     - [Installation](#installation-node)
@@ -112,6 +113,26 @@ For any other MongoDB Database, you will need to set up a new database connectio
     - version 4.0 or later
     - close
 
+<a name="mongodb-collections"></a>
+##### Create MongoDB Collections
+
+EcoSonar database will contain the following MongoDB collections: 
+- bestpractices
+- greenits
+- lighthouses
+- projects
+- urlsprojects
+- w3cs
+
+Collections are created automatically when the project is first launched.
+However, if you chose Azure CosmoDB for MongoDB Database as database, then you will need to create the following collections with related indexes before starting the project otherwise it will fail. Please find below the different indexes that needs to be added for each collection:
+1. bestpractices : `_id`, `idAnalysisBestPractices`, `dateAnalysisBestPractices`
+2. greenits : `_id`, `idGreenAnalysis`, `dateGreenAnalysis`
+3. lighthouses : `_id`, `idLighthouseAnalysis`, `dateLighthouseAnalysis`
+4. projects : `_id`
+5. urlsprojects : `_id`, `idKey`
+6. w3cs : `_id`, `idW3cAnalysis`, `dateW3cAnalysis`
+
 <a name="nodejs"></a>
 ## Node.js
 
@@ -160,7 +181,7 @@ API can be reached at: http://localhost:3000
  ```
 4. Launch a Docker Server :
 ```
-docker container run -d -p 8080:3000 imageName
+docker container run -d -p 3000:3000 imageName
 ```
 
 API can be reached at: http://localhost:3000
