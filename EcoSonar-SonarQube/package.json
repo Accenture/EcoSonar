@@ -1,6 +1,6 @@
 {
   "name": "ecosonar-plugin",
-  "version": "1.0.0",
+  "version": "3.2.0",
   "description": "Ecodesign and accessibility tool to help developpers minimize carbon footprint of their web-application",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,20 @@
   },
   "author": "",
   "license": "GNU",
+  "dependencies": {
+    "apexcharts": "^3.37.0",
+    "axios": "^1.3.2",
+    "classnames": "^2.3.2",
+    "file-saver": "^2.0.5",
+    "focus-trap-react": "^10.0.2",
+    "interweave": "^13.0.0",
+    "react": "^18.2.0",
+    "react-apexcharts": "^1.4.0",
+    "react-dom": "^18.2.0",
+    "react-multi-select-component": "^4.3.4",
+    "sass": "^1.58.3"
+  },
   "devDependencies": {
-    "@babel/core": "^7.20.12",
     "@babel/eslint-parser": "^7.19.1",
     "@babel/plugin-transform-runtime": "^7.19.6",
     "@babel/preset-env": "^7.20.2",
@@ -44,19 +56,5 @@
     "presets": [
       "@babel/preset-react"
     ]
-  },
-  "dependencies": {
-    "apexcharts": "^3.37.0",
-    "axios": "^1.3.2",
-    "classnames": "^2.3.2",
-    "file-loader": "^6.2.0",
-    "file-saver": "^2.0.5",
-    "focus-trap-react": "^10.0.2",
-    "interweave": "^13.0.0",
-    "react": "^18.2.0",
-    "react-apexcharts": "^1.3.9",
-    "react-dom": "18.2.0",
-    "react-multi-select-component": "^4.3.4",
-    "sass": "^1.58.3"
   }
 }
