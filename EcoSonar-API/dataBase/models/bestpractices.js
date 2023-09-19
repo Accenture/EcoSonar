@@ -160,12 +160,6 @@ const bestPracticesSchema = new Schema({
       description: { type: Array },
       auditedMetric: { type: Number }
     },
-    criticalRequestChains: {
-      score: { type: Number },
-      scoreDisplayMode: { type: String },
-      description: { type: Array },
-      auditedMetric: { type: Number }
-    },
     mainthreadWorkBreakdown: {
       score: { type: Number },
       scoreDisplayMode: { type: String },

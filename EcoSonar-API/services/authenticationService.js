@@ -1,6 +1,6 @@
-
 const { waitForSelectors, applyChange } = require('../utils/playSelectors')
 const loginProxyConfigurationService = require('./loginProxyConfigurationService')
+const viewPortParams = require('../utils/viewportParams')
 
 class AuthenticationService { }
 
@@ -17,10 +17,7 @@ AuthenticationService.prototype.loginIfNeeded = async function (browser, project
     // Go to login url
     const [page] = await browser.pages()
 
-    await page.setViewport({
-      width: 1920,
-      height: 1080
-    })
+    await page.setViewport(viewPortParams.viewPortParams)
 
     await page.goto(loginInformations.authentication_url, { timeout: 0, waitUntil: 'networkidle2' })
     // Fill login fields

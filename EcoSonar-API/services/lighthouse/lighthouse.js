@@ -3,6 +3,7 @@ const config = require('./config.js')
 const puppeteer = require('puppeteer')
 const authenticationService = require('../authenticationService')
 const userJourneyService = require('../userJourneyService')
+const viewPortParams = require('../../utils/viewportParams')
 
 module.exports = {
   lighthouseAnalysis: async function (urlList, projectName) {
@@ -28,10 +29,7 @@ module.exports = {
       ignoreDefaultArgs: [
         '--disable-gpu'
       ],
-      defaultViewport: {
-        width: 1920,
-        height: 1080
-      }
+      defaultViewport: viewPortParams.viewPortParams
     })
 
     const results = []

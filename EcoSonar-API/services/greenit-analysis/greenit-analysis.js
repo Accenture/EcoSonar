@@ -2,6 +2,7 @@
 const PuppeteerHar = require('puppeteer-har')
 const path = require('path')
 const userJourneyService = require('../userJourneyService')
+const viewPortParams = require('../../utils/viewportParams')
 
 module.exports = {
   async createGreenITReports (browser, projectName, urlList, autoscroll) {
@@ -172,10 +173,7 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
 async function launchPageWithoutUserJourney (browser, url, autoscroll) {
   const page = await browser.newPage()
 
-  await page.setViewport({
-    width: 1920,
-    height: 1080
-  })
+  await page.setViewport(viewPortParams.viewPortParams)
 
   // disabling cache
   await page.setCacheEnabled(false)
@@ -187,30 +185,7 @@ async function launchPageWithoutUserJourney (browser, url, autoscroll) {
 
   // go to url
   await page.goto(url, { timeout: 30000, waitUntil: 'networkidle2' })
-  if (autoscroll) { await autoScroll(page) }
+  if (autoscroll) { await userJourneyService.scrollUntilPercentage(page, 100) } // scroll until the end of the page
   const harObj = await pptrHar.stop()
   return { page, harObj }
-}
-
-async function autoScroll (page) {
-  console.log('AUTOSCROLL - autoscroll has started')
-  await page.evaluate(async () => {
-    await new Promise((resolve, _reject) => {
-      let totalHeight = 0
-      const distance = 100
-      const timer = setInterval(() => {
-        const scrollHeight = document.body.scrollHeight
-        window.scrollBy(0, distance)
-        totalHeight += distance
-
-        if (totalHeight >= scrollHeight - window.innerHeight) {
-          clearInterval(timer)
-          setTimeout(() => {
-            resolve()
-          })
-        }
-      }, 100)
-    })
-  })
-  console.log('AUTOSCROLL - Autoscroll has ended ')
 }

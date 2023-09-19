@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer')
 const createGreenITReports = require('./greenit-analysis.js').createGreenITReports
 const authenticationService = require('../authenticationService')
+const viewPortParams = require('../../utils/viewportParams')
 
 async function analyse (urlList, autoscroll, projectName) {
   let reports = []
@@ -38,13 +39,8 @@ async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projec
       args: browserArgs,
       ignoreHTTPSErrors: true,
       // Keep gpu horsepower in headless
-      ignoreDefaultArgs: [
-        '--disable-gpu'
-      ],
-      defaultViewport: {
-        width: 1920,
-        height: 1080
-      }
+      ignoreDefaultArgs: ['--disable-gpu'],
+      defaultViewport: viewPortParams.viewPortParams
     })
 
     try {
@@ -71,13 +67,8 @@ async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName
     args: browserArgs,
     ignoreHTTPSErrors: true,
     // Keep gpu horsepower in headless
-    ignoreDefaultArgs: [
-      '--disable-gpu'
-    ],
-    defaultViewport: {
-      width: 1920,
-      height: 1080
-    }
+    ignoreDefaultArgs: ['--disable-gpu'],
+    defaultViewport: viewPortParams.viewPortParams
   })
 
   let reports = []

@@ -25,7 +25,6 @@ EnumAudits.prototype.performanceNamesToSave = function () {
 
     viewport: 'viewport',
     serverResponseTime: 'server-response-time',
-    criticalRequestChains: 'critical-request-chains',
     mainthreadWorkBreakdown: 'mainthread-work-breakdown',
     bootupTime: 'bootup-time',
     usesRelPreload: 'uses-rel-preload',

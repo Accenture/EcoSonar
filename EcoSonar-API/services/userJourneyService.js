@@ -2,15 +2,13 @@ const lighthouseUserFlow = require('lighthouse/lighthouse-core/fraggle-rock/api.
 const PuppeteerHar = require('puppeteer-har')
 const { clickOnElement, waitForSelectors, applyChange } = require('../utils/playSelectors')
 const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
+const viewPortParams = require('../utils/viewportParams')
 
 class UserJourneyService { }
 
 UserJourneyService.prototype.playUserJourney = async function (url, browser, userJourney) {
   const page = await browser.newPage()
-  await page.setViewport({
-    width: 1920,
-    height: 1080
-  })
+  await page.setViewport(viewPortParams.viewPortParams)
   // disabling cache
   await page.setCacheEnabled(false)
 
@@ -51,6 +49,9 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
           element = await waitForSelectors(step.selectors, page, { timeout, visible: true })
           await applyChange(step.value, element)
           break
+        case 'scroll' :
+          await userJourneyService.scrollUntilPercentage(page, step.distancePercentage)
+          break
         default:
           break
       }
@@ -70,10 +71,7 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
 UserJourneyService.prototype.playUserFlowLighthouse = async function (url, browser, userJourney) {
   const timeout = 10000
   const targetPage = await browser.newPage()
-  await targetPage.setViewport({
-    width: 1920,
-    height: 1080
-  })
+  await targetPage.setViewport(viewPortParams.viewPortParams)
   const flow = await lighthouseUserFlow.startFlow(targetPage, { name: url })
   const steps = userJourney.steps
   let step; let element
@@ -83,10 +81,7 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
         await flow.navigate(step.url, {
           stepName: step.url
         })
-        await targetPage.setViewport({
-          width: 1920,
-          height: 1080
-        })
+        await targetPage.setViewport(viewPortParams.viewPortParams)
         break
       case 'click':
         element = await waitForSelectors(step.selectors, targetPage, { timeout, visible: true })
@@ -95,6 +90,9 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
       case 'change':
         element = await waitForSelectors(step.selectors, targetPage, { timeout, visible: true })
         await applyChange(step.value, element)
+        break
+      case 'scroll' :
+        await userJourneyService.scrollUntilPercentage(targetPage, step.distancePercentage)
         break
       default:
         break
@@ -139,6 +137,26 @@ UserJourneyService.prototype.deleteUserFlow = async function (projectName, url) 
   } else {
     urlsProjectRepository.deleteUserFlow(projectName, url)
   }
+}
+
+UserJourneyService.prototype.scrollUntilPercentage = async function (page, distancePercentage) {
+  console.log('AUTOSCROLL - autoscroll has started')
+  await page.evaluate(async (distancePercentage) => {
+    await new Promise((resolve, _reject) => {
+      let totalHeight = 0
+      const distance = 100
+      const scrollHeight = document.body.scrollHeight * distancePercentage / 100
+      const timer = setInterval(() => {
+        window.scrollBy(0, distance)
+        totalHeight += distance
+        if (totalHeight >= scrollHeight) {
+          clearInterval(timer)
+          resolve()
+        }
+      }, 100)
+    })
+  }, distancePercentage)
+  console.log('AUTOSCROLL - Autoscroll has ended ')
 }
 
 const userJourneyService = new UserJourneyService()

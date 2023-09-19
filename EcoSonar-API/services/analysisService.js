@@ -139,7 +139,7 @@ function formatAuditsToBeSaved (reports, urlProjectList) {
 
   // Format Lighthouse Analysis
   for (const lighthouseReport of reports.reportsLighthouse) {
-    if (lighthouseReport.runtimeError === undefined) {
+    if (lighthouseReport?.runtimeError === undefined) {
       const formattedLighthouseMetrics = formatLighthouseMetrics.formatLighthouseMetrics(lighthouseReport)
       const urlProjectAudited = urlProjectList.filter((urlProject) => urlProject.urlName === lighthouseReport.url)
       const lighthouseAudit = {

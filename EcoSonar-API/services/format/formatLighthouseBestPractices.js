@@ -47,14 +47,9 @@ FormatLighthouseBestPractices.prototype.formatPerformance = function (report) {
   const performanceBestPractices = enumAudits.performanceNamesToSave()
   const formattedReports = {}
   for (const element in performanceBestPractices) {
-    let items
     const score = report.audits[performanceBestPractices[element]].score
     const scoreDisplayMode = report.audits[performanceBestPractices[element]].scoreDisplayMode
-    if (element === 'criticalRequestChains') {
-      items = (report.audits[performanceBestPractices[element]].details !== undefined) ? [report.audits[performanceBestPractices[element]].details] : []
-    } else {
-      items = (report.audits[performanceBestPractices[element]].details !== undefined) ? report.audits[performanceBestPractices[element]].details.items : []
-    }
+    const items = (report.audits[performanceBestPractices[element]].details !== undefined) ? report.audits[performanceBestPractices[element]].details.items : []
     let displayValue = report.audits[performanceBestPractices[element]].displayValue
     if (displayValue) {
       displayValue = Number(displayValue.replace(',', '').match(reg)[0])

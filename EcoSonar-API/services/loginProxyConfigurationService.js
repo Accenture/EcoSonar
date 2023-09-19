@@ -68,9 +68,9 @@ LoginProxyConfigurationService.prototype.getLoginCredentials = async function (p
       .then((result) => {
         if (!(result === null || result.login === undefined)) {
           loginInformations = {
-            authentication_url: result.login.get("authentication_url"),
-            username: result.login.get("username"),
-            password: result.login.get("password")
+            authentication_url: result.login.get('authentication_url'),
+            username: result.login.get('username'),
+            password: result.login.get('password')
           }
         }
       })

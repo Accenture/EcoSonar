@@ -214,7 +214,7 @@ ECOSONAR_ENV_DB_NAME = 'EcoSonar'
 
 ##### MongoDB Atlas
 ```
-ECOSONAR_ENV_DB_TYPE= ‘MongoDB_Atlas’
+ECOSONAR_ENV_DB_TYPE= MongoDB_Atlas
 ECOSONAR_ENV_CLUSTER = #cluster
 ECOSONAR_ENV_DB_NAME = 'EcoSonar'
 ECOSONAR_ENV_USER = #user
@@ -535,18 +535,25 @@ It should have the following format :
         ]
       ],
       ]
-    }​​​​​​​​​​​​​​​​​​​
+    }​​​​​​​​​​​​​​​​​​​,
+    {
+    "type": "scroll",
+    "distancePercentage": 50
+    },
     ]
 }​​​​​​​​​​​​​​​​​​​​​​​​​​​​​ 
 ```
  
-We are handling into EcoSonar 3 kind of browser interactions :
+We are handling into EcoSonar 4 kind of browser interactions :
 1. Navigate to a URL 
 It should have "type" = "navigate" and "url" the url you want to go to
 2. Change an input field
 "type" = "change", "value" : value to be set in the input field, "selectors" : list of CSS Selectors to find the right input field
 3. Click on a button 
 "type" = "click",  "selectors" : list of CSS Selectors to find the right button
+4. Scroll in the page and stop at a certain percentage at the page. 
+It will scroll down each 100px until the scroll limit has been reached. For example, the page is 1080px and we want to stop at the middle of the page (so distancePercentage = 50 %), it will iterate every 100 pixels until the windows has scrolled 540 px.
+"type" = "scroll" and "distancePercentage" = value between 0 and 100
 
 <a name="integration"></a>
 ## User Flow Integration
