@@ -33,8 +33,7 @@
     "mongoose": " ^5.0.0",
     "puppeteer": "^18.2.1",
     "puppeteer-har": "^1.1.2",
-    "uniqid": "^5.4.0",
-    "xlsx": "^0.18.5"
+    "uniqid": "^5.4.0"
   },
   "devDependencies": {
     "@ecocode/eslint-plugin": "^0.2.0",
