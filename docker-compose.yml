@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   api-ecosonar:
-    build: ./EcoSonar-API
+    build: .
     container_name: ecosonar_api
     ports:
       - "3000:3000"
