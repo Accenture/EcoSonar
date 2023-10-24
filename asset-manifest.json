@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.c8cdcbe7.css",
-    "main.js": "/static/js/main.9c58fafe.js",
+    "main.js": "/static/js/main.9e9aa4db.js",
     "static/media/EcoSonarLogo2.svg": "/static/media/EcoSonarLogo2.c3ad736cf58bd014cb2b53bf7a473b30.svg",
     "static/media/LighthouseLogo.svg": "/static/media/LighthouseLogo.2d9d0e9ca0eecf2f40b39ff23231ba16.svg",
     "static/media/W3C Scoring Methodology.pdf": "/static/media/W3C Scoring Methodology.c319d9f70975b6bdf6d9.pdf",
@@ -36,10 +36,10 @@
     "static/media/ArrowBtnClose.svg": "/static/media/ArrowBtnClose.37e4170575a8021278691ff87def467b.svg",
     "static/media/ArrowBtnOpen.svg": "/static/media/ArrowBtnOpen.82a4df20a445f6c2a21faaf0cfe37589.svg",
     "main.c8cdcbe7.css.map": "/static/css/main.c8cdcbe7.css.map",
-    "main.9c58fafe.js.map": "/static/js/main.9c58fafe.js.map"
+    "main.9e9aa4db.js.map": "/static/js/main.9e9aa4db.js.map"
   },
   "entrypoints": [
     "static/css/main.c8cdcbe7.css",
-    "static/js/main.9c58fafe.js"
+    "static/js/main.9e9aa4db.js"
   ]
 }
