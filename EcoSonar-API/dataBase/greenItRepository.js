@@ -33,6 +33,22 @@ const GreenItRepository = function () {
   }
 
   /**
+  * find all EcoIndex analysis
+  * @returns
+  */
+  this.findAllAnalysis = async function () {
+    return new Promise((resolve, reject) => {
+      greenits.find({})
+        .then((res) => {
+          resolve(res)
+        })
+        .catch(() => {
+          reject(new SystemError())
+        })
+    })
+  }
+
+  /**
    * find analysis for one url : OK
    * @param {project Name} projectNameReq
    * @param {url Name} urlNameReq
@@ -52,7 +68,7 @@ const GreenItRepository = function () {
           .find({ idUrlGreen: res[0].idKey }, { domSize: 1, nbRequest: 1, responsesSize: 1, dateGreenAnalysis: 1, ecoIndex: 1, grade: 1 })
           .sort({ dateGreenAnalysis: 1 })
         if (allAnalysis.length === 0) {
-          stringErr = 'no greenit analysis found for ' + urlNameReq
+          stringErr = 'Greenit - no greenit analysis found for ' + urlNameReq
           console.log(stringErr)
         }
       }
@@ -123,7 +139,7 @@ const GreenItRepository = function () {
           const lastAnalysis = deployments.filter((greenitAnalysis) => greenitAnalysis.dateGreenAnalysis.getTime() === dateLastAnalysis.getTime())
           results = { deployments, lastAnalysis }
         } else {
-          console.log('no greenit analysis found for ' + projectNameReq)
+          console.log('Greenit - no greenit analysis found for ' + projectNameReq)
           results = { deployments: [], lastAnalysis: null }
         }
       }
@@ -142,6 +158,7 @@ const GreenItRepository = function () {
       }
     })
   }
+
   /**
    * find EcoIndex from last analysis for one Project
    * @param {project Name} projectNameReq
@@ -165,13 +182,12 @@ const GreenItRepository = function () {
           i++
         }
         analysis = await greenits.find({ idUrlGreen: listIdKey }, { ecoIndex: 1, dateGreenAnalysis: 1 }).sort({ dateGreenAnalysis: 1 })
-
         if (analysis.length !== 0) {
           const dateLastAnalysis = analysis[analysis.length - 1].dateGreenAnalysis
           const lastAnalysis = analysis.filter((greenitAnalysis) => greenitAnalysis.dateGreenAnalysis.getTime() === dateLastAnalysis.getTime())
           result = { scores: lastAnalysis }
         } else {
-          console.log('no greenit analysis found for ' + projectNameReq)
+          console.log('Greenit - no greenit analysis found for ' + projectNameReq)
           result = { scores: null }
         }
       }

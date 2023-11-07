@@ -32,6 +32,23 @@ const W3cRepository = function () {
       }
     })
   }
+
+  /**
+  * find all w3c analysis
+  * @returns
+  */
+  this.findAllAnalysis = async function () {
+    return new Promise((resolve, reject) => {
+      w3cs.find({})
+        .then((res) => {
+          resolve(res)
+        })
+        .catch(() => {
+          reject(new SystemError())
+        })
+    })
+  }
+
   /**
    * find analysis for one url in a project
    * @param {project Name} projectNameReq
@@ -50,11 +67,11 @@ const W3cRepository = function () {
       )
       if (urlMatching.length === 0) {
         stringErr =
-        'url : ' +
-        urlNameReq +
-        ' or project : ' +
-        projectNameReq +
-        ' not found'
+          'url : ' +
+          urlNameReq +
+          ' or project : ' +
+          projectNameReq +
+          ' not found'
       } else {
         allAnalysis = await w3cs
           .find(
@@ -151,11 +168,11 @@ const W3cRepository = function () {
           .sort({ dateW3cAnalysis: 1 })
         if (deployments.length !== 0) {
           const dateLastAnalysis =
-              deployments[deployments.length - 1].dateW3cAnalysis
+            deployments[deployments.length - 1].dateW3cAnalysis
           const lastDeployment = deployments.filter(
             (deployment) =>
               deployment.dateW3cAnalysis.getTime() ===
-                dateLastAnalysis.getTime()
+              dateLastAnalysis.getTime()
           )
           result = {
             deployments,

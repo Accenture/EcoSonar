@@ -12,6 +12,9 @@ const userJourneyService = require('../services/userJourneyService')
 const exportAuditService = require('../services/exportAuditService')
 const SystemError = require('../utils/SystemError')
 const asyncMiddleware = require('../utils/AsyncMiddleware')
+const swaggerUi = require('swagger-ui-express')
+const swaggerSpec = require('../swagger')
+const projectService = require('../services/projectService')
 
 dotenv.config()
 
@@ -20,6 +23,10 @@ app.disable('x-powered-by')
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+
+const PORT = process.env.SWAGGER_PORT || 3002
+app.listen(PORT, () => console.log(`Swagger in progress on port ${PORT}`))
 
 const sonarqubeServerUrl = process.env.ECOSONAR_ENV_SONARQUBE_SERVER_URL || ''
 const whitelist = [sonarqubeServerUrl]
@@ -47,7 +54,28 @@ app.use((_req, res, next) => {
 })
 
 // API CRUD UrlsProject
-// retrieve list of URLs saved and audited by EcoSonar for the project
+/**
+ * @swagger
+ * /api/all:
+ *   get:
+ *     tags:
+ *       - "URL Configuration"
+ *     summary: "Get All URLs from Project"
+ *     description: retrieve list of URLs saved and audited by EcoSonar for the project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: No url found for the project.
+ *       500:
+ *         description: System error.
+ */
 app.get('/api/all', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('GET URLS PROJECT - retrieve all urls from project ' + projectName)
@@ -65,7 +93,40 @@ app.get('/api/all', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// add list of URLs to be audited once project is audited by EcoSonar
+/**
+ * @swagger
+ * /api/insert:
+ *   post:
+ *     tags:
+ *       - "URL Configuration"
+ *     summary: "Insert URL into Project"
+ *     description: add list of URLs to be audited once project is audited by EcoSonar.
+ *     parameters:
+ *       - name: urls
+ *         in: body
+ *         description: urls to be inserted in the project
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            urls:
+ *              type:
+ *                projectName:
+ *                  type: string
+ *                urlName:
+ *                  type: array
+ *                  items: string
+ *          example:
+ *            projectName:  ""
+ *            urlName: ["url"]
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Validation failed.
+ *       500:
+ *         description: System error.
+ */
 app.post('/api/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlsList = req.body.urlName
@@ -84,7 +145,34 @@ app.post('/api/insert', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Delete url to be audited in a project configuration
+/**
+ * @swagger
+ * /api/delete:
+ *   delete:
+ *     tags:
+ *       - "URL Configuration"
+ *     summary: "Delete URL from Project"
+ *     description: Delete url to be audited in a project configuration.
+ *     parameters:
+ *       - name: urlDeleted
+ *         in: body
+ *         description: The url to be deleted in the project
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            urlName:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Url not found, could not be deleted.
+ *       500:
+ *         description: System error.
+ */
 app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlName = req.body.urlName
@@ -104,7 +192,51 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
 }))
 
 // API CRUD LOGIN Credentials
-// insert login credentials for a project
+/**
+ * @swagger
+ * /api/login/insert:
+ *   post:
+ *     tags:
+ *       - "Login Configuration"
+ *     summary: "Save Login and Proxy For Project"
+ *     description: Insert login credentials and proxy configuration for a project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *       - name: login and proxy
+ *         in: body
+ *         description: The login credentials and proxy settings
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            login:
+ *              type: object
+ *              properties:
+ *                authentication_url:
+ *                  type: string
+ *                steps:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *            proxy:
+ *              type: object
+ *              properties:
+ *                ipAddress:
+ *                  type: string
+ *                port:
+ *                  type: string
+ *     responses:
+ *       201:
+ *         description: Success.
+ *       400:
+ *         description: Insertion failed.
+ *       500:
+ *         description: System error.
+ */
 app.post('/api/login/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   const loginCredentials = req.body.login
@@ -124,7 +256,28 @@ app.post('/api/login/insert', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Find login credentials for a project
+/**
+ * @swagger
+ * /api/login/find:
+ *   get:
+ *     tags:
+ *       - "Login Configuration"
+ *     summary: "Get Login For Project"
+ *     description: Find login credentials for a project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: No login credentials retrieved.
+ *       500:
+ *         description: System error.
+ */
 app.get('/api/login/find', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('FIND LOGIN CREDENTIALS - credentials into project ' + projectName)
@@ -142,7 +295,28 @@ app.get('/api/login/find', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Find proxy configuration for a project
+/**
+ * @swagger
+ * /api/proxy/find:
+ *   get:
+ *     tags:
+ *       - "Login Configuration"
+ *     summary: "Get Proxy For Project"
+ *     description: Find proxy configuration for a project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: No proxy configuration retrieved.
+ *       500:
+ *         description: System error.
+ */
 app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('FIND PROXY CONFIGURATION - credentials into project ' + projectName)
@@ -160,7 +334,28 @@ app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Delete login credentials for a project
+/**
+ * @swagger
+ * /api/login:
+ *   delete:
+ *     tags:
+ *       - "Login Configuration"
+ *     summary: "Delete Login for Project"
+ *     description: Delete login credentials for a project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Delete login credentials failed.
+ *       500:
+ *         description: System error.
+ */
 app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('DELETE LOGIN CREDENTIALS - delete credentials into project ' + projectName)
@@ -178,7 +373,28 @@ app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Delete proxy configuration for a project
+/**
+ * @swagger
+ * /api/proxy:
+ *   delete:
+ *     tags:
+ *       - "Login Configuration"
+ *     summary: "Delete Proxy for Project"
+ *     description: Delete proxy configuration for a project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Delete proxy configuration failed.
+ *       500:
+ *         description: System error.
+ */
 app.delete('/api/proxy', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('DELETE PROXY CONFIGURATION  - delete credentials into project ' + projectName)
@@ -197,7 +413,41 @@ app.delete('/api/proxy', asyncMiddleware(async (req, res, _next) => {
 }))
 
 // API CRUD User Flow
-// insert new user flow for a url in a project
+/**
+ * @swagger
+ * /api/user-flow/insert:
+ *   post:
+ *     tags:
+ *       - "User Flow Configuration"
+ *     summary: "Save User Flow for URL"
+ *     description: Insert new user flow for a url in a project.
+ *     parameters:
+ *       - name: userFlow
+ *         in: body
+ *         description: user flow to be added
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            url:
+ *              type: string
+ *            userFlow:
+ *              type: object
+ *              properties:
+ *                steps:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Insertion failed.
+ *       500:
+ *         description: System error.
+ */
 app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
   const url = req.body.url
   const projectName = req.body.projectName
@@ -217,7 +467,33 @@ app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Find user flow for a project
+/**
+ * @swagger
+ * /api/user-flow/find:
+ *   post:
+ *     tags:
+ *       - "User Flow Configuration"
+ *     summary: "Get User Flow for URL"
+ *     description: Find user flow for a URL.
+ *     parameters:
+ *       - name: userFlow
+ *         in: body
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            url:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: No user flow retrieved.
+ *       500:
+ *         description: System error.
+ */
 app.post('/api/user-flow/find', asyncMiddleware(async (req, res, _next) => {
   const url = req.body.url
   const projectName = req.body.projectName
@@ -236,7 +512,33 @@ app.post('/api/user-flow/find', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Delete user flow for a project
+/**
+ * @swagger
+ * /api/user-flow:
+ *   delete:
+ *     tags:
+ *       - "User Flow Configuration"
+ *     summary: "Delete User Flow for URL"
+ *     description: Delete user flow for a URL
+ *     parameters:
+ *       - name: userFlow
+ *         in: body
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            url:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Delete user flow failed.
+ *       500:
+ *         description: System error.
+ */
 app.delete('/api/user-flow', asyncMiddleware(async (req, res, _next) => {
   const url = req.body.url
   const projectName = req.body.projectName
@@ -256,7 +558,29 @@ app.delete('/api/user-flow', asyncMiddleware(async (req, res, _next) => {
 }))
 
 // API CRUD GreenIT X Lighthouse x W3C Validator
-// insert an analysis
+/**
+ * @swagger
+ * /api/greenit/insert:
+ *   post:
+ *     tags:
+ *       - "EcoSonar Analysis"
+ *     summary: "Launch an EcoSonar Analysis"
+ *     description: Launch an EcoSonar analysis (GreenIT-Analysis, Google Lighthouse and W3C Validator only)
+ *     parameters:
+ *       - name: projectName
+ *         in: body
+ *         description: The name of the project
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *     responses:
+ *       202:
+ *         description: Analysis launched
+ *
+ */
 app.post('/api/greenit/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   console.log('INSERT ANALYSIS - Launch analysis for project ' + projectName)
@@ -264,7 +588,34 @@ app.post('/api/greenit/insert', asyncMiddleware(async (req, res, _next) => {
   res.status(202).send()
 }))
 
-// get analysis for an url
+/**
+ * @swagger
+ * /api/greenit/url:
+ *   post:
+ *     tags:
+ *       - "EcoSonar Analysis"
+ *     summary: "Get Analysis Per URL"
+ *     description: Get last EcoSonar analysis for the url
+ *     parameters:
+ *       - name: projectName
+ *         in: body
+ *         description: The name of the project
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            urlName:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Analysis for url could not be retrieved.
+ *       500:
+ *         description: System error.
+ */
 app.post('/api/greenit/url', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlName = req.body.urlName
@@ -283,7 +634,28 @@ app.post('/api/greenit/url', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// get analysis for all urls of a project at one date
+/**
+ * @swagger
+ * /api/greenit/project:
+ *    get:
+ *     tags:
+ *       - "EcoSonar Analysis"
+ *     summary: "Get Analysis Per Project"
+ *     description: Get last EcoSonar analysis for the project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Analysis for project could not be retrieved.
+ *       500:
+ *         description: System error.
+ */
 app.get('/api/greenit/project', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('GET ANALYSIS PROJECT - retrieve analysis for project ' + projectName)
@@ -300,7 +672,28 @@ app.get('/api/greenit/project', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// Retrieve EcoSonar scores (greenit, lighthouse and w3c validator) to be returned to the CICD pipelines
+/**
+ * @swagger
+ * /api/ecosonar/scores:
+ *   get:
+ *     tags:
+ *       - "EcoSonar Analysis"
+ *     summary: "Get Project Scores for latest analysis"
+ *     description: Retrieve EcoSonar scores (EcoIndex, Google Lighthouse and W3C Validator) to be returned to the CICD pipelines.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Scores for project could not be retrieved.
+ *       500:
+ *         description: System error.
+ */
 app.get('/api/ecosonar/scores', asyncMiddleware(async (req, res, _next) => {
   const projectNameReq = req.query.projectName
   console.log('GET ECOSONAR PROJECT SCORES - retrieve scores for project ' + projectNameReq)
@@ -317,8 +710,162 @@ app.get('/api/ecosonar/scores', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
+/**
+ * @swagger
+ * /api/ecosonar/info:
+ *   get:
+ *     tags:
+ *       - "EcoSonar Analysis"
+ *     summary: "Get Average of all scores for projects registered in EcoSonar at a defined date"
+ *     description: Retrieve all EcoSonar projects average for all scores (EcoIndex, Google Lighthouse and W3C Validator). You can retrieve the scores at a date defined or for last analysis made if no date defined.
+ *     parameters:
+ *       - name: date
+ *         in: query
+ *         description: endpoint will return the last analysis before that date, today if none
+ *         required: false
+ *         type: string
+ *         format: date
+ *         example: "2020-12-31"
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Scores for projects could not be retrieved.
+ *       500:
+ *         description: System error.
+ */
+app.get('/api/ecosonar/info', asyncMiddleware(async (req, res, _next) => {
+  const date = req.query.date ?? null
+  console.log('GET AVERAGE PROJECT SCORE - retrieve all informations for all projects for the date defined')
+  projectService.getAllInformationsAverage(date)
+    .then((result) => {
+      console.log('GET AVERAGE PROJECT SCORES - Average of scores from all projects for the date defined')
+      return res.status(200).json(result)
+    }).catch((error) => {
+      if (error instanceof SystemError) {
+        return res.status(500).send()
+      }
+      console.log('GET AVERAGE PROJECT SCORES - Average of scores from all projects for the date defined could not be retrieved')
+      return res.status(400).json({ error: error.message })
+    })
+}))
+
+/**
+ * @swagger
+ * /api/project/all:
+ *   post:
+ *     tags:
+ *       - "EcoSonar Analysis"
+ *     summary: "Get all projects scores from date defined"
+ *     description: Retrieve all EcoSonar projects and return the scores for each of them at the date defined, if date not filled it would be the latest analysis.
+ *     parameters:
+ *       - name: date
+ *         in: query
+ *         description: endpoint will return the last analysis before that date, today if none
+ *         required: false
+ *         type: string
+ *         format: date
+ *         example: "2020-12-31"
+ *       - name: filterName
+ *         in: query
+ *         description: retrieve projects whose name contains the string 'filterName', case insensitive
+ *         required: false
+ *         type: string
+ *         example: "my-project"
+ *       - name: filterAndSort
+ *         in: body
+ *         description: filter and sorting configuration for projects scores of all projects registered in EcoSonar API. CATEGORY in filterScore can take the following enum ecoIndex, perfScore, accessScore, w3cScore. score is a value from 0 to 100, it will be the threshold for the CATEGORY. select takes the value upper or lower according if you want only project whose scores have an average value higher than score or lower. CATEGORY in sortBy can take the following enum ecoIndex, perfScore, accessScore, w3cScore and name. order can take the value asc or desc if you want to sort your projects according to the type.
+ *         required: false
+ *         schema:
+ *          type: object
+ *          properties:
+ *            filterScore:
+ *              type: object
+ *              properties:
+ *                cat:
+ *                  type: string
+ *                  example: ecoIndex
+ *                  enum:
+ *                    - ecoIndex
+ *                    - perfScore
+ *                    - accessScore
+ *                    - w3cScore
+ *                score:
+ *                  type: integer
+ *                select:
+ *                  type: string
+ *                  example: upper
+ *                  enum:
+ *                    - upper
+ *                    - lower
+ *            sortBy:
+ *              type: object
+ *              properties:
+ *                type:
+ *                  type: string
+ *                  example: ecoIndex
+ *                  enum:
+ *                    - ecoIndex
+ *                    - perfScore
+ *                    - accessScore
+ *                    - w3cScore
+ *                    - name
+ *                order:
+ *                  type: string
+ *                  enum:
+ *                    - asc
+ *                    - desc
+ *                  example: asc
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Scores for project could not be retrieved.
+ *       500:
+ *         description: System error.
+ */
+app.post('/api/project/all', asyncMiddleware(async (req, res, _next) => {
+  const date = req.query.date ?? null
+  const filterName = req.query.filterName ?? null
+  const sortBy = req.body.sortBy ?? null
+  const filterScore = req.body.filterScore ?? null
+  console.log('GET PROJECTS SCORES - Retrieve scores for each projects.')
+  projectService.getAllProjectInformations(date, sortBy, filterName, filterScore)
+    .then((result) => {
+      console.log('GET PROJECTS SCORES - Average scores for each projects.')
+      return res.status(200).json(result)
+    }).catch((error) => {
+      if (error instanceof SystemError) {
+        return res.status(500).send()
+      }
+      console.log('GET PROJECT SCORES - Average scores for each each projects could not be retrieved')
+      return res.status(400).json({ error: error.message })
+    })
+}))
+
 // API CRUD BestPractices
-// retrieve all best practices for a project
+/**
+ * @swagger
+ * /api/bestPractices/project:
+ *    get:
+ *     tags:
+ *       - "EcoSonar Analysis"
+ *     summary: "Get Best Practices per Project"
+ *     description: Retrieve all best practices for a project from the last analysis.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Best practices analysis for project could not be retrieved.
+ *       500:
+ *         description: System error.
+ */
 app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   console.log('GET BEST PRACTICES PROJECT - retrieve best practices analysis for project ' + projectName)
@@ -338,7 +885,34 @@ app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) =>
 }))
 
 // API CRUD BestPractices
-// retrieve  best practices for an URL
+/**
+ * @swagger
+ * /api/bestPractices/url:
+ *    post:
+ *      tags:
+ *        - "EcoSonar Analysis"
+ *      summary: "Get Best Practices per URL"
+ *      description: Retrieve best practices for an URL from the last analysis
+ *      parameters:
+ *        - name: projectName
+ *          in: body
+ *          description: The name of the project
+ *          required: true
+ *          schema:
+ *            type: object
+ *            properties:
+ *              projectName:
+ *                type: string
+ *              urlName:
+ *                type: string
+ *      responses:
+ *        200:
+ *          description: Success.
+ *        400:
+ *          description: Best practices analysis for url could not be retrieved.
+ *        500:
+ *          description: System error.
+ */
 app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlName = req.body.urlName
@@ -352,13 +926,38 @@ app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
       if (error instanceof SystemError) {
         return res.status(500).send()
       }
-      console.log('GET BEST PRACTICES URL - Best practices analysis for project could not be retrieved')
+      console.log('GET BEST PRACTICES URL - Best practices analysis for url could not be retrieved')
       return res.status(400).json({ error: error.message })
     })
 }))
 
 // Crawler service
-// Crawl across the given website to find URLs
+/**
+ * @swagger
+ * /api/crawl:
+ *   post:
+ *     tags:
+ *       - "URL Configuration"
+ *     summary: "Get Crawler Result"
+ *     description: Crawl the given website to find all pages related.
+ *     parameters:
+ *       - name: crawledUrl
+ *         in: body
+ *         description: crawling the website
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            mainUrl:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       500:
+ *         description: System error.
+ */
 app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const mainUrl = req.body.mainUrl
@@ -369,13 +968,40 @@ app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).json(results)
     })
     .catch(() => {
-      console.log('CRAWLER - Crawler has encountered and error')
+      console.log('CRAWLER - Crawler has encountered an error')
       return res.status(500).send()
     })
 }))
 
 // API PROCEDURE
-// POST method is used to update the procedure of a project
+/**
+ * @swagger
+ * /api/procedure:
+ *   post:
+ *     tags:
+ *       - "Procedure Configuration"
+ *     summary: "Add Procedure for project"
+ *     description: Update the procedure of a project, procedure can take the following values quickWins, highestImpact, scoreImpact. Procedure is the sorting method for best practices analysis.
+ *     parameters:
+ *       - name: projectName
+ *         in: body
+ *         description: The name of the project
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            selectedProcedure:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Procedure could not be updated.
+ *       500:
+ *         description: System Error.
+ */
 app.post('/api/procedure', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const selectedProcedure = req.body.selectedProcedure
@@ -394,7 +1020,28 @@ app.post('/api/procedure', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// get method is used to get the procedure of the project
+/**
+ * @swagger
+ * /api/procedure:
+ *   get:
+ *     tags:
+ *       - "Procedure Configuration"
+ *     summary: "Get Procedure for project"
+ *     description: Retrieve the sorting method used for best practices analysis.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Procedure could not be retrieved.
+ *       500:
+ *         description: System Error.
+ */
 app.get('/api/procedure', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   procedureService.getProcedure(projectName)
@@ -412,7 +1059,6 @@ app.get('/api/procedure', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-// export excel
 app.post('/api/export', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   console.log(`POST EXCEL - audit for project ${projectName} to be retrieved`)

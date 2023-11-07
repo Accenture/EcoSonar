@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Version 3.3 , 07/11/2023
+
+### Added
+- Integrate new EcoCode features including : 
+    - additional rules for Python and PHP
+    - new languages covered : Javascript, Typescript, Android and iOS
+- Implement Swagger User Interface for a more friendly user interface of the API
+- Automatically push a new Docker Image as a Github package for each new commit in the 'main' branch of the Github repository
+- Add new API Endpoints to retrieve projects scores average at a selected date with filter and sorting configuration
+
+### Removed
+
+### Changed
+- Fix some security vulnerabilities
+
+---
+
+## Version 3.2 , 10/08/2023
+
+### Added
+- Include Ecocode documentation into EcoSonar website
+- Update best practices documentation
+- Add MongoDB Community Server connection as a potential database for EcoSonar
+
+### Removed
+
+### Changed
+- BUG FIX: user journey flow not working when some CSS selectors are hidden in the page
+
+---
+
 ## Version 3.1 , 27/03/2023
 
 ### Added

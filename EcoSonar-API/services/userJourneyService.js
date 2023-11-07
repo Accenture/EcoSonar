@@ -141,11 +141,11 @@ UserJourneyService.prototype.deleteUserFlow = async function (projectName, url) 
 
 UserJourneyService.prototype.scrollUntilPercentage = async function (page, distancePercentage) {
   console.log('AUTOSCROLL - autoscroll has started')
-  await page.evaluate(async (distancePercentage) => {
+  await page.evaluate(async (percentage) => {
     await new Promise((resolve, _reject) => {
       let totalHeight = 0
       const distance = 100
-      const scrollHeight = document.body.scrollHeight * distancePercentage / 100
+      const scrollHeight = document.body.scrollHeight * percentage / 100
       const timer = setInterval(() => {
         window.scrollBy(0, distance)
         totalHeight += distance

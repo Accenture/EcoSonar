@@ -1,6 +1,6 @@
 import React from 'react'
 import { getUrlsConfiguration } from '../../services/configUrlService'
-import { getAnalysisForProjectConfiguration } from '../../services/ecosonarService'
+import { getAnalysisForProjectConfiguration } from '../../services/ecoSonarService'
 import AnalysisPanel from './AnalysisPanel'
 import DisclaimerPanel from './IndexPanel/DisclaimerPanel'
 import EcoIndexPanel from './IndexPanel/EcoIndexPanel'

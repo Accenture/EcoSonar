@@ -1,9 +1,9 @@
 import React from 'react'
-import { getAnalysisUrlConfiguration } from '../../services/ecosonarService'
+import { getAnalysisUrlConfiguration } from '../../services/ecoSonarService'
+import AccessibilityAlert from '../../utils/AccessibilityAlert'
 import GraphPanelForUrl from './GraphPanel/GraphPanelForUrl'
 import GreenItPanelPerUrl from './GreenItPanel/GreenItPanelPerUrl'
 import LightHousePanelPerUrl from './LighthousePanel/LighthousePanelPerUrl'
-import AccessibilityAlert from '../../utils/AccessibilityAlert'
 import W3cPanelPerUrl from './W3cPanel/W3cPanelPerUrl'
 export default class AnalysisPerUrlPanel extends React.PureComponent {
   constructor (props) {

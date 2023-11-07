@@ -164,7 +164,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   row.getCell(2).alignment = { wrapText: true }
   row.getCell(3).alignment = { wrapText: true }
 
-  let i = 3
+  let rowIndex = 3
   if (urlName !== '') {
     row = sheet.getRow(4)
     row.getCell(1).value = 'Audited Page:'
@@ -191,10 +191,10 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     }
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
-    i = 6
+    rowIndex = 6
   }
   // score and grade
-  row = sheet.getRow(i)
+  row = sheet.getRow(rowIndex)
   row.getCell(1).value = 'EcoIndex project grade (average)'
   if (analysisGreenit !== null) {
     row.getCell(2).value = analysisGreenit.grade
@@ -266,9 +266,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   row.getCell(6).alignment = { wrapText: true }
   row.getCell(7).alignment = { wrapText: true }
   row.getCell(8).alignment = { wrapText: true }
-  i++
+  rowIndex++
 
-  row = sheet.getRow(i)
+  row = sheet.getRow(rowIndex)
   row.getCell(1).value = 'EcoIndex project score (average)'
   if (analysisGreenit !== null) {
     row.getCell(2).value = analysisGreenit.ecoIndex
@@ -340,11 +340,11 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   row.getCell(6).alignment = { wrapText: true }
   row.getCell(7).alignment = { wrapText: true }
   row.getCell(8).alignment = { wrapText: true }
-  i++
+  rowIndex++
 
   // greenit Analysis metrics
-  i++
-  row = sheet.getRow(i)
+  rowIndex++
+  row = sheet.getRow(rowIndex)
   row.getCell(1).value = 'GreenIT-Analysis Metrics:'
   row.getCell(1).font = {
     bold: true,
@@ -352,7 +352,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   }
   // formatting
   row.getCell(1).alignment = { wrapText: true }
-  i++
+  rowIndex++
   // draw border of the cell
   row.getCell(1).border = {
     top: { style: 'thick' },
@@ -365,7 +365,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     right: { style: 'thick' },
     top: { style: 'thick' }
   }
-  row = sheet.getRow(i)
+  row = sheet.getRow(rowIndex)
   if (analysisGreenit !== null) {
     row.getCell(1).value = 'Size of the DOM (average)'
     row.getCell(2).value = analysisGreenit.domSize.displayValue
@@ -375,7 +375,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
-    i++
+    rowIndex++
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -383,7 +383,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(3).border = {
       right: { style: 'thick' }
     }
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of requests (average)'
     row.getCell(2).value = analysisGreenit.nbRequest.displayValue
     row.getCell(3).value = analysisGreenit.nbRequest.complianceLevel
@@ -399,9 +399,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
-    i++
+    rowIndex++
 
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Size of the page (Kb) (average)'
     row.getCell(2).value = analysisGreenit.responsesSize.displayValue
     row.getCell(3).value = analysisGreenit.responsesSize.complianceLevel
@@ -422,7 +422,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
-    i++
+    rowIndex++
   } else {
     row.getCell(1).value = 'no analysis'
     setColor(row.getCell(1), '')
@@ -441,12 +441,12 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
       right: { style: 'thick' },
       bottom: { style: 'thick' }
     }
-    i++
+    rowIndex++
   }
 
   // Lighthouse performance metrics
-  i++
-  row = sheet.getRow(i)
+  rowIndex++
+  row = sheet.getRow(rowIndex)
   row.getCell(1).value = 'Lighthouse Performance Metrics:'
   row.getCell(1).font = {
     bold: true,
@@ -454,7 +454,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   }
   // formatting
   row.getCell(1).alignment = { wrapText: true }
-  i++
+  rowIndex++
   // draw border of the cell
   row.getCell(1).border = {
     top: { style: 'thick' },
@@ -471,7 +471,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     top: { style: 'thick' }
   }
 
-  row = sheet.getRow(i)
+  row = sheet.getRow(rowIndex)
   if (lighthouseMetrics !== null) {
     row.getCell(1).value = 'Largest Contentful Paint (s) (average)'
     row.getCell(2).value = lighthouseMetrics.largestContentfulPaint.displayValue
@@ -491,9 +491,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
     row.getCell(4).alignment = { wrapText: true }
-    i++
+    rowIndex++
 
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Cumulative Layout Shift (average)'
     row.getCell(2).value = lighthouseMetrics.cumulativeLayoutShift.displayValue
     row.getCell(3).value = lighthouseMetrics.cumulativeLayoutShift.complianceLevel
@@ -512,9 +512,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
     row.getCell(4).alignment = { wrapText: true }
-    i++
+    rowIndex++
 
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'First Contentful Paint (s) (average)'
     row.getCell(2).value = lighthouseMetrics.firstContentfulPaint.displayValue
     row.getCell(3).value = lighthouseMetrics.firstContentfulPaint.complianceLevel
@@ -533,9 +533,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
     row.getCell(4).alignment = { wrapText: true }
-    i++
+    rowIndex++
 
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Speed Index (s) (average)'
     row.getCell(2).value = lighthouseMetrics.speedIndex.displayValue
     row.getCell(3).value = lighthouseMetrics.speedIndex.complianceLevel
@@ -554,9 +554,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
     row.getCell(4).alignment = { wrapText: true }
-    i++
+    rowIndex++
 
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Total Blocking Time (ms) (average)'
     row.getCell(2).value = lighthouseMetrics.totalBlockingTime.displayValue
     row.getCell(3).value = lighthouseMetrics.totalBlockingTime.complianceLevel
@@ -575,9 +575,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
     row.getCell(4).alignment = { wrapText: true }
-    i++
+    rowIndex++
 
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Time to interactive (s) (average)'
     row.getCell(2).value = lighthouseMetrics.interactive.displayValue
     row.getCell(3).value = lighthouseMetrics.interactive.complianceLevel
@@ -604,7 +604,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).alignment = { wrapText: true }
     row.getCell(3).alignment = { wrapText: true }
     row.getCell(4).alignment = { wrapText: true }
-    i++
+    rowIndex++
   } else {
     row.getCell(1).value = 'no analysis'
     setColor(row.getCell(1), '')
@@ -623,12 +623,12 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
       right: { style: 'thick' },
       bottom: { style: 'thick' }
     }
-    i++
+    rowIndex++
   }
 
   // W3c validator
-  i++
-  row = sheet.getRow(i)
+  rowIndex++
+  row = sheet.getRow(rowIndex)
   row.getCell(1).value = 'W3C Validator Metrics:'
   row.getCell(1).font = {
     bold: true,
@@ -636,7 +636,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   }
   // formatting
   row.getCell(1).alignment = { wrapText: true }
-  i++
+  rowIndex++
   // draw border of the cell
   row.getCell(1).border = {
     top: { style: 'thick' },
@@ -647,14 +647,14 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     right: { style: 'thick' }
   }
 
-  row = sheet.getRow(i)
+  row = sheet.getRow(rowIndex)
   if (analysisW3c !== null) {
     row.getCell(1).value = 'Number of Infos'
     row.getCell(2).value = analysisW3c.totalInfo
     // formatting
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
-    i++
+    rowIndex++
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -662,13 +662,13 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).border = {
       right: { style: 'thick' }
     }
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of Warnings'
     row.getCell(2).value = analysisW3c.totalWarning
     // formatting
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
-    i++
+    rowIndex++
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -676,13 +676,13 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).border = {
       right: { style: 'thick' }
     }
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of Errors'
     row.getCell(2).value = analysisW3c.totalError
     // formatting
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
-    i++
+    rowIndex++
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -690,7 +690,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     row.getCell(2).border = {
       right: { style: 'thick' }
     }
-    row = sheet.getRow(i)
+    row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of Fatal Errors'
     row.getCell(2).value = analysisW3c.totalFatalError
     // draw border of the cell
@@ -718,7 +718,6 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
       right: { style: 'thick' },
       bottom: { style: 'thick' }
     }
-    i++
   }
 
   // Adapting each column's size to view all text

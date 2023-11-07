@@ -1,12 +1,13 @@
 const greenItRepository = require('../dataBase/greenItRepository')
 const lighthouseRepository = require('../dataBase/lighthouseRepository')
 const w3cRepository = require('../dataBase/w3cRepository')
+const projectsRepository = require('../dataBase/projectsRepository')
 const formatLighthouseAnalysis = require('./format/formatLighthouseAnalysis')
 const SystemError = require('../utils/SystemError')
 const formatGreenItAnalysis = require('./format/formatGreenItAnalysis')
 const formatW3cAnalysis = require('./format/formatW3cAnalysis')
 
-class RetrieveAnalysisService {}
+class RetrieveAnalysisService { }
 
 /**
  * Get an analysis (GreenIt & Lighthouse) from a given project and URL
@@ -180,10 +181,64 @@ RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectNa
   })
 }
 
+function groupByProject (idKeys, fieldName, allAnalysis) {
+  return allAnalysis.filter(obj => idKeys.includes(obj[fieldName]))
+}
+
+function regroupUrlIdKeyByProjectName (projects) {
+  return projects.reduce((acc, obj) => {
+    const existingObj = acc.find(o => o.projectName === obj.projectName)
+    if (existingObj) {
+      existingObj.IdKeys.push(obj.idKey)
+    } else {
+      acc.push({ projectName: obj.projectName, IdKeys: [obj.idKey] })
+    }
+    return acc
+  }, [])
+}
+
+/**
+   * Get the average of scores (EcoIndex & Performance & Accessibility) from all projects at a range of date
+   * @param {string} filterName by default equal to null, if stirng is not null allow to filter project by their name
+   * @returns {Object} Returns the formatted average scores
+   */
+RetrieveAnalysisService.prototype.getProjectScoresAverageAll = async function (filterName = null) {
+  const result = []
+  let error = null
+  try {
+    const allLighthouseAnalysis = await lighthouseRepository.findAllAnalysis()
+    const allgreenITAnalysis = await greenItRepository.findAllAnalysis()
+    const allW3CAnalysis = await w3cRepository.findAllAnalysis()
+
+    let projects = await projectsRepository.findAllProjectsNames(filterName)
+    projects = regroupUrlIdKeyByProjectName(projects)
+    for (const project of projects) {
+      const analysisOfProjectLighthouse = groupByProject(project.IdKeys, 'idUrlLighthouse', allLighthouseAnalysis)
+      const analysisOfProjectGreenIt = groupByProject(project.IdKeys, 'idUrlGreen', allgreenITAnalysis)
+      const analysisOfProjectW3C = groupByProject(project.IdKeys, 'idUrlW3c', allW3CAnalysis)
+      result.push({
+        name: project.projectName,
+        lighthouse: analysisOfProjectLighthouse,
+        greenIt: analysisOfProjectGreenIt,
+        w3c: analysisOfProjectW3C
+      })
+    }
+  } catch (err) {
+    error = err
+  }
+  return new Promise((resolve, reject) => {
+    if (error !== null) {
+      reject(new SystemError())
+    } else {
+      resolve(result)
+    }
+  })
+}
+
 /**
    * Get the EcoSonar scores (GreenIt & Lighthouse & W3C Validator) from a given project
    * @param {string} projectName
-   * @returns {Object} Returns the formatted scores  for the given project
+   * @returns {Object} Returns the formatted scores for the given project
    */
 RetrieveAnalysisService.prototype.getProjectScores = async function (projectName) {
   let ecoIndex = 0

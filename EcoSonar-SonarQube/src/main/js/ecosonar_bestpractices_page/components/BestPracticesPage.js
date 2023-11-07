@@ -128,12 +128,10 @@ export default function BestPracticesPage (props) {
         getBestPractices(props.project.key)
           .then((data) => {
             setResultData(data)
-            setLoading(false)
           })
           .catch((result) => {
             if (result instanceof Error) {
               setError(result.message)
-              setLoading(false)
             }
           })
       })
@@ -141,6 +139,9 @@ export default function BestPracticesPage (props) {
         if (err instanceof Error) {
           setSaveProcedureError(err.message)
         }
+      })
+      .finally(() => {
+        setLoading(false)
       })
   }
   function setResultData (data) {
@@ -154,7 +155,7 @@ export default function BestPracticesPage (props) {
   function handleAccessibilityAlert () {
     setAriaAlertForAccessibility(false)
     setAriaAlertForAccessibility(true)
-  };
+  }
 
   function handleCloseAll () {
     setIsFolded(!isFolded)

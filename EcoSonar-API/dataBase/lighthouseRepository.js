@@ -33,6 +33,22 @@ const LighthouseRepository = function () {
   }
 
   /**
+   * find all Lighthouse analysis
+   * @returns
+   */
+  this.findAllAnalysis = async function () {
+    return new Promise((resolve, reject) => {
+      lighthouses.find({})
+        .then((res) => {
+          resolve(res)
+        })
+        .catch(() => {
+          reject(new SystemError())
+        })
+    })
+  }
+
+  /**
    * find analysis for one url in a project
    * @param {project Name} projectNameReq
    * @param {url Name} urlNameReq
@@ -73,7 +89,7 @@ const LighthouseRepository = function () {
           )
           .sort({ dateLighthouseAnalysis: 1 })
         if (allAnalysis.length === 0) {
-          stringErr = 'no lighthouse analysis found for ' + urlNameReq
+          stringErr = 'Lighthouse - No lighthouse analysis found for ' + urlNameReq
           console.log(stringErr)
         }
       }
@@ -222,13 +238,10 @@ const LighthouseRepository = function () {
         stringErr = 'url or project :' + projectNameReq + ' not found'
       } else {
         // create a list of idKey
-        let i = 0
         const listIdKey = []
-        while (i < resList.length) {
+        for (let i = 0; i < resList.length; i++) {
           listIdKey[i] = resList[i].idKey
-          i++
         }
-
         deployments = await lighthouses
           .find(
             { idUrlLighthouse: listIdKey },
@@ -239,10 +252,8 @@ const LighthouseRepository = function () {
             }
           )
           .sort({ dateLighthouseAnalysis: 1 })
-
         if (deployments.length !== 0) {
-          const dateLastAnalysis =
-            deployments[deployments.length - 1].dateLighthouseAnalysis
+          const dateLastAnalysis = deployments[deployments.length - 1].dateLighthouseAnalysis
           const lastDeployment = deployments.filter(
             (deployment) =>
               deployment.dateLighthouseAnalysis.getTime() ===
@@ -252,7 +263,7 @@ const LighthouseRepository = function () {
             scores: lastDeployment
           }
         } else {
-          console.log('no lighthouse analysis found for ' + projectNameReq)
+          console.log('Lighthouse - No lighthouse analysis found for ' + projectNameReq)
           result = { scores: null }
         }
       }

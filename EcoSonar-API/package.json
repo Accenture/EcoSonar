@@ -30,9 +30,11 @@
     "js-yaml": "^4.1.0",
     "lighthouse": "^9.6.8",
     "mongodb": "^5.0.1",
-    "mongoose": " ^5.0.0",
+    "mongoose": " ^7.6.2",
     "puppeteer": "^18.2.1",
     "puppeteer-har": "^1.1.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "uniqid": "^5.4.0"
   },
   "devDependencies": {

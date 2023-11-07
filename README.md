@@ -82,7 +82,7 @@ For EcoSonar Sonarqube plugin : https://github.com/Accenture/EcoSonar/blob/main/
 
 For specific details on Ecocode, please look at their GitHub repository: https://github.com/green-code-initiative/ecoCode .
 You will find here https://github.com/Accenture/EcoSonar/tree/main/EcoSonar-SonarQube/ecocode the EcoCode Sonarqube plugin that needs to be imported into your Sonarqube instance. 
-To install plugins, you can follow the same instructions provided for EcoSonar Sonarqube plugin https://github.com/Accenture/EcoSonar/tree/main/EcoSonar-SonarQube#install-sonarqube-plugins and copy/paste the 3 jar files into the same `extensions/plugins/` folder.
+To install plugins, you can follow the same instructions provided for EcoSonar Sonarqube plugin https://github.com/Accenture/EcoSonar/tree/main/EcoSonar-SonarQube#install-sonarqube-plugins and copy/paste the jar files into the same `extensions/plugins/` folder.
 
 
 When using Sonarqube as code analysis, a default Quality Profile is set up for each language. If you want to use EcoCode rules related to eco-design, you will have to:

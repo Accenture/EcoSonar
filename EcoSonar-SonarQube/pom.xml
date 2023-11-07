@@ -6,7 +6,7 @@
 
     <groupId>com.ls</groupId>
     <artifactId>ecosonar</artifactId>
-    <version>3.2</version>
+    <version>3.3</version>
 
     <packaging>sonar-plugin</packaging>
 
@@ -98,6 +98,22 @@
                                 <NODE_ENV>${url}</NODE_ENV>
                             </environmentVariables> 
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>8.4.0</version>
+                <configuration>
+                <format>HTML</format>
+                <outputDirectory>${project.build.directory}/dependency-check</outputDirectory>
+            </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

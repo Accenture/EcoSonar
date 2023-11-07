@@ -50,12 +50,12 @@ mvn clean package -Durl=#EcoSonar-API-URL
 
 EcoSonar-API-URL should be replaced in local by `http://localhost:3000` and by the EcoSonar API URL for a deployed version.
 
-### Install Sonarqube Plugins
+### Install Sonarqube Plugins Manually
 
 1. Copy the file located at the following path `target/ecosonar-X-SNAPSHOT.jar`.
 2. Go to your Sonarqube folder  `extensions/plugins/` and paste the JAR.
-3. Retrieve 3 JAR files available in the `ecocode` folder :
-4. Go to your Sonarqube folder  `extensions/plugins/` and paste the 3 JAR files to add the EcoCode Sonarqube plugins.
+3. Retrieve all JAR files available in the `ecocode` folder (there should be 6, one by language):
+4. Go to your Sonarqube folder  `extensions/plugins/` and paste the JAR files to add the EcoCode Sonarqube plugins.
 
 To finally launch Sonarqube with the plugin, run the shell script: `bin/windows-x86-64/StartSonar.bat`.
 

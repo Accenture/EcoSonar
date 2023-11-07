@@ -5,5 +5,3 @@
 2) Integration of WebSite Analytics : weighted-average of EcoSonar scores according to page frequency, detection of pages not visited that could be decomissionned, etc.
 
 3) More green coding rules
-
-4) Investigation on added-value that LLM Models (such as GPT-3) could procure

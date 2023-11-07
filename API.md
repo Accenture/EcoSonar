@@ -3,10 +3,16 @@
 New Postman Collection available with all endpoints : 
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9592977-29c7010f-0efd-4063-b76a-5b0f455b1829?action=collection%2Ffork&collection-url=entityId%3D9592977-29c7010f-0efd-4063-b76a-5b0f455b1829%26entityType%3Dcollection%26workspaceId%3Df7ed92ee-00aa-4dc1-95aa-9f7d2da44e68)
+
+Swagger User Interface available at the link : `[ECOSONAR-API-URL]/swagger/`
+
+Locally, available at this address : `http://localhost:3002/swagger/`
+
 ----
 
 **EcoSonar URL Configuration - GET URLs FROM PROJECT**
 ----
+![GET URLs FROM PROJECT](./images/get-urls-from-project.webp)
 
 * **URL**
 
@@ -53,6 +59,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar URL Configuration - INSERT URLs IN PROJECT**
 ----
+![INSERT URLs IN PROJECT](./images/insert-urls-in-project.webp)
 
 * **URL**
 
@@ -99,6 +106,8 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar URL Configuration - DELETE URL IN PROJECT**
 ----
+![DELETE URL IN PROJECT](./images/delete-url-in-project.webp)
+
 You can delete one url at a time.
 
 * **URL**
@@ -143,6 +152,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar URL Configuration - GET CRAWLER RESULT**
 ----
+![GET CRAWLER RESULT](./images/get-crawler-result.webp)
 
 * **URL**
 
@@ -184,6 +194,8 @@ EcoSonar API failed to launch crawler:
 
 **EcoSonar LAUNCH ANALYSIS**
 ----
+![LAUNCH ANALYSIS](./images/launch-analysis.webp)
+
 EcoSonar analysis is launched through this API call either directly with a curl command or Postman request or through a Sonarqube Analysis. API call is done asynchronously to avoid performance issue ( ~ 3 seconds to analyse one page)
 
 * **URL**
@@ -212,6 +224,7 @@ EcoSonar analysis is launched through this API call either directly with a curl 
 
 **EcoSonar ANALYSIS - RETRIEVE ANALYSIS PER PROJECT**
 ----
+![RETRIEVE ANALYSIS PER PROJECT](./images/retrieve-analysis-per-project.webp)
 
 * **URL**
 
@@ -363,6 +376,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar ANALYSIS - RETRIEVE ANALYSIS PER URL**
 ----
+![RETRIEVE ANALYSIS PER URL](./images/retrieve-analysis-per-url.webp)
 
 * **URL**
 
@@ -507,6 +521,8 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar ANALYSIS - GET PROJECT SCORES**
 ----
+![GET PROJECT SCORES](./images/get-project-scores.webp)
+
 Retrieve current scores from EcoIndex, Lighthouse Performance and Accessibility and W3C Validator for the project
 
 * **URL**
@@ -552,6 +568,141 @@ When no analysis found for the project
   OR
 
 EcoSonar API is not able to request to the MongoDB Database :
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar ANALYSIS - GET AVERAGE OF ALL SCORES FOR PROJECTS REGISTERED IN ECOSONAR AT A DEFINED DATE**
+----
+![GET AVERAGE OF ALL SCORES FOR PROJECTS REGISTERED IN ECOSONAR AT A DEFINED DATE](./images/get-average-all-scores-projects.webp)
+
+Retrieve all EcoSonar projects average for all scores (EcoIndex, Google Lighthouse and W3C Validator). You can retrieve the scores at a date defined or for last analysis made if no date defined
+
+* **URL**
+  `/api/ecosonar/info`
+  or
+  `/api/ecosonar/info?date=<yyyy-mm-dd>`
+
+* **Method:**
+
+  `GET`
+  
+*  **URL Params**
+
+    DATE is optional : if no date defined, will look at latest analysis otherwise search for the latest analysis made before that date.
+
+    **Optional:**
+  
+    `DATE=[string]` with format YYYY-MM-DD
+
+* **Data Params**
+
+    None
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** `
+    {
+      "nbProjects": 0,
+      "ecoIndex": 0,
+      "perfScore": 0,
+      "accessibilityScore": 0,
+      "w3cScore": 0
+    }`
+
+* **Error Response:**
+
+If date format is wrong
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": 'Bad date format: YYYY-MM-DD'
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database or other internal error:
+
+  * **Code:** 500 Internal Server Error <br />
+
+**EcoSonar ANALYSIS - GET ALL PROJECTS SCORES FROM DATE DEFINED**
+----
+![GET ALL PROJECTS SCORES FROM DATE DEFINED](./images/get-all-scores-projects.webp)
+
+Retrieve all EcoSonar projects and return the scores for each of them at the date defined, if date not filled it would be the latest analysis.
+
+* **URL**
+  `/api/project/all`
+  or
+  `/api/ecosonar/info?date=<yyyy-mm-dd>`
+  or
+  `/api/ecosonar/info?filterName=<FILTER-NAME>`
+  or 
+  `/api/ecosonar/info?date=<yyyy-mm-dd>&filterName=<FILTER-NAME>`
+
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+    DATE is optional : if no date defined, will look at latest analysis otherwise search for the latest analysis made before that date.
+    FILTER-NAME is optional : retrieve projects whose name contains the string 'filterName' (case insensitive) if filled
+
+
+    **Optional:**
+  
+    `DATE=[string]` with format YYYY-MM-DD
+    `FILTER-NAME=[string]`
+
+* **Data Params**
+
+  CATEGORY in "filterScore" can take the following enum : ecoIndex, perfScore, accessScore, w3cScore.
+  "score" is a value from 0 to 100, it will be the threshold for the CATEGORY.
+  "select" takes the value "upper" or "lower" according if you want only project whose scores have an average value higher than score or lower.
+  CATEGORY in "sortBy" can take the following enum : ecoIndex, perfScore, accessScore, w3cScore and name.
+  "order" can take the value "asc" or "desc" if you want to sort your projects according to the type.
+
+  `{
+    "filterScore" : {
+      "cat": "CATEGORY",
+      "score": 0,
+      "select": "upper"
+    },
+    "sortBy": {
+      "type": "CATEGORY",
+      "order": "asc"
+    }
+  }`
+
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 
+    `{
+      "nbProjects": 0,
+      "projects": {
+        "PROJECT": {
+          "ecoIndex": 0,
+          "perfScore": 0,
+          "accessScore": 0,
+          "w3cScore": 0,
+          "nbUrl": 0
+    },`
+
+* **Error Response:**
+
+If date format is wrong
+
+  * **Code:** 400 BAD REQUEST  <br />
+    **Content:** `{
+    "error": 'Bad date format: YYYY-MM-DD'
+}`
+
+  OR
+
+EcoSonar API is not able to request to the MongoDB Database or other internal error:
 
   * **Code:** 500 Internal Server Error <br />
 
@@ -601,6 +752,8 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar ANALYSIS - SAVE PROCEDURE FOR THE PROJECT**
 ----
+![SAVE PROCEDURE FOR THE PROJECT](./images/save-procedure-for-the-project.webp)
+
 Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
 You have 3 different configurations available in EcoSonar:
 - `scoreImpact` : best practices will be sorted by descending order of implementation (best practices not implemented returned first)
@@ -653,6 +806,8 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar ANALYSIS - RETRIEVE PROCEDURE SAVED FOR THE PROJECT**
 ----
+![RETRIEVE PROCEDURE SAVED FOR THE PROJECT](./images/retrieve-procedure-saved-for-the-project.webp)
+
 Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
 This request will return you the procedure chosen for this project.
 
@@ -700,6 +855,8 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar ANALYSIS - RETRIEVE BEST PRACTICES PER PROJECT**
 ----
+![RETRIEVE BEST PRACTICES PER PROJECT](./images/retrieve-best-practices-per-project.webp)
+
 Retrieve audits from GreenIt-Analysis and Google Lighthouse aggregated per project.
 
 * **URL**
@@ -786,6 +943,8 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar ANALYSIS - RETRIEVE BEST PRACTICES PER URL**
 ----
+![RETRIEVE BEST PRACTICES PER URL](./images/retrieve-best-practices-per-url.webp)
+
 Retrieve audits from GreenIt-Analysis and Google Lighthouse per url audited.
 
 * **URL**
@@ -873,6 +1032,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar Login Configuration - SAVE LOGIN AND PROXY FOR PROJECT**
 ----
+![SAVE LOGIN AND PROXY FOR PROJECT](./images/save-login-and-proxy-for-project.webp)
 
 * **URL**
 
@@ -914,6 +1074,7 @@ EcoSonar API is not able to save into the MongoDB Database :
 
 **EcoSonar Login Configuration - GET LOGIN FOR PROJECT**
 ----
+![GET LOGIN FOR PROJECT](./images/get-login-for-project.webp)
 
 * **URL**
 
@@ -960,6 +1121,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar Login Configuration - GET PROXY FOR PROJECT**
 ----
+![GET PROXY FOR PROJECT](./images/get-proxy-for-project.webp)
 
 * **URL**
 
@@ -1006,6 +1168,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar Login Configuration - DELETE LOGIN FOR PROJECT**
 ----
+![DELETE LOGIN FOR PROJECT](./images/delete-login-for-project.webp)
 
 * **URL**
 
@@ -1049,6 +1212,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar Login Configuration - DELETE PROXY FOR PROJECT**
 ----
+![DELETE PROXY FOR PROJECT](./images/delete-proxy-for-project.webp)
 
 * **URL**
 
@@ -1080,6 +1244,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar USER FLOW Configuration - GET USER FLOW for URL**
 ----
+![GET USER FLOW for URL](./images/get-user-flow-for-url.webp)
 
 * **URL**
 
@@ -1129,6 +1294,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar USER FLOW Configuration - SAVE USER FLOW for URL**
 ----
+![SAVE USER FLOW for URL](./images/save-user-flow-for-url.webp)
 
 * **URL**
 
@@ -1169,7 +1335,7 @@ You want to add user flow to unexisting url :
   * **Code:** 400 BAD REQUEST  <br />
     **Content:** `{
     "error": "Url not found"
-}}`
+}`
 
   OR
 
@@ -1179,6 +1345,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 **EcoSonar USER FLOW Configuration - DELETE USER FLOW FOR URL**
 ----
+![DELETE USER FLOW FOR URL](./images/delete-user-flow-for-url.webp)
 
 * **URL**
 

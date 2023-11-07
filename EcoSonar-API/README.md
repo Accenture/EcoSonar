@@ -10,6 +10,10 @@ Then, the API can allow you to retrieve pre-formatted audit results using json f
 
 API Documentation : https://github.com/Accenture/EcoSonar/blob/main/API.md 
 
+Swagger User Interface available at the link : `[ECOSONAR-API-URL]/swagger/`
+
+Locally, available at this address : `http://localhost:3002/swagger/`
+
 # Summary
 - [To start with](#to-start-with)
   - [MongoDB Database](#mongodb-database)
@@ -206,30 +210,30 @@ Then choose among the variables below the ones required and add it into `.env` f
 
 ##### MongoDB Community Server
 ```
-ECOSONAR_ENV_DB_TYPE=’MongoDB’
-ECOSONAR_ENV_CLUSTER = 'localhost' or ‘127.0.0.1’
+ECOSONAR_ENV_DB_TYPE = 'MongoDB'
+ECOSONAR_ENV_CLUSTER = 'localhost' or '127.0.0.1'
 ECOSONAR_ENV_DB_PORT = '27017'
 ECOSONAR_ENV_DB_NAME = 'EcoSonar'
 ```
 
 ##### MongoDB Atlas
 ```
-ECOSONAR_ENV_DB_TYPE= MongoDB_Atlas
+ECOSONAR_ENV_DB_TYPE= 'MongoDB_Atlas'
 ECOSONAR_ENV_CLUSTER = #cluster
 ECOSONAR_ENV_DB_NAME = 'EcoSonar'
 ECOSONAR_ENV_USER = #user
-ECOSONAR_ENV_CLOUD_PROVIDER= ‘local’ (the password will be retrieved from the environment variables)
+ECOSONAR_ENV_CLOUD_PROVIDER= 'local' (the password will be retrieved from the environment variables)
 ECOSONAR_ENV_PASSWORD = #password
 ```
 
 ###### Azure CosmosDB
 ```
-ECOSONAR_ENV_DB_TYPE= ‘CosmosDB’
+ECOSONAR_ENV_DB_TYPE= 'CosmosDB'
 ECOSONAR_ENV_CLUSTER = #cluster
 ECOSONAR_ENV_DB_PORT = #port
 ECOSONAR_ENV_DB_NAME = 'EcoSonar'
 ECOSONAR_ENV_USER = #user
-ECOSONAR_ENV_CLOUD_PROVIDER= ‘AZURE’ (the password will be retrieved from the Azure Key Vault) or ‘local’ (the password will be retrieved from the environment variables)
+ECOSONAR_ENV_CLOUD_PROVIDER= 'AZURE' (the password will be retrieved from the Azure Key Vault) or ‘local’ (the password will be retrieved from the environment variables)
 ECOSONAR_ENV_PASSWORD = #password (if ECOSONAR_ENV_CLOUD_PROVIDER=’local’)
 ECOSONAR_ENV_KEY_VAULT_NAME= #keyVaultName (if ECOSONAR_ENV_CLOUD_PROVIDER=’AZURE’)
 ECOSONAR_ENV_SECRET_NAME = #keyVaultSecretName (if ECOSONAR_ENV_CLOUD_PROVIDER=’AZURE’)
@@ -239,9 +243,8 @@ ECOSONAR_ENV_SECRET_NAME = #keyVaultSecretName (if ECOSONAR_ENV_CLOUD_PROVIDER=�
 ##### Other database configuration possible
 
 If you are not using the same MongoDB database than us, you can develop your own.
-Please check to the `EcoSonar-API/configuration/database.js` to set up a different connection string to your database.
+Please check to the `EcoSonar-API/configuration/database.js` to set up a different connection string to your database and `EcoSonar-API/configuration/retrieveDatabasePasswordFromCloud.js` for another password manager solution.
 We would be very happy if you want to share this new set up in a Pull Request in the Github Repository to enrich the community.
-and `EcoSonar-API/configuration/retrieveDatabasePasswordFromCloud.js` for another password manager solution.
 
 <a name="cors"></a>
 #### CORS Setup
@@ -269,9 +272,19 @@ ECOSONAR_ENV_USER_JOURNEY_ENABLED = take `true`or `false`
 <a name="api-endpoints"></a>
 # API Endpoints
 
+1. With Postman
+
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/9592977-29c7010f-0efd-4063-b76a-5b0f455b1829?action=collection%2Ffork&collection-url=entityId%3D9592977-29c7010f-0efd-4063-b76a-5b0f455b1829%26entityType%3Dcollection%26workspaceId%3Df7ed92ee-00aa-4dc1-95aa-9f7d2da44e68)
 
-For documentation on available API : https://github.com/Accenture/EcoSonar/blob/main/API.md
+2. With Swagger
+
+For Swagger User Interface : `[ECOSONAR-API-URL]/swagger/`
+
+Locally, available at this address : `http://localhost:3002/swagger/`
+
+3. Additional documentation
+
+https://github.com/Accenture/EcoSonar/blob/main/API.md
 
 <a name="auth"></a>
 # Authentication Configuration

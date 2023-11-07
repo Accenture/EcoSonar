@@ -1,7 +1,28 @@
 const projects = require('./models/projects')
 const SystemError = require('../utils/SystemError')
+const urlsProject = require('./models/urlsprojects')
 
 const ProjectsRepository = function () {
+  /**
+   * get all projects in database
+   * @returns an array with the projectName for all projects founded
+   */
+  this.findAllProjectsNames = async function (filterName) {
+    let query = {}
+    if (filterName !== null) {
+      query = { projectName: { $regex: new RegExp(filterName, 'i') } }
+    }
+    return new Promise((resolve, reject) => {
+      urlsProject.find(query)
+        .then((res) => {
+          resolve(res)
+        })
+        .catch(() => {
+          reject(new SystemError())
+        })
+    })
+  }
+
   /**
    * add a new procedure for a project
    * @param {projectName} : the name of the project
@@ -79,7 +100,7 @@ const ProjectsRepository = function () {
   this.updateLoginConfiguration = async function (projectName, procedure, loginCredentials, proxy) {
     const loginMap = new Map(Object.entries(loginCredentials))
     return new Promise((resolve, reject) => {
-      projects.updateOne({ projectName }, { login: loginMap, proxy })
+      projects.updateOne({ projectName }, { login: loginMap, proxy, procedure })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('PROJECTS REPOSITORY - login update failed')
