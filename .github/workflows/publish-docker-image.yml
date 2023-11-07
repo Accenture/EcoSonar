@@ -44,5 +44,5 @@ jobs:
         with:
           context: ./EcoSonar-API
           push: true
-          tags: ecosonar-api:3.3
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
