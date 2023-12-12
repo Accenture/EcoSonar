@@ -70,7 +70,8 @@ LoginProxyConfigurationService.prototype.getLoginCredentials = async function (p
           loginInformations = {
             authentication_url: result.login.get('authentication_url'),
             username: result.login.get('username'),
-            password: result.login.get('password')
+            password: result.login.get('password'),
+            steps: result.login.get('steps')
           }
         }
       })
