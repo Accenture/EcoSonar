@@ -1,5 +1,20 @@
 version: "3.3"
 services:
+  mongodb:
+    image: mongo:latest
+    restart: on-failure
+    container_name: mongo-ecosonar
+    networks:
+      - sonarnet
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodb
+      MONGO_INITDB_ROOT_PASSWORD: mongodb
+    volumes:
+      - mongodb_data:/data
+      - ./docker-compose/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
   api-ecosonar:
     build: ./EcoSonar-API
     container_name: ecosonar_api
@@ -7,7 +22,17 @@ services:
       - "3000:3000"
     networks:
       - sonarnet
+    depends_on:
+      - mongodb
+    environment:
+      ECOSONAR_ENV_CLOUD_PROVIDER: local
+      ECOSONAR_ENV_DB_NAME: EcoSonar
+      ECOSONAR_ENV_DB_TYPE: MongoDB
+      ECOSONAR_ENV_CLUSTER: ecosonar:ecosonar@mongodb
+      ECOSONAR_ENV_SONARQUBE_SERVER_URL: http://localhost:9000
+      ECOSONAR_ENV_LOCAL_DEV_SERVER_URL: http://localhost:3000
     restart: unless-stopped
+
 
   sonar:
     image: sonarqube:lts-community
@@ -25,7 +50,7 @@ services:
       SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonarqube
       SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: 'true'
     volumes:
-      - ./EcoSonar-SonarQube/target/ecosonar-3.3.jar:/opt/sonarqube/extensions/plugins/ecosonar-3.3.jar:ro
+      - ./EcoSonar-SonarQube/target/:/opt/sonarqube/extensions/plugins/
       - ./EcoSonar-SonarQube/ecocode/ecocode-android-1.0.1.jar:/opt/sonarqube/extensions/plugins/ecocode-android-1.0.1.jar
       - ./EcoSonar-SonarQube/ecocode/ecocode-ios-1.1.0.jar:/opt/sonarqube/extensions/plugins/ecocode-ios-1.1.0.jar:ro
       - ./EcoSonar-SonarQube/ecocode/ecocode-java-plugin-1.4.0.jar:/opt/sonarqube/extensions/plugins/ecocode-java-plugin-1.4.0.jar:ro
@@ -62,3 +87,4 @@ volumes:
   sonarqube_extensions:
   postgresql:
   postgresql_data:
+  mongodb_data:
