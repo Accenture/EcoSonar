@@ -15,6 +15,8 @@ const asyncMiddleware = require('../utils/AsyncMiddleware')
 const swaggerUi = require('swagger-ui-express')
 const swaggerSpec = require('../swagger')
 const projectService = require('../services/projectService')
+const packageJson = require('../package.json')
+const bestPracticesServices = require('../services/bestPracticesService')
 
 dotenv.config()
 
@@ -32,8 +34,10 @@ const sonarqubeServerUrl = process.env.ECOSONAR_ENV_SONARQUBE_SERVER_URL || ''
 const whitelist = [sonarqubeServerUrl]
 
 if (process.env.ECOSONAR_ENV_CLOUD_PROVIDER === 'local') {
-  const localServer = process.env.ECOSONAR_ENV_LOCAL_DEV_SERVER_URL || ''
-  whitelist.push(localServer)
+  const localServers = process.env.ECOSONAR_ENV_LOCAL_DEV_SERVER_URL?.split(';') || []
+  for (const localServer of localServers) {
+    whitelist.push(localServer)
+  }
 }
 
 const corsOptions = {
@@ -130,7 +134,7 @@ app.get('/api/all', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlsList = req.body.urlName
-  console.log('INSERT URLS PROJECT - insert urls into project ' + projectName)
+  console.log(`INSERT URLS PROJECT - insert urls into project ${projectName}`)
   urlConfigurationService.insert(projectName, urlsList)
     .then(() => {
       console.log('INSERT URLS PROJECT - insert succeeded')
@@ -198,17 +202,17 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
  *   post:
  *     tags:
  *       - "Login Configuration"
- *     summary: "Save Login and Proxy For Project"
- *     description: Insert login credentials and proxy configuration for a project.
+ *     summary: "Save Login For Project"
+ *     description: Insert login credentials for a project.
  *     parameters:
  *       - name: projectName
  *         in: query
  *         description: The name of the project
  *         required: true
  *         type: string
- *       - name: login and proxy
+ *       - name: login
  *         in: body
- *         description: The login credentials and proxy settings
+ *         description: The login credentials settings
  *         required: true
  *         schema:
  *          type: object
@@ -222,6 +226,52 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
  *                  type: array
  *                  items:
  *                    type: object
+ *     responses:
+ *       201:
+ *         description: Success.
+ *       500:
+ *         description: System error.
+ */
+app.post('/api/login/insert', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.query.projectName
+  const loginCredentials = req.body.login
+  console.log('INSERT LOGIN CREDENTIALS - insert credentials into project ' + projectName)
+  loginProxyConfigurationService.insertLoginCredentials(projectName, loginCredentials)
+    .then(() => {
+      console.log('INSERT LOGIN CREDENTIALS - insert succeeded')
+      return res.status(201).send()
+    })
+    .catch((error) => {
+      if (error instanceof SystemError) {
+        return res.status(500).send()
+      }
+      console.log('INSERT LOGIN CREDENTIALS - insertion failed')
+      return res.status(400).json({ error })
+    })
+}))
+
+// API CRUD PROXY Configuration
+/**
+ * @swagger
+ * /api/proxy/insert:
+ *   post:
+ *     tags:
+ *       - "Proxy Configuration"
+ *     summary: "Save Proxy For Project"
+ *     description: Insert proxy configuration for a project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *       - name: proxy
+ *         in: body
+ *         description: The proxy settings
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
  *            proxy:
  *              type: object
  *              properties:
@@ -232,26 +282,23 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       201:
  *         description: Success.
- *       400:
- *         description: Insertion failed.
  *       500:
  *         description: System error.
  */
-app.post('/api/login/insert', asyncMiddleware(async (req, res, _next) => {
+app.post('/api/proxy/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  const loginCredentials = req.body.login
   const proxyConfiguration = req.body.proxy
-  console.log('INSERT LOGIN - PROXY CREDENTIALS - insert credentials into project ' + projectName)
-  loginProxyConfigurationService.insert(projectName, loginCredentials, proxyConfiguration)
+  console.log('INSERT PROXY - insert proxy credentials into project ' + projectName)
+  loginProxyConfigurationService.insertProxyConfiguration(projectName, proxyConfiguration)
     .then(() => {
-      console.log('INSERT LOGIN CREDENTIALS - insert succeeded')
+      console.log('INSERT PROXY CREDENTIALS - insert succeeded')
       return res.status(201).send()
     })
     .catch((error) => {
       if (error instanceof SystemError) {
         return res.status(500).send()
       }
-      console.log('INSERT LOGIN CREDENTIALS - insertion failed')
+      console.log('INSERT PROXY CREDENTIALS - insertion failed')
       return res.status(400).json({ error })
     })
 }))
@@ -300,7 +347,7 @@ app.get('/api/login/find', asyncMiddleware(async (req, res, _next) => {
  * /api/proxy/find:
  *   get:
  *     tags:
- *       - "Login Configuration"
+ *       - "Proxy Configuration"
  *     summary: "Get Proxy For Project"
  *     description: Find proxy configuration for a project.
  *     parameters:
@@ -340,7 +387,7 @@ app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
  *   delete:
  *     tags:
  *       - "Login Configuration"
- *     summary: "Delete Login for Project"
+ *     summary: "Delete Login For Project"
  *     description: Delete login credentials for a project.
  *     parameters:
  *       - name: projectName
@@ -378,8 +425,8 @@ app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
  * /api/proxy:
  *   delete:
  *     tags:
- *       - "Login Configuration"
- *     summary: "Delete Proxy for Project"
+ *       - "Proxy Configuration"
+ *     summary: "Delete Proxy For Project"
  *     description: Delete proxy configuration for a project.
  *     parameters:
  *       - name: projectName
@@ -419,7 +466,7 @@ app.delete('/api/proxy', asyncMiddleware(async (req, res, _next) => {
  *   post:
  *     tags:
  *       - "User Flow Configuration"
- *     summary: "Save User Flow for URL"
+ *     summary: "Save User Flow For URL"
  *     description: Insert new user flow for a url in a project.
  *     parameters:
  *       - name: userFlow
@@ -473,7 +520,7 @@ app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
  *   post:
  *     tags:
  *       - "User Flow Configuration"
- *     summary: "Get User Flow for URL"
+ *     summary: "Get User Flow For URL"
  *     description: Find user flow for a URL.
  *     parameters:
  *       - name: userFlow
@@ -518,7 +565,7 @@ app.post('/api/user-flow/find', asyncMiddleware(async (req, res, _next) => {
  *   delete:
  *     tags:
  *       - "User Flow Configuration"
- *     summary: "Delete User Flow for URL"
+ *     summary: "Delete User Flow For URL"
  *     description: Delete user flow for a URL
  *     parameters:
  *       - name: userFlow
@@ -938,7 +985,7 @@ app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
  *   post:
  *     tags:
  *       - "URL Configuration"
- *     summary: "Get Crawler Result"
+ *     summary: Launch crawling website
  *     description: Crawl the given website to find all pages related.
  *     parameters:
  *       - name: crawledUrl
@@ -952,24 +999,59 @@ app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
  *              type: string
  *            mainUrl:
  *              type: string
+ *            saveUrls:
+ *              type: boolean
  *     responses:
- *       200:
- *         description: Success.
- *       500:
- *         description: System error.
+ *       202:
+ *         description: Crawler started.
  */
 app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const mainUrl = req.body.mainUrl
+  const saveUrls = req.body.saveUrls
   console.log(`CRAWLER - Running crawler from ${mainUrl}`)
-  crawlerService.crawl(projectName, mainUrl)
+  crawlerService.launchCrawl(projectName, mainUrl, saveUrls)
+  console.log('CRAWLER - Crawler started')
+  return res.status(202).send()
+}))
+
+/**
+ * @swagger
+ * /api/crawl:
+ *   get:
+ *     tags:
+ *       - "URL Configuration"
+ *     summary: "Get URLs crawled"
+ *     description: Get all URLs already crawled for the project
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: project name
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: No urls crawled saved.
+ *       500:
+ *         description: System error.
+ */
+app.get('/api/crawl', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.query.projectName
+  console.log(`CRAWLER - Retrieve all urls crawled for ${projectName}`)
+  crawlerService.retrieveCrawledUrl(projectName)
     .then((results) => {
-      console.log(`CRAWLER - ${results.length} URL retrieved`)
+      console.log(`CRAWLER - ${results.length} URLs retrieved for project ${projectName}`)
       return res.status(200).json(results)
     })
-    .catch(() => {
-      console.log('CRAWLER - Crawler has encountered an error')
-      return res.status(500).send()
+    .catch((error) => {
+      if (error instanceof SystemError) {
+        console.log(`CRAWLER -  Urls for ${projectName} retrieving has encountered an error`)
+        return res.status(500).send()
+      }
+      console.log(`CRAWLER -  No Urls saved for ${projectName}`)
+      return res.status(400).json(error.message)
     })
 }))
 
@@ -1076,4 +1158,91 @@ app.post('/api/export', asyncMiddleware(async (req, res, _next) => {
       return res.status(400).json({ error: error.message })
     })
 }))
+
+/**
+ * @swagger
+ * /api/version:
+ *   get:
+ *     tags:
+ *       - "EcoSonar Infos"
+ *     summary: "Get version of Ecosonar"
+ *     description: Retrieve the version of Ecosonar used.
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: EcoSonar version could not be retrieved.
+ */
+app.get('/api/version', asyncMiddleware(async (_req, res, _next) => {
+  try {
+    console.log('GET VERSION - Version of Ecosonar retrieved')
+    return res.status(200).json({ version: packageJson.version })
+  } catch (error) {
+    console.log('GET VERSION - Version of Ecosonar could not be retrieved')
+    return res.status(400).json({ error: error.message })
+  }
+}))
+
+/**
+ * @swagger
+ * /api/best-practices-rules:
+ *   get:
+ *     tags:
+ *       - "EcoSonar Infos"
+ *     summary: "Get all practices documentation"
+ *     description: Retrieve documentation for all best practices in EcoSonar.
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Documentation could not be retrieved.
+ */
+app.get('/api/best-practices-rules', asyncMiddleware(async (req, res, _next) => {
+  console.log('GET BEST PRACTICES - Best practices rules to be retrieved')
+
+  bestPracticesServices.getAllBestPracticesRules()
+    .then((bestPracticesRules) => {
+      console.log('GET BEST PRACTICES - Best practices rules has been retrieved')
+      return res.status(200).send(bestPracticesRules)
+    })
+    .catch((error) => {
+      console.log('GET BEST PRACTICES - Best practices rules could not be retrieved')
+      return res.status(400).json({ error: error.message })
+    })
+}))
+
+/**
+ * @swagger
+ * /api/project:
+ *   delete:
+ *     tags:
+ *       - "URL Configuration"
+ *     summary: "Delete Project "
+ *     description: Delete project and all related urls & analysis
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       500:
+ *         description: System error.
+ */
+app.delete('/api/project', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.query.projectName
+  console.log(`DELETE PROJECT - Delete project ${projectName}`)
+  projectService.deleteProject(projectName)
+    .then(() => {
+      console.log(`DELETE PROJECT - Project ${projectName} deletion succeeded`)
+      return res.status(200).send()
+    })
+    .catch(() => {
+      console.log(`DELETE PROJECT - Project ${projectName} deletion failed`)
+      return res.status(500).send()
+    })
+}))
+
 module.exports = app

@@ -7,8 +7,7 @@ const formatW3cAnalysis = require('../services/format/formatW3cAnalysis')
 const W3cRepository = function () {
   /**
    * Insert the w3c analysis for a project
-   * @param {reportsW3c} reportW3c is a list a the report for the w3c analysis
-   * @returns
+   * @param {reportsW3c} reportW3c is a list of the report for the w3c analysis
    */
   this.insertAll = function (reportsW3c) {
     return new Promise((resolve, reject) => {
@@ -34,8 +33,8 @@ const W3cRepository = function () {
   }
 
   /**
-  * find all w3c analysis
-  * @returns
+  * find all w3c analysis saved in EcoSonar
+  * @returns list of w3c analysis
   */
   this.findAllAnalysis = async function () {
     return new Promise((resolve, reject) => {
@@ -43,17 +42,18 @@ const W3cRepository = function () {
         .then((res) => {
           resolve(res)
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error.message)
           reject(new SystemError())
         })
     })
   }
 
   /**
-   * find analysis for one url in a project
-   * @param {project Name} projectNameReq
-   * @param {url Name} urlNameReq
-   * @returns
+   * find last w3c analysis for one url in a project
+   * @param {string} projectNameReq project Name
+   * @param {string} urlNameReq url Name
+   * @returns last w3c analysis for the URL
    */
   this.findAnalysisUrl = async function (projectNameReq, urlNameReq) {
     let urlMatching
@@ -129,9 +129,9 @@ const W3cRepository = function () {
   }
 
   /**
-   * find w3c analysis for one Project
-   * @param {project Name} projectName
-   * @returns
+   * find last w3c analysis for one Project
+   * @param {string} projectName project Name
+   * @returns last w3c analysis for the project
    */
   this.findAnalysisProject = async function (projectName) {
     let error = null
@@ -203,10 +203,10 @@ const W3cRepository = function () {
   }
 
   /**
-   * find analysis of w3c best practices  for an URL on the table w3cs
-   * @param {name of the project} projectName
-   * @param {url} urlName
-   * @returns
+   * find last analysis of w3c best practices for an URL on the table w3cs
+   * @param {string} projectName name of the project
+   * @param {string} urlName url
+   * @returns last w3c analysis
    */
   this.find = async function (projectName, urlName) {
     let hasNoUrl = false
@@ -245,8 +245,7 @@ const W3cRepository = function () {
 
   /**
    * Deletion of one or more w3c analysis on the w3cs collection
-   * @param {name of the project} projectNameReq
-   * @returns
+   * @param {string} projectNameReq name of the project
    */
   this.delete = async function (projectNameReq) {
     let empty = false
@@ -280,6 +279,24 @@ const W3cRepository = function () {
         }
         resolve()
       }
+    })
+  }
+
+  /**
+   * Deletion of all w3c analysis for a project
+   * @param {string} urlIdKeyList list of id key representing url saved
+   */
+  this.deleteProject = async function (urlIdKeyList) {
+    return new Promise((resolve, reject) => {
+      w3cs.deleteMany({ idUrlW3c: { $in: urlIdKeyList } })
+        .then((result) => {
+          console.log(`DELETE URLS PROJECT - On W3C ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error.message)
+          reject(new SystemError())
+        })
     })
   }
 }

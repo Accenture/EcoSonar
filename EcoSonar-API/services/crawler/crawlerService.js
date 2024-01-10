@@ -2,8 +2,9 @@ const cheerio = require('cheerio')
 const puppeteer = require('puppeteer')
 const authenticationService = require('../authenticationService')
 const urlConfigurationService = require('../urlConfigurationService')
+const tempUrlsProjectRepository = require('../../dataBase/tempurlsProjectRepository')
 
-class CrawlerService {}
+class CrawlerService { }
 
 /**
  * VARIABLES
@@ -18,8 +19,10 @@ let seenUrls
  *
  * @param {*} projectName the name of the project
  * @param {*} mainUrl the main url used to start crawling
+ * @param {*} savedAsPermanent boolean value that mentions if urls crawled should be saved permanently or temporary
+ * launch crawling of the website and save the urls crawled according to context
  */
-CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
+CrawlerService.prototype.launchCrawl = async function (projectName, mainUrl, savedAsPermanent) {
   let crawledUrls = []
   let projectUrls = []
   seenUrls = []
@@ -49,7 +52,7 @@ CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
     await authenticationService.loginIfNeeded(browser)
     await recursiveCrawl(mainUrl, browser, crawledUrls)
   } catch (error) {
-    console.log(error)
+    console.error(error)
   } finally { browser.close() }
 
   // Get all the URL already registered in the project to avoid crawling them again
@@ -57,7 +60,7 @@ CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
     .then((result) => {
       projectUrls = result
     }).catch(() => {
-      console.log(`CRAWLER - Project ${projectName} has 0 url`)
+      console.log('An error occured when retrieving urls saved to be audited for the project or no urls were saved')
     })
   // Removing mainUrl and aliases from return list if already exist in the project
   if (projectUrls.includes(mainUrl) || projectUrls.includes(mainUrl + '/') || projectUrls.includes(mainUrl.slice(0, -1)) || crawledUrls.includes(mainUrl + '/')) {
@@ -71,7 +74,7 @@ CrawlerService.prototype.crawl = async function (projectName, mainUrl) {
 
   crawledUrls = crawledUrls.filter((url) => (!projectUrls.includes(url) && !projectUrls.includes(url + '/') && !projectUrls.includes(url.slice(0, -1))))
 
-  return crawledUrls
+  saveUrlsCrawled(projectName, crawledUrls, savedAsPermanent)
 }
 
 /**
@@ -144,14 +147,66 @@ async function recursiveCrawl (url, browser, crawledUrls) {
 
 /**
  *
- * @param {string} link any link found by the scrawler
+ * @param {string} projectName project name
+ * @param {string} urlsList list of urls crawled
+ * @param {string} savedAsPermanent boolean if urls crawled should be saved as temporary or permanent
+ * Save the urls crawled as temporary or permanent
+ */
+async function saveUrlsCrawled (projectName, urlsList, savedAsPermanent) {
+  if (savedAsPermanent) {
+    urlConfigurationService.insert(projectName, urlsList)
+      .then(() => {
+        console.log('CRAWLER - Crawled URLs are saved and added to the project')
+      })
+      .catch((error) => {
+        console.error(error)
+        console.error('CRAWLER - Crawled URLs could not be saved')
+      })
+  } else {
+    let temporaryUrlsAlreadySaved = null
+    await tempUrlsProjectRepository.findUrls(projectName)
+      .then((result) => {
+        temporaryUrlsAlreadySaved = result
+      })
+      .catch((error) => {
+        console.error(error)
+        console.error('CRAWLER - Crawled URLs could not be saved')
+      })
+
+    if (temporaryUrlsAlreadySaved === null) {
+      await tempUrlsProjectRepository.create(projectName, urlsList)
+        .then(() => {
+          console.log('CRAWLER - Crawled URLs are saved temporary')
+        })
+        .catch((error) => {
+          console.error(error)
+          console.error('CRAWLER - Crawled URLs could not be saved temporary')
+        })
+    } else {
+      temporaryUrlsAlreadySaved = temporaryUrlsAlreadySaved.urlsList
+      const crawledNotSavedUrls = urlsList.filter(e => !temporaryUrlsAlreadySaved.includes(e))
+      const urlsToUpdate = crawledNotSavedUrls.concat(temporaryUrlsAlreadySaved)
+      await tempUrlsProjectRepository.updateUrls(projectName, urlsToUpdate)
+        .then(() => {
+          console.log('CRAWLER - Crawled URLs temporary are updated')
+        })
+        .catch((error) => {
+          console.error(error.message)
+          console.error('CRAWLER - Crawled URLs could not be updated temporary')
+        })
+    }
+  }
+}
+
+/**
+ *
+ * @param {string} link any link found by the crawler
  * @returns a formatted link
  * Avoid issue with relatives URL by formatting links to be crawled. Ex : given '/about' when crawling, function will construct an usable URL with websiteProtocol and websitePrefix to be : 'https://nameofthewebsite.com/about'
  */
-
 CrawlerService.prototype.getUrl = function (link) {
   // Exclude links that are outside website
-  if ((link.includes(websiteProtocol) || link.includes(alternativeProtocol)) && link.slice(0, webSitePrefixWithProtocol.length) !== webSitePrefixWithProtocol) {
+  if ((link.includes(websiteProtocol) || link.includes(alternativeProtocol)) && link.startsWith(webSitePrefixWithProtocol)) {
     return undefined
   } else {
     // If the link is part of the website
@@ -181,6 +236,27 @@ CrawlerService.prototype.checkUrl = function (url) {
     seenUrls.push(url)
     return false
   } else return true
+}
+
+/**
+ *
+ * @param {string} projectName project name
+ * retrieve the temporary urls saved from last crawling in the database for this project
+ * @returns a list of urls crawled saved
+ */
+CrawlerService.prototype.retrieveCrawledUrl = async function (projectName) {
+  return new Promise((resolve, reject) => {
+    tempUrlsProjectRepository.findUrls(projectName)
+      .then((result) => {
+        if (result && result.urlsList.length > 0) {
+          resolve(result.urlsList)
+        } else {
+          reject(new Error('No crawled urls were saved for this project'))
+        }
+      }).catch((error) => {
+        reject(error)
+      })
+  })
 }
 
 const crawlerService = new CrawlerService()

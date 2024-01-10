@@ -1,9 +1,15 @@
 const SystemError = require('../utils/SystemError')
 const retrieveAnalysisService = require('../services/retrieveAnalysisService')
+const projectsRepository = require('../dataBase/projectsRepository')
+const w3cRepository = require('../dataBase/w3cRepository')
+const lighthouseRepository = require('../dataBase/lighthouseRepository')
+const greenItRepository = require('../dataBase/greenItRepository')
+const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
+const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
+const tempurlsProjectRepository = require('../dataBase/tempurlsProjectRepository')
 const scores = ['ecoIndex', 'perfScore', 'accessScore', 'w3cScore']
 
-class ProjectService {
-}
+class ProjectService { }
 
 /**
  * get an average of all score for all projects of the database of last analysis
@@ -23,11 +29,9 @@ ProjectService.prototype.getAllInformationsAverage = async function (date) {
                 resultformatted[scoreType] += result.projects[project][scoreType]
                 scoreNbProject[scoreType] += 1
               }
-            } else {
-              if (result.projects[project][scoreType] !== null) {
-                resultformatted[scoreType] = result.projects[project][scoreType]
-                scoreNbProject[scoreType] = 1
-              }
+            } else if (result.projects[project][scoreType] !== null) {
+              resultformatted[scoreType] = result.projects[project][scoreType]
+              scoreNbProject[scoreType] = 1
             }
           }
         })
@@ -50,9 +54,9 @@ function selectRightAnalysisByDateAndUrl (searchDate, projectsAnalysis, urlField
     acc[obj[urlFieldName]].push(obj)
     return acc
   }, {})
-  Object.keys(groupedAnalysisByIdKeys).forEach(UrlAnalysisId => {
-    const retainedAnalysis = filterPerDate(searchDate, groupedAnalysisByIdKeys[UrlAnalysisId])
-    allAnalysisPerUrl[UrlAnalysisId] = retainedAnalysis
+  Object.keys(groupedAnalysisByIdKeys).forEach(id => {
+    const retainedAnalysis = filterPerDate(searchDate, groupedAnalysisByIdKeys[id])
+    allAnalysisPerUrl[id] = retainedAnalysis
   })
   return allAnalysisPerUrl
 }
@@ -247,15 +251,51 @@ ProjectService.prototype.getAllProjectInformations = async function (date, sortB
         }
       })
     } else {
-      return new Promise((_resolve, reject) => {
-        reject(new Error(error))
-      })
+      return Promise.reject(new Error(error))
     }
   } else {
-    return new Promise((_resolve, reject) => {
-      reject(new Error(error))
-    })
+    return Promise.reject(new Error(error))
   }
+}
+
+/**
+ * Delete all part the project (project, urls and analysis)
+ * @param {string} projectName name of the project to delete
+ */
+ProjectService.prototype.deleteProject = async function (projectName) {
+  let urlsProjects = []
+  let systemError = false
+  try {
+    await urlsProjectRepository.findAll(projectName, true)
+      .then((result) => {
+        urlsProjects = result.map((e) => e.idKey)
+      })
+  } catch (error) {
+    console.error('\x1b[31m%s\x1b[0m', error.message)
+    systemError = true
+  }
+  if (systemError) {
+    Promise.reject(new SystemError())
+  }
+  try {
+    await lighthouseRepository.deleteProject(urlsProjects)
+    await greenItRepository.deleteProject(urlsProjects)
+    await w3cRepository.deleteProject(urlsProjects)
+    await bestPracticesRepository.deleteProject(urlsProjects)
+    await urlsProjectRepository.deleteProject(urlsProjects)
+    await tempurlsProjectRepository.deleteProject(projectName)
+    await projectsRepository.deleteProjectPerProjectName(projectName)
+  } catch (error) {
+    console.error('\x1b[31m%s\x1b[0m', error.message)
+    systemError = true
+  }
+  return new Promise((resolve, reject) => {
+    if (systemError) {
+      reject(new SystemError())
+    } else {
+      resolve()
+    }
+  })
 }
 
 const projectService = new ProjectService()

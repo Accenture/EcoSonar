@@ -4,9 +4,10 @@ const retrieveLoginProxyYamlConfigurationService = require('./yamlConfiguration/
 
 class LoginProxyConfigurationService {}
 
-LoginProxyConfigurationService.prototype.insert = async function (projectName, loginCredentials, proxy) {
+LoginProxyConfigurationService.prototype.insertLoginCredentials = async function (projectName, loginCredentials) {
   let projectSettingsRegistered = null
   let systemError = null
+  const succesMessage = 'INSERT LOGIN CONFIGURATION - Success'
   await projectsRepository.getProjectSettings(projectName)
     .then((projectSettings) => {
       projectSettingsRegistered = projectSettings
@@ -16,17 +17,55 @@ LoginProxyConfigurationService.prototype.insert = async function (projectName, l
       }
     })
   if (projectSettingsRegistered === null) {
-    await projectsRepository.createLoginConfiguration(projectName, loginCredentials, proxy)
+    await projectsRepository.createLoginConfiguration(projectName, loginCredentials)
       .then(() => {
-        console.log('INSERT LOGIN - PROXY CONFIGURATION - Success')
+        console.log(succesMessage)
       })
       .catch(() => {
         systemError = new SystemError()
       })
   } else {
-    await projectsRepository.updateLoginConfiguration(projectName, projectSettingsRegistered.procedure, loginCredentials, proxy)
+    await projectsRepository.updateLoginConfiguration(projectName, projectSettingsRegistered.procedure, loginCredentials)
       .then(() => {
-        console.log('UPDATE LOGIN - PROXY CONFIGURATION - Success')
+        console.log(succesMessage)
+      })
+      .catch(() => {
+        systemError = new SystemError()
+      })
+  }
+  return new Promise((resolve, reject) => {
+    if (systemError !== null) {
+      reject(systemError)
+    } else {
+      resolve()
+    }
+  })
+}
+
+LoginProxyConfigurationService.prototype.insertProxyConfiguration = async function (projectName, proxy) {
+  let projectSettingsRegistered = null
+  let systemError = null
+  const succesMessage = 'INSERT PROXY CONFIGURATION - Success'
+  await projectsRepository.getProjectSettings(projectName)
+    .then((projectSettings) => {
+      projectSettingsRegistered = projectSettings
+    }).catch((error) => {
+      if (error instanceof SystemError) {
+        systemError = new SystemError()
+      }
+    })
+  if (projectSettingsRegistered === null) {
+    await projectsRepository.createProxyConfiguration(projectName, proxy)
+      .then(() => {
+        console.log(succesMessage)
+      })
+      .catch(() => {
+        systemError = new SystemError()
+      })
+  } else {
+    await projectsRepository.updateProxyConfiguration(projectName, projectSettingsRegistered.procedure, proxy)
+      .then(() => {
+        console.log(succesMessage)
       })
       .catch(() => {
         systemError = new SystemError()

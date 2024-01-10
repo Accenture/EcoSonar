@@ -5,9 +5,8 @@ const formatLighthouseAnalysis = require('../services/format/formatLighthouseAna
 
 const LighthouseRepository = function () {
   /**
-   * insertion of one or more analysis on the table lighthouses
-   * @param {list of url analysis} lighthouseMetricsReports
-   * @returns
+   * insertion of one or more lighthouse analysis on the table lighthouses
+   * @param {Array} lighthouseMetricsReports lightouse reports
    */
   this.insertAll = function (lighthouseMetricsReports) {
     return new Promise((resolve, reject) => {
@@ -33,8 +32,8 @@ const LighthouseRepository = function () {
   }
 
   /**
-   * find all Lighthouse analysis
-   * @returns
+   * find all Lighthouse analysis saved in EcoSonar
+   * @returns all ligthouse reports
    */
   this.findAllAnalysis = async function () {
     return new Promise((resolve, reject) => {
@@ -42,17 +41,18 @@ const LighthouseRepository = function () {
         .then((res) => {
           resolve(res)
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error.message)
           reject(new SystemError())
         })
     })
   }
 
   /**
-   * find analysis for one url in a project
-   * @param {project Name} projectNameReq
-   * @param {url Name} urlNameReq
-   * @returns
+   * find last analysis for one url in a project
+   * @param {string} projectNameReq name of the project
+   * @param {string} urlNameReq url id key representing the url saved in database
+   * @returns last ligthouse analysis for url
    */
   this.findAnalysisUrl = async function (projectNameReq, urlNameReq) {
     let urlMatching
@@ -144,9 +144,9 @@ const LighthouseRepository = function () {
   }
 
   /**
-   * find analysis for one Project
-   * @param {project Name} projectNameReq
-   * @returns
+   * find last lighthouse analysis for one Project
+   * @param {string} projectNameReq project name
+   * @returns last lighthouse analysis for the project
    */
   this.findAnalysisProject = async function (projectNameReq) {
     let stringErr = null
@@ -222,8 +222,8 @@ const LighthouseRepository = function () {
 
   /**
    * find Lighthouse Scores for one Project
-   * @param {project Name} projectNameReq
-   * @returns
+   * @param {string} projectNameReq project name
+   * @returns ligthouse score for last analysis in the project
    */
   this.findScoreProject = async function (projectNameReq) {
     let stringErr = null
@@ -282,6 +282,24 @@ const LighthouseRepository = function () {
       } else {
         resolve(result)
       }
+    })
+  }
+
+  /**
+   * Deletion of all lighthouses analysis for a project
+   * @param {Array} urlIdKeyList list of id key representing urls saved
+   */
+  this.deleteProject = async function (urlIdKeyList) {
+    return new Promise((resolve, reject) => {
+      lighthouses.deleteMany({ idUrlLighthouse: { $in: urlIdKeyList } })
+        .then((result) => {
+          console.log(`DELETE URLS PROJECT - On Lighthouse ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 }

@@ -1,6 +1,5 @@
 import React from 'react'
 import { getUrlsConfiguration } from '../../services/configUrlService'
-import { crawl } from '../../services/crawlerService'
 import AddUrlForm from './AddUrlForm'
 import CrawlerPage from './Crawler/CrawlerPage'
 import DeleteUrlForm from './DeleteUrlForm'
@@ -17,10 +16,7 @@ export default class ConfigurationPage extends React.PureComponent {
       error: '',
       indexToDelete: 0,
       urls: [],
-      crawledUrls: [],
-      crawlerLoading: false,
-      displayCrawler: false,
-      hasCrawled: false
+      displayCrawler: false
     }
   }
 
@@ -30,17 +26,11 @@ export default class ConfigurationPage extends React.PureComponent {
     })
     getUrlsConfiguration(this.props.project.key)
       .then((urls) => {
-        this.setState({ urls })
-        this.setState({
-          loading: false
-        })
+        this.setState({ urls, loading: false })
       })
       .catch((result) => {
         if (result instanceof Error) {
-          this.setState({ error: result.message })
-          this.setState({
-            loading: false
-          })
+          this.setState({ error: result.message, loading: false })
         }
       })
   }
@@ -80,27 +70,15 @@ export default class ConfigurationPage extends React.PureComponent {
 
   addNewUrls = (urlsAdded) => {
     this.setState({
-      urls: this.state.urls.concat(urlsAdded)
-    })
-    this.setState({ crawledUrls: [] })
-    this.setState({ displayCrawler: false })
-    this.setState({ hasCrawled: false })
-    this.setState({ error: '' })
-  }
-
-  setMainUrl = async (url) => {
-    this.setState({ crawlerLoading: true })
-    await crawl(this.state.projectName, url.trim()).then((response) => {
-      this.setState({ crawlerLoading: false })
-      this.setState({ crawledUrls: response })
-      this.setState({ hasCrawled: true })
+      urls: this.state.urls.concat(urlsAdded),
+      crawledUrls: [],
+      displayCrawler: false,
+      error: ''
     })
   }
 
   setDisplayCrawler = () => {
     this.setState({ displayCrawler: !this.state.displayCrawler })
-    this.setState({ crawledUrls: [] })
-    this.setState({ hasCrawled: false })
   }
 
   checkUrl = () => {
@@ -114,12 +92,8 @@ export default class ConfigurationPage extends React.PureComponent {
       return (
         <div className='boxed-group'>
           <CrawlerPage
-            setMainUrl={this.setMainUrl}
-            crawledUrls={this.state.crawledUrls}
             projectName={this.state.projectName}
             addNewUrls={this.addNewUrls}
-            crawlerLoading={this.state.crawlerLoading}
-            hasCrawled={this.state.hasCrawled}
             setDisplayCrawler={this.setDisplayCrawler}
           />
         </div>
@@ -131,30 +105,30 @@ export default class ConfigurationPage extends React.PureComponent {
     return (
       <main role='main' aria-hidden='true'>
 
-      <div className='page' aria-hidden='true'>
-        <div className='page-header' role='banner' aria-label='configuration page presentation'>
-          <h1 className='page-title'>URL Configuration for project {this.state.projectName}</h1>
-          <div className='page-actions' aria-hidden={this.state.openCreate}>
-            <button
-              className='basic-button'
-              disabled={this.state.displayCrawler}
-              onClick={this.handleCreateOpen}
-              type='button'
-              aria-haspopup='dialog'
-              aria-label='add new urls'
-              aria-controls='dialog'
-            >
-              Add new URLs
-            </button>
-            {this.state.openCreate && <AddUrlForm isDisplayed={this.state.openCreate} projectName={this.state.projectName} onClose={this.handleCreateClose} onSubmitSuccess={this.addNewUrls} />}
-          </div>
+        <div className='page' aria-hidden='true'>
+          <div className='page-header' role='banner' aria-label='configuration page presentation'>
+            <h1 className='page-title'>URL Configuration for project {this.state.projectName}</h1>
+            <div className='page-actions' aria-hidden={this.state.openCreate}>
+              <button
+                className='basic-button'
+                disabled={this.state.displayCrawler}
+                onClick={this.handleCreateOpen}
+                type='button'
+                aria-haspopup='dialog'
+                aria-label='add new urls'
+                aria-controls='dialog'
+              >
+                Add new URLs
+              </button>
+              {this.state.openCreate && <AddUrlForm isDisplayed={this.state.openCreate} projectName={this.state.projectName} onClose={this.handleCreateClose} onSubmitSuccess={this.addNewUrls} />}
+            </div>
 
-          <p className='page-description'>
-            In order to analyse your code and monitor key ecodesign metrics, you will need to set every route defined for your web application.
-            <br />
-            EcoSonar will then analyse all pages of your web app and will guide you to set up practices optimizing ressources.
-          </p>
-        </div>
+            <p className='page-description'>
+              In order to analyse your code and monitor key ecodesign metrics, you will need to set every route defined for your web application.
+              <br />
+              EcoSonar will then analyse all pages of your web app and will guide you to set up practices optimizing ressources.
+            </p>
+          </div>
           {!this.state.loading ? this.checkUrl() : <div className="loader"></div>}
 
           {this.state.deleting && (
@@ -166,9 +140,8 @@ export default class ConfigurationPage extends React.PureComponent {
               onCloseDelete={this.onCloseDelete}
             />
           )}
-      </div>
+        </div>
       </main>
-
     )
   }
 }

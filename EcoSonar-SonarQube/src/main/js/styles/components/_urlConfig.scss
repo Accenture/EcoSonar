@@ -16,6 +16,7 @@
 
   .modal-header-config {
     padding: 32px 32px 0;
+
     .modal-title-config {
       margin: 0;
       font-size: 16px;
@@ -24,9 +25,11 @@
       overflow-wrap: break-word;
     }
   }
+
   .modal-body-config {
     padding: 20px 32px;
   }
+
   .modal-footer-config {
     padding: 20px 32px;
     border-top: 1px solid $medium-grey;
@@ -45,35 +48,43 @@
     margin-right: 2%;
     margin-bottom: 1%;
   }
+
   .input {
     max-width: 30%;
     margin-right: 2%;
     margin-bottom: 4%;
   }
+
   .basic-button {
     margin-bottom: 1%;
   }
 }
+
 .crawler-loading {
   text-align: center;
 }
+
 .crawled-url-list {
   display: flex;
   flex-direction: column;
+
   .basic-button {
     max-width: 10%;
     margin-top: 3%;
     margin-left: auto;
     margin-right: 5%;
     text-align: right;
+
     span {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
   }
+
   .crawler-message {
     margin-bottom: 1%;
+
     span {
       text-decoration: underline;
     }
@@ -83,6 +94,7 @@
 .crawler-message-no-more-url {
   text-align: center;
 }
+
 .crawler-input-no-url-assigned {
   display: flex;
   justify-content: space-around;
@@ -91,6 +103,7 @@
 .url-list-button {
   display: flex;
   align-items: center;
+
   .basic-button {
     margin-left: 3%;
   }
@@ -99,9 +112,16 @@
 .crawler-buttons {
   display: flex;
   justify-content: right;
-  margin-bottom: 1%;
+  margin-bottom: 5%;
+  flex-direction: row;
+  align-items: center;
   .basic-button {
     margin-left: 5%;
+  }
+  .crawler-message {
+    font-size: $small-font;
+    margin-right: 2%;
+    margin-bottom: 1%;
   }
 }
 
@@ -124,4 +144,21 @@
   outline: none;
   border-color: $red-error;
   color: $red-error;
+}
+
+.unset {
+  position: 'unset'
+}
+
+.input-crawler {
+  margin-right: 8px;
+  width: calc(100% - 54px);
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid $light-grey;
+  box-sizing: border-box;
+  border-radius: 2px;
+  background: $white;
+  color: $dark-grey;
+  transition: border-color 0.2s ease;
 }

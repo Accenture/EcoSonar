@@ -8,9 +8,9 @@ const SystemError = require('../utils/SystemError')
 
 const UrlsProjectRepository = function () {
   /**
-   * insertion of one or more url on the table urlsProject : OK
-   * @param {*} values
-   * @returns
+   * insertion of one or more url on the table urlsProject
+   * @param {string} projectName project Name
+   * @param {Array} urlList urls to be saved
    */
   this.insertAll = async function (projectName, urlList) {
     const urlsProjects = []
@@ -48,7 +48,7 @@ const UrlsProjectRepository = function () {
   }
 
   /**
-     * deletion on the table urlsProject : OK
+     * deletion on the table urlsProject
      * @param {id url} key
      */
   this.delete = async function (projectNameReq, urlNameReq) {
@@ -84,14 +84,33 @@ const UrlsProjectRepository = function () {
   }
 
   /**
-   * display all urls of a project : OK
-   * @param {name of the project} projectName
+   * deletion of all urls of a project
+   * @param {Array} urlIdKeyList list of id key representing url saved
    */
-  this.findAll = async function (projectNameReq, insert) {
+  this.deleteProject = async function (urlIdKeyList) {
+    return new Promise((resolve, reject) => {
+      urlsprojects.deleteMany({ idKey: { $in: urlIdKeyList } })
+        .then((result) => {
+          console.log(`DELETE URLS PROJECT - On urlsprojects ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
+    })
+  }
+
+  /**
+   * list all urls of a project
+   * @param {string} projectName name of the project
+   * @param {boolean} getUrlNameOnly retrieve only parameter url from the collection
+   */
+  this.findAll = async function (projectNameReq, getUrlNameOnly) {
     return new Promise((resolve, reject) => {
       let res
       try {
-        if (insert) {
+        if (getUrlNameOnly) {
           res = urlsprojects.find({ projectName: projectNameReq })
         } else {
           res = urlsprojects.find({ projectName: projectNameReq }, { urlName: 1 })
@@ -107,9 +126,8 @@ const UrlsProjectRepository = function () {
 
   /**
    * Insert or Update user flow for a specific url
-   * @param {urlObject} urlsProject previously registered
-   * @param {userFlow} user flow to be saved
-   * @returns
+   * @param {JSON} urlObject urlProject previously registered
+   * @param {JSON} userFlow user flow to be saved
    */
   this.insertUserFlow = async function (urlObject, userFlow) {
     const userflowMap = new Map(Object.entries(userFlow))
@@ -126,8 +144,9 @@ const UrlsProjectRepository = function () {
 
   /**
    * find user flow for url to be audited
-   * @param {urlName} url to find user flow
-   * @returns
+   * @param {string} projectName project name
+   * @param {string} url url name
+   * @returns user flow for the project and url defined
    */
   this.getUserFlow = async function (projectName, urlName) {
     let systemError = null
@@ -150,8 +169,7 @@ const UrlsProjectRepository = function () {
 
   /**
    * Deletion of user flow for a specified url
-   * @param {urlName} url to delete user flow
-   * @returns
+   * @param {string} urlName url to delete user flow
    */
   this.deleteUserFlow = async function (projectName, urlName) {
     let systemError = null

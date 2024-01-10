@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import AccordionManager from './Accordion/AccordionManager'
 import BestPracticesFilters from './BestPracticesFilters/BestPracticesFilters'
-import { allTools, auditTypes, defaultSelectedComplianceLevel, greenITTool, lighthouseAccessibility, lighthousePerformanceTool, w3cValidator, setTools } from './BestPracticesFilters/Filters'
+import { allTools, auditTypes, defaultSelectedComplianceLevel, greenITTool, lighthouseAccessibility, lighthousePerformanceTool, setTools, w3cValidator } from './BestPracticesFilters/Filters'
 
 export default function BestPracticesBody (props) {
   const {

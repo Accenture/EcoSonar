@@ -6,16 +6,14 @@ const BestPracticesRepository = function () {
   /**
    * Insert best practices
    * @param {Array} reports array containing the result of greenIt analysis (including metrics and best practices)
-   * @param {Array} urlIdList array of urls ID
-   * @param {String} projectName name of the project
    */
-  this.insertBestPractices = async function (arrayToInsert) {
-    if (arrayToInsert.length > 0) { arrayToInsert = await checkValues(arrayToInsert) }
+  this.insertBestPractices = async function (reports) {
+    if (reports.length > 0) { reports = checkValues(reports) }
 
     return new Promise((resolve, reject) => {
-      if (arrayToInsert.length > 0) {
+      if (reports.length > 0) {
         bestpractices
-          .insertMany(arrayToInsert)
+          .insertMany(reports)
           .then(() => {
             resolve()
           })
@@ -33,8 +31,7 @@ const BestPracticesRepository = function () {
 
   /**
    * deletion of one or more analysis of best practices on the table bestPractices
-   * @param {name of the project} projectNameReq
-   * @returns
+   * @param {string} projectNameReq
    */
   this.delete = async function (projectNameReq) {
     let empty = false
@@ -73,8 +70,8 @@ const BestPracticesRepository = function () {
 
   /**
    * find All analysis of best practices  for a project on the table bestPractices
-   * @param {name of the project} projectNameReq
-   * @returns
+   * @param {string} projectNameReq
+   * @returns {Array} best practices reports for the last analysis run on project
    */
   this.findAll = async function (projectNameReq) {
     let hasNoUrl = false
@@ -118,9 +115,9 @@ const BestPracticesRepository = function () {
 
   /**
    * find analysis of best practices  for an URL on the table bestPractices
-   * @param {name of the project} projectName
-   * @param {url} urlName
-   * @returns
+   * @param {string} projectName
+   * @param {string} urlName
+   * @returns {Array} best practices reports for the last analysis run on URL
    */
   this.find = async function (projectName, urlName) {
     let hasNoUrl = false
@@ -153,24 +150,42 @@ const BestPracticesRepository = function () {
   }
 
   /**
+   * Deletion of all best practices analysis for a project
+   * @param {string} urlIdKeyList list of id key representing url saved
+   */
+  this.deleteProject = async function (urlIdKeyList) {
+    return new Promise((resolve, reject) => {
+      bestpractices.deleteMany({ idUrl: { $in: urlIdKeyList } })
+        .then((result) => {
+          console.log(`DELETE URLS PROJECT - On best practices ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
+    })
+  }
+}
+
+/**
    *
    * @param {Array} arrayToInsert
    * @param {Array} urlIdList
-   * @param {String} projectName
+   * @param {string} projectName
    * @returns an array cleaned of analysis containing undefined and NaN to avoid mongoose rejecting every GreenIt Best Practices insertion
    * This function check if best practices exists for each url of the report (arrayToInsert), if true then also update urlIdList array to match
    */
-  async function checkValues (arrayToInsert) {
-    const arrayToInsertSanitized = []
-    for (const analysis of arrayToInsert) {
-      if (analysis.bestPractices) {
-        arrayToInsertSanitized.push(analysis)
-      } else {
-        console.log(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
-      }
+function checkValues (arrayToInsert) {
+  const arrayToInsertSanitized = []
+  for (const analysis of arrayToInsert) {
+    if (analysis.bestPractices) {
+      arrayToInsertSanitized.push(analysis)
+    } else {
+      console.log(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
     }
-    return arrayToInsertSanitized
   }
+  return arrayToInsertSanitized
 }
 
 const bestPracticesRepository = new BestPracticesRepository()

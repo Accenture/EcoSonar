@@ -97,7 +97,6 @@ body {
 .basic-button {
   display: inline-flex;
   align-items: center;
-  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   justify-content: center;
@@ -163,6 +162,10 @@ body {
     background: $white;
     cursor: not-allowed;
     box-shadow: none;
+  }
+  
+  span {
+    padding: 3px 3px;
   }
 }
 .boxed-group {

@@ -15,6 +15,8 @@
    "errorRetrievingAnalysisforURL": "An error occured while retrieving analysis for {1} in project {0}, please try again.",
    "errorRetrievingBestPractices": "An error occured while retrieving best practices for project {0}, please try again.",
    "errorCrawling": "An error occured while crawling from url {0}, please try again",
+   "errorGetCrawling": "An error occured while retrieving url crawled from project {0}, please try again",
+   "errorCrawlingEmpty": "No crawled urls were saved for project {0}",
    "errorW3cAnalysisNotFound": "The W3C Analysis could not be processed for project {0}, check with technical team to resolve this issue",
    "errorW3cLastAnalysisNotFoundForURL": "The W3C Analysis could not be processed for {0} in project {1}, check with technical team to resolve this issue",
    "errorSystemAddProcedure": "An error occured while adding procedure in project {0}, please try again.",

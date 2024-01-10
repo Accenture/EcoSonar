@@ -1,0 +1,169 @@
+{
+  "viewport": {
+    "title": "Has a Viewport meta tag",
+    "description": "Lighthouse flags pages without a viewport meta tag.",
+    "correction": "A `< meta name=\"viewport\" >` not only optimizes your app for mobile screen sizes, but also prevents a 300 millisecond delay to user inputGovernment Regulation: RGESN 1.6 : Does the digital service adapt to different types of terminals display ? See Does not have a < meta name=\"viewport\" > tag with width or initial-scaleViewport meta tag Lighthouse: Use a < meta name=\"viewport\" > tag with width or initial-scale",
+    "titleData": "have missing `<meta name=\"viewport\">` tag",
+    "titleDataSuccess": "have viewport meta tag"
+  },
+  "serverResponseTime": {
+    "title": "Initial server response time was short",
+    "description": "This audit fails when the browser waits more than 600 ms for the server to respond to the main document request.",
+    "correction": "Keep the server response time for the main document short because all other requests depend on it. Government Regulation: RGESN 6.3 : Does the digital service use caching mechanisms for all transferred content under its control? RGESN 7.1 : Does the digital service use a server caching system for the most used data? See : Reduce server response times (TTFB) Lighthouse: Reduce initial server response time 7 Ways to Reduce Server Response Time 8 Ways to Effectively Reduce Server Response Time",
+    "titleData": "Root document took {0}ms on average"
+  },
+  "mainthreadWorkBreakdown": {
+    "title": "Minimize main-thread work",
+    "description": "Lighthouse flags pages that keep the main thread busy for longer than 4 seconds during load.",
+    "correction": "Consider reducing the time spent parsing, compiling and executing JS. You may find delivering smaller JS payloads helps with this.Government Regulation: RGESN 6.8 : Does the digital service avoid triggering the loading of unused assets and content for each feature?  See : Minimize main thread work Lighthouse: Minimize main-thread work How do I minimize main thread work? How to minimize main thread work in React Component",
+    "titleData": "{0}s on average"
+  },
+  "bootupTime": {
+    "title": "Reduce JavaScript execution time",
+    "description": "Lighthouse shows a warning when JavaScript execution takes longer than 2 seconds. The audit fails when execution takes longer than 3.5 seconds.",
+    "correction": "Consider reducing the time spent parsing, compiling and executing JS. You may find delivering smaller JS payloads helps with this.Government Regulation: RGESN 6.8 : Does the digital service avoid triggering the loading of unused assets and content for each feature?  See : Reduce JavaScript execution time Lighthouse: Reduce JavaScript execution time How to Reduce Javascript Execution Time Reduce script evaluation time in 4 steps",
+    "titleData": "{0}s on average"
+  },
+  "fontDisplay": {
+    "title": "Ensure text remains visible during webfont load",
+    "description": "Lighthouse flags any font URLs that may flash invisible text.",
+    "correction": "Leverage the font-display CSS feature to ensure text is user-visible while webfonts are loading.  See : Ensure text remains visible during webfont load Lighthouse: Ensure text remains visible during webfont load How to Ensure Text Remains Visible During Webfont Load",
+    "titleData": "text are invisible during one of pages load",
+    "titleDataSuccess": "no text are invisible"
+  },
+  "thirdPartySummary": {
+    "title": "Minimize third-party usage",
+    "description": "Reduce the presence of third-party code.",
+    "correction": "Third-party code can significantly impact load performance. Limit the number of redundant third-party providers and try to load third-party code after your page has primarily finished loading. Best practices n°82 from '115 bonnes pratiques d'écoconception web v4' See : Loading Third-Party JavaScript Lighthouse: Reduce the impact of third-party code Reduce the Impact of Third-Party Code",
+    "titleData": "Third-party code blocked the main thread for {0}ms on average"
+  },
+  "thirdPartyFacades": {
+    "title": "Some third-party resources can be lazy loaded with a facade",
+    "description": "Some third-party embeds can be lazy loaded. Consider replacing them with a facade until they are required.",
+    "correction": "Some third-party embeds can be lazy loaded. Consider replacing them with a facade until they are required.Government Regulation: RGESN 6.8 : Does the digital service avoid triggering the loading of unused assets and content for each feature? See : Lazy load third-party resources with facades Lighthouse: Lazy load third-party resources with facades Lazy load third-party resources with facades",
+    "titleData": "{0} facade alternative(s) available"
+  },
+  "lcpLazyLoaded": {
+    "title": "Don't lazy load Largest Contentful Paint image",
+    "description": "Above-the-fold images that are lazily loaded render later in the page lifecycle, which can delay the largest contentful paint.",
+    "correction": "Lazy-loading is a technique to defer downloading a resource until it's needed, which conserves data and reduces network contention for critical assets. It became a web standard in 2019 and today loading='lazy' for images is supported by most major browsers. That sounds great, but is there such a thing as too much lazy loading? What we found is that lazy-loading can be an amazingly effective tool for reducing unneeded image bytes, but overuse can negatively affect performance. Concretely, our analysis shows that more eagerly loading images within the initial viewport—while liberally lazy-loading the rest—can give us the best of both worlds: fewer bytes loaded and improved Core Web Vitals.Government Regulation: RGESN 6.6 : Does the digital service provide a progressive loading mechanism for graphics and media that require it? See : The performance effects of too much lazy-loading Lighthouse: Don't lazy load Largest Contentful Paint image",
+    "titleData": "At least one largest contentful image was lazy loaded",
+    "titleDataSuccess": "No largest contentful image was lazy loaded"
+  },
+  "nonCompositedAnimations": {
+    "title": "Avoid non-composited animations",
+    "description": "Animations which are not composited can be janky and increase Cumulative Layout Shift.",
+    "correction": "Animations which are not composited can be janky and increase CLS. See :Avoid non-composited animations Lighthouse: Avoid non-composited animations Non-composited animations",
+    "titleData": "{0} animated elements found"
+  },
+  "domSize": {
+    "title": "Avoids an excessive DOM size",
+    "description": "Lighthouse flags pages with DOM trees that: Warns when the body element has more than ~800 nodes. Errors when the body element has more than ~1,400 nodes. Be careful EcoSonar rules are more strict : you should have less than 475 nodes to reach a B Score.",
+    "correction": "A large DOM will increase memory usage, cause longer style calculations, and produce costly layout reflows. Best practices n°12 from '115 bonnes pratiques d'écoconception web v4' See : Avoid an excessive DOM size Reduce the scope and complexity of style calculations Minimizing browser reflow",
+    "titleData": "{0} elements in average"
+  },
+  "usesLongCacheTtl": {
+    "title": "Serve static assets with an efficient cache policy",
+    "description": "Lighthouse flags all static resources that aren't cached.",
+    "correction": "A long cache lifetime can speed up repeat visits to your page.Government Regulation: RGESN 6.9 : Does the digital service use client-side storage of some resources to avoid unnecessary network exchanges? See : Serve static assets with an efficient cache policy Lighthouse: Serve static assets with an efficient cache policy How to Serve Assets With an Efficient Cache Policy on WordPress",
+    "titleData": "{0} resources found"
+  },
+  "usesResponsiveImages": {
+    "title": "Properly size images",
+    "description": "The Opportunities section of your Lighthouse report lists all images in your page that aren't appropriately sized, along with the potential savings in kibibytes (KiB).",
+    "correction": "Serve images that are appropriately-sized to save cellular data and improve load time.Government Regulation: RGESN 5.2 Does the digital service offer image content whose level of compression is appropriate for the content and viewing context? See : Properly size images Optimize bitmaps How to properly size images",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "offscreenImages": {
+    "title": "Defer offscreen images (or lazy-loading)",
+    "description": "The Opportunities section of your Lighthouse report lists all offscreen or hidden images in your page along with the potential savings in kibibytes (KiB). Consider lazy-loading these images after all critical resources have finished loading to lower Time to Interactive.",
+    "correction": "Consider lazy-loading offscreen and hidden images after all critical resources have finished loading to lower time to interactive.Government Regulation: RGESN 6.6 : Le service numérique propose-t-il un mécanisme de chargement progressif pour les éléments graphiques et les médias le nécessitant ? See : Defer offscreen images Learn how to fix 'defer offscreen images' Lighthouse: Defer offscreen images How to Defer Offscreen Images",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "unusedCssRules": {
+    "title": "Reduce unused CSS",
+    "description": "The Opportunities section of your Lighthouse report lists all stylesheets with unused CSS with a potential savings of 2 KiB or more. Remove the unused CSS to reduce unnecessary bytes consumed by network activity.",
+    "correction": "Reduce unused rules from stylesheets and defer CSS not used for above-the-fold content to decrease bytes consumed by network activity.Government Regulation: RGESN 6.8 : Does the digital service avoid triggering the loading of unused assets and content for each feature? See : Remove unused CSS How Do You Remove Unused CSS From a Site? 4 Ways to Remove Unused CSS",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "unusedJavascript": {
+    "title": "Reduce unused JavaScript",
+    "description": "Lighthouse flags every JavaScript file with more than 20 kibibytes of unused code.",
+    "correction": "Reduce unused JavaScript and defer loading scripts until they are required to decrease bytes consumed by network activity. Government Regulation: RGESN 6.8 : Does the digital service avoid triggering the loading of unused assets and content for each feature? See :Remove unused JavaScript A Lifehack for removing unused JS/CSS.. or just unminify How to Remove Unused JavaScript",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "usesOptimizedImages": {
+    "title": "Efficiently encode images",
+    "description": "The Opportunities section of your Lighthouse report lists all unoptimized images, with potential savings in kibibytes (KiB).",
+    "correction": "Optimized images load faster and consume less cellular data.Government Regulation: RGESN 5.2 Does the digital service offer image content whose level of compression is appropriate for the content and viewing context? See : Efficiently encode images Lighthouse: Efficiently encode images",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "modernImageFormats": {
+    "title": "Serve images in modern formats",
+    "description": "The Opportunities section of your Lighthouse report lists all images in older image formats, showing potential savings gained by serving AVIF versions of those images.",
+    "correction": "Image formats like WebP and AVIF often provide better compression than PNG or JPEG, which means faster downloads and less data consumption.Government Regulation: RGESN 5.1 : Does the digital service use a file format adapted to the content and viewing context of each image content? See : Serve images in modern formats How to Serve Next-Gen Image Formats in Modern Browsers Using Modern Image Formats: AVIF And WebP",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "usesTextCompression": {
+    "title": "Enable text compression",
+    "description": "The Opportunities section of your Lighthouse report lists all text-based resources that aren't compressed.",
+    "correction": "Text-based resources should be served with compression (gzip, deflate or brotli) to minimize total network bytes.Government Regulation: RGESN 6.4 : Has the digital service implemented compression techniques on all transferred resources under its control? See :Enable text compression Lighthouse: Enable text compression How to Enable GZIP Compression for Faster Web Pages Enable Text Compression",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "usesHttp2": {
+    "title": "Use HTTP/2",
+    "description": "Lighthouse lists all resources not served over HTTP/2.",
+    "correction": "HTTP/2 offers many benefits over HTTP/1.1, including binary headers and multiplexing.Regulation: Best practices n°83 from '115 bonnes pratiques d'écoconception web v4' See : Does not use HTTP/2 for all of its resources Lighthouse: Use HTTP/2 for all resources Use HTTP/2 for all of its resources",
+    "titleData": "{0} requests not served via HTTP/2"
+  },
+  "efficientAnimatedContent": {
+    "title": "Use video formats for animated content",
+    "description": "The Opportunities section of your Lighthouse report lists all animated GIFs, along with estimated savings in seconds achieved by converting these GIFs to video.",
+    "correction": "Large GIFs are inefficient for delivering animated content. Consider using MPEG4/WebM videos for animations and PNG/WebP for static images instead of GIF to save network bytes. See : Use video formats for animated content Lighthouse: Use video formats for animated content",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "legacyJavascript": {
+    "title": "Avoid serving legacy JavaScript to modern browsers",
+    "description": "Lighthouse identifies the polyfills and transforms that should not be present if using the module/nomodule pattern.",
+    "correction": "Polyfills and transforms enable legacy browsers to use new JavaScript features. However, many aren't necessary for modern browsers. For your bundled JavaScript, adopt a modern script deployment strategy using module/nomodule feature detection to reduce the amount of code shipped to modern browsers, while retaining support for legacy browsers. See : Lighthouse: Avoid serving legacy JavaScript to modern browsers Deploying ES2015+ Code in Production Today",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "totalByteWeight": {
+    "title": "Avoid enormous network payloads",
+    "description": "Lighthouse shows the total size in kibibytes (KiB) of all resources requested by your page. The largest requests are presented first.",
+    "correction": "Large network payloads cost users real money and are highly correlated with long load times.Government Regulation: RGESN 6.4 : Has the digital service implemented compression techniques on all transferred resources under its control?  See : Avoid enormous network payloads Lighthouse: Avoid enormous network payloads",
+    "titleData": "Total size was {0} KiB in average"
+  },
+  "noDocumentWrite": {
+    "title": "Avoids document.write()",
+    "description": "Lighthouse flags calls to document.write() that weren't blocked by Chrome.",
+    "correction": "For users on slow connections, external scripts dynamically injected via `document.write()` can delay page load by tens of seconds.Government Regulation: RGESN 4.1 : Is the digital service usable via a low-speed connection? See : Uses document.write() Intervening against document.write()",
+    "titleData": "have at least one document.write()",
+    "titleDataSuccess": "have no document.write()"
+  },
+  "layoutShiftElements": {
+    "title": "Avoid large layout shifts",
+    "description": "These DOM elements contribute most to the Cumulative Layout Shift of the page.",
+    "correction": "Large layout shifts can create a frustrating experience for your visitors as they make your page appear visually jarring, as page elements appear suddenly, move around, and affect how your visitors interact with the page. Avoiding large layout shifts is essential in creating a smooth and streamlined experience for your visitors. Regarding image dimensions, you should not be resizing image within your browser. Images should have by default the width and height that you want to set up.  See : Lighthouse: Avoid large layout shifts Optimize Cumulative Layout Shift",
+    "titleData": "{0} elements found"
+  },
+  "usesPassiveEventListeners": {
+    "title": "Does not use passive listeners to improve scrolling performance",
+    "description": "Consider marking your touch and wheel event listeners as `passive` to improve your page's scroll performance.",
+    "correction": "Consider marking your touch and wheel event listeners as `passive` to improve your page's scroll performance.  See : Use passive listeners to improve scrolling performance Improving scroll performance with passive event listeners",
+    "titleData": "at least one page does not have passive listeners",
+    "titleDataSuccess": "have passive listeners"
+  },
+  "duplicatedJavascript": {
+    "title": "Remove duplicate modules in JavaScript bundles",
+    "description": "If the wasted bandwidth exceeds 1 KB, this audit triggers.",
+    "correction": "Remove large, duplicate JavaScript modules from bundles to reduce unnecessary bytes consumed by network activity.Government Regulation: RGESN 6.8 : Does the digital service avoid triggering the loading of unused assets and content for each feature? See : Lighthouse: Remove duplicate modules in JavaScript bundles Reduce webpack bundle size by eliminating duplicated",
+    "titleData": "Potential savings of {0} KiB"
+  },
+  "unminifiedJavascript": {
+    "title": "Minify JavaScript",
+    "description": "The Opportunities section of your Lighthouse report lists all unminified JavaScript files, along with the potential savings in kibibytes (KiB) when these files are minified.",
+    "correction": "Minifying JavaScript files can reduce payload sizes and script parse time.Best practices n°77 from '115 bonnes pratiques d'écoconception web v4'  See : Minifiy Javascript Minify Javascript files Minification",
+    "titleData": "Potential savings of {0} KiB"
+  }
+}

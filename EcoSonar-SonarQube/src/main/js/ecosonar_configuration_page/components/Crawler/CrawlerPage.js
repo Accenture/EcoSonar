@@ -1,13 +1,23 @@
 import React from 'react'
 import { insertUrlsConfiguration } from '../../../services/configUrlService'
 import CrawledUrlItem from './CrawledUrlItem'
+import { crawl, getCrawl } from '../../../services/crawlerService'
 
 export default function CrawlerPage (props) {
-  const { setMainUrl, crawledUrls, projectName, addNewUrls, crawlerLoading, hasCrawled, setDisplayCrawler } = props
+  const {
+    projectName,
+    addNewUrls,
+    setDisplayCrawler
+  } = props
   const [url, setUrl] = React.useState('')
   const [checkedUrls, setCheckedUrls] = React.useState([])
   const [globalError, setGlobalError] = React.useState('')
   const [allChecked, setAllChecked] = React.useState(false)
+  const [autoSaveUrlsResult, setAutoSaveUrlsResult] = React.useState(false)
+  const [crawledUrls, setCrawledUrls] = React.useState([])
+  const [crawlerLoading, setCrawlerLoading] = React.useState(false)
+  const [crawlerLaunched, setCrawlerLaunched] = React.useState(false)
+  const [crawlerErrorMessage, setCrawlerErrorMessage] = React.useState('')
 
   const handleChangeSetUrl = (event) => {
     setUrl(event.target.value)
@@ -17,7 +27,9 @@ export default function CrawlerPage (props) {
     if (!checkedUrls.includes(checkedUrl)) {
       setCheckedUrls((checkedUrlList) => [...checkedUrlList, checkedUrl])
     } else {
-      setCheckedUrls((checkedUrlList) => checkedUrlList.filter((urlObject) => urlObject !== checkedUrl))
+      setCheckedUrls((checkedUrlList) =>
+        checkedUrlList.filter((urlObject) => urlObject !== checkedUrl)
+      )
     }
   }
 
@@ -33,7 +45,7 @@ export default function CrawlerPage (props) {
       })
   }
 
-  function compareArray (crawledUrlsObject, checkedUrlsObject) {
+  const compareArray = (crawledUrlsObject, checkedUrlsObject) => {
     for (let i = 0; i < crawledUrlsObject.length; i++) {
       if (crawledUrlsObject[i] !== checkedUrlsObject[i]) {
         return false
@@ -53,88 +65,188 @@ export default function CrawlerPage (props) {
     }
   }
 
-  const checkCrawledAndNoUrl = () => {
-    return hasCrawled && crawledUrls.length === 0
+  const handleChangeAutoSaveUrlsResult = () => {
+    setAutoSaveUrlsResult(!autoSaveUrlsResult)
+  }
+
+  const launchCrawler = (url, autoSave) => {
+    setCrawlerLoading(true)
+    setCrawlerErrorMessage('')
+    crawl(projectName, url.trim(), autoSave).then(() => {
+      setCrawlerLoading(false)
+      setCrawlerLaunched(true)
+    })
+      .catch((error) => {
+        setCrawlerLoading(false)
+        if (error instanceof Error) {
+          setCrawlerErrorMessage(error.message)
+        }
+      })
+  }
+
+  const getCrawlerResult = async () => {
+    setCrawlerLoading(true)
+    setCrawlerErrorMessage('')
+    await getCrawl(projectName).then((response) => {
+      setCrawlerLoading(false)
+      setCrawledUrls(response)
+      setCrawlerLaunched(false)
+    }).catch((error) => {
+      setCrawlerLoading(false)
+      if (error instanceof Error) {
+        setCrawlerErrorMessage(error.message)
+      }
+    })
   }
 
   return (
     <div>
+      <div className="url-list-button">
+        <p className="crawler-message">
+          I want to automatically search for all pages within my website
+        </p>
+      </div>
+      <div className="crawler-buttons">
+        <input
+          className="input-crawler"
+          name="url"
+          type="text"
+          onChange={handleChangeSetUrl}
+          id="webhook-url"
+          placeholder="Add the homepage from my website"
+          aria-label="add the homepage from my website"
+        />
+        <label
+          className="switch"
+          htmlFor="checkbox"
+          style={{ position: 'unset' }}
+        >
+          <input
+            type="checkbox"
+            checked={autoSaveUrlsResult}
+            aria-checked={autoSaveUrlsResult}
+            tabIndex={0}
+            aria-labelledby="checkbox"
+            onChange={() => handleChangeAutoSaveUrlsResult()}
+            id="checkbox"
+          />
+          <div></div>
+          <p className="crawler-message">
+            Save urls as to be audited by EcoSonar
+          </p>
+        </label>
+        <button
+          className="basic-button"
+          aria-label="launch-crawler"
+          onClick={() => launchCrawler(url, autoSaveUrlsResult)}
+          disabled={crawlerLoading || url === '' || crawledUrls.length > 0}
+        >
+          <span>Launch Crawler</span>
+        </button>
+        <button
+          className="basic-button"
+          aria-label="return to url list"
+          onClick={() => setDisplayCrawler()}
+          disabled={crawlerLoading}
+        >
+          <span>Return to url list</span>
+        </button>
+      </div>
       {crawledUrls.length === 0 && (
         <div>
-          <div className='crawler-input'>
-            <p className='crawler-message'>I want to automatically search for all pages within my website</p>
-            <input
-              className='input'
-              name='url'
-              type='text'
-              onChange={handleChangeSetUrl}
-              id='webhook-url'
-              placeholder='add the homepage from my website'
-              aria-label='add the homepage from my website'
-            />
-
-            <div className='crawler-buttons'>
-              <button className='basic-button' aria-label='find pages' onClick={() => setMainUrl(url)} disabled={crawlerLoading}>
-                <span>Find pages</span>
-              </button>
-              <button className='basic-button' aria-label='return to url list' onClick={() => setDisplayCrawler()} disabled={crawlerLoading}>
-                <span>Return to url list</span>
-              </button>
-            </div>
+          <div>
+            <p className="crawler-message">
+              If you previoulsy crawled your website, click directly on the button below.
+            </p>
+            <button
+              className="basic-button"
+              aria-label="return to url list"
+              onClick={() => getCrawlerResult()}
+              disabled={crawlerLoading}
+            >
+              <span>Get Crawled URLs</span>
+            </button>
           </div>
-          {crawlerLoading && (
-            <div className='crawler-loading'>
-              <div className="loader"></div>
-              <p>Ecosonar crawler is running. Process can take several minutes according to the size of the website. Leave this page open.</p>
-            </div>
-          )}
+          <div>
+            {crawlerLaunched && (
+              <div className="crawler-loading">
+                <p>
+                  Ecosonar crawler is running. Process can take several minutes
+                  according to the size of the website. If you enabled the Save
+                  option, URLS crawled will be saved automatically in the URL
+                  Configuration list. Otherwise by default, the URLs crawled
+                  will be saved in a temporary database and made available to
+                  you by clicking on the button Get Crawler Result.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
-
+      <p className='text-danger' role='alert'>
+        {crawlerErrorMessage}
+      </p>
       {crawledUrls.length > 0 && (
-        <div className='crawled-url-list'>
-          <table className='data-zebra' role='presentation'>
+        <div className="crawled-url-list">
+          <table className="data-zebra" role="presentation">
             <tbody>
               <tr>
                 <td>
-                  <p className='crawler-message'>
-                    I want to automatically search for all pages within my website : <span className='url-name'>{url}</span>
+                  <p className="crawler-message">
+                    Find below the URLs previously crawled for this project. Please select those you wish EcoSonar to audit.
                   </p>
                 </td>
               </tr>
-              <tr className='data-zebra-thead'>
-                <td className='head-url'>{'URL'}</td>
+              <tr className="data-zebra-thead">
+                <td className="head-url">{'URL'}</td>
                 <td>
                   <input
-                    type='checkbox'
-                    onChange={() => { selectAll() }}
+                    type="checkbox"
+                    onChange={() => {
+                      selectAll()
+                    }}
                     checked={allChecked}
-                    aria-label='select all'
+                    aria-label="select all"
                   ></input>
                 </td>
               </tr>
               {crawledUrls.map((crawledUrl, index) => {
-                return <CrawledUrlItem key={'url-' + index} index={index} url={crawledUrl} handleChangeCheckedUrls={handleChangeCheckedUrls} checkedUrls={checkedUrls} setAllChecked={setAllChecked} />
+                return (
+                  <CrawledUrlItem
+                    key={'url-' + index}
+                    index={index}
+                    url={crawledUrl}
+                    handleChangeCheckedUrls={handleChangeCheckedUrls}
+                    checkedUrls={checkedUrls}
+                    setAllChecked={setAllChecked}
+                  />
+                )
               })}
             </tbody>
           </table>
-          <div className='crawler-buttons'>
-            <button className='basic-button' aria-label='Cancel' onClick={() => setDisplayCrawler()}>
+          <div className="crawler-buttons">
+            <button
+              className="basic-button"
+              aria-label="Cancel"
+              onClick={() => setDisplayCrawler()}
+            >
               <span>Cancel</span>
             </button>
-            <button className='basic-button' aria-label='Validate list' disabled={!checkedUrls.length} onClick={() => validateList()}>
-              <span>Validate list</span>
+            <button
+              className="basic-button"
+              aria-label="Validate list"
+              disabled={!checkedUrls.length}
+              onClick={() => validateList()}
+            >
+              <span>Validate</span>
             </button>
           </div>
           {globalError !== '' && (
-            <p className='text-danger' role='alert'>
+            <p className="text-danger" role="alert">
               {globalError}
             </p>
           )}
         </div>
-      )}
-      {checkCrawledAndNoUrl() && (
-        <p className='crawler-message-no-more-url'>No url detected</p>
       )}
     </div>
   )

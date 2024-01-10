@@ -5,17 +5,16 @@ const formatGreenItAnalysis = require('../services/format/formatGreenItAnalysis'
 
 const GreenItRepository = function () {
   /**
-   * insertion of one or more analysis
-   * @param {arrayToInsert} reports
-   * @returns
+   * insertion of one or more greenit analysis
+   * @param {Array} reports reports to add
    */
-  this.insertAll = async function (arrayToInsert) {
-    if (arrayToInsert.length > 0) { arrayToInsert = await checkValues(arrayToInsert) }
+  this.insertAll = async function (reports) {
+    if (reports.length > 0) { reports = await checkValues(reports) }
 
     return new Promise((resolve, reject) => {
-      if (arrayToInsert.length > 0) {
+      if (reports.length > 0) {
         greenits
-          .insertMany(arrayToInsert)
+          .insertMany(reports)
           .then(() => {
             resolve()
           })
@@ -33,8 +32,8 @@ const GreenItRepository = function () {
   }
 
   /**
-  * find all EcoIndex analysis
-  * @returns
+  * find all GreenIT analysis saved in EcoSonar
+  * @returns greenit reports
   */
   this.findAllAnalysis = async function () {
     return new Promise((resolve, reject) => {
@@ -42,17 +41,18 @@ const GreenItRepository = function () {
         .then((res) => {
           resolve(res)
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
   }
 
   /**
-   * find analysis for one url : OK
-   * @param {project Name} projectNameReq
-   * @param {url Name} urlNameReq
-   * @returns
+   * find last greenit analysis for one url
+   * @param {string} projectNameReq project name
+   * @param {string} urlNameReq URL of the page analyzed
+   * @returns last greenit analysis of a url
    */
   this.findAnalysisUrl = async function (projectNameReq, urlNameReq) {
     let res
@@ -112,10 +112,9 @@ const GreenItRepository = function () {
   }
 
   /**
-   * find analysis for one Project
-   * @param {project Name} projectNameReq
-   * @param {all deployment = true} alldeployment
-   * @returns
+   * find last greenit analysis for one Project
+   * @param {string} projectNameReq name of the project
+   * @returns last greenit analysis of a project
    */
   this.findAnalysisProject = async function (projectNameReq) {
     let stringErr = null
@@ -160,9 +159,9 @@ const GreenItRepository = function () {
   }
 
   /**
-   * find EcoIndex from last analysis for one Project
-   * @param {project Name} projectNameReq
-   * @returns
+   * find scores from last analysis for one Project
+   * @param {string} projectNameReq name of the project
+   * @returns scores of last analysis
    */
   this.findScoreProject = async function (projectNameReq) {
     let stringErr = null
@@ -206,6 +205,24 @@ const GreenItRepository = function () {
       }
     })
   }
+
+  /**
+   * Deletion of all greenIt analysis for a project
+   * @param {string} urlIdKeyList list of id key representing url saved
+   */
+  this.deleteProject = async function (urlIdKeyList) {
+    return new Promise((resolve, reject) => {
+      greenits.deleteMany({ idUrlGreen: { $in: urlIdKeyList } })
+        .then((result) => {
+          console.log(`DELETE URLS PROJECT - On GreenIt ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
+    })
+  }
 }
 
 /**
@@ -219,8 +236,13 @@ async function checkValues (arrayToInsert) {
     if (!Object.values(analysis).includes(undefined) || !Object.values(analysis).includes(NaN)) {
       arrayToInsertSanitized.push(analysis)
     } else {
-      const urlInfos = await urlsprojects.find({ idKey: analysis.idUrlGreen })
-      console.log(`GREENIT INSERT - Url  ${urlInfos[0].urlName} cannot be inserted due to presence of NaN or undefined values`)
+      await urlsprojects.find({ idKey: analysis.idUrlGreen })
+        .then((result) => {
+          console.warn(`GREENIT INSERT - Url  ${result[0].urlName} cannot be inserted due to presence of NaN or undefined values`)
+        })
+        .catch((error) => {
+          console.error(error)
+        })
     }
   }
   return arrayToInsertSanitized
