@@ -17,19 +17,19 @@ Then, the API can allow you to retrieve pre-formatted audit results using json f
       - [Create a MongoDB Database](#mongodb-creation)
         - [Create a MongoDB Community Server](#mongodb-server)
         - [Create a MongoDB Atlas Database](#mongodb-atlas)
-        - [Create MongoDB Collections](#mongodb-collections)
-  - [Node.js](#nodejs)
+      - [Create MongoDB Collections](#mongodb-collections)
+  - [API: option 1 - Node.js](#nodejs)
     - [Prerequisites](#prerequisites-node)
     - [Installation](#installation-node)
-  - [Docker](#docker)
+  - [API: option 2 - Docker](#docker)
     - [Prerequisites](#prerequisites-docker)
     - [Installation](#installation-api)
     - [Our advice for Server Deployment](#docker-deployment)
-    - [Add Environment setup](#env-setup)
-      - [Database configuration](#database-env-var)
-      - [CORS Setup](#cors)
-      - [Enable W3C validator Analysis](#w3c-validator)
-      - [Setup User flow](#user-flow)
+  - [Add Environment setup to API](#env-setup)
+    - [Database configuration](#database-env-var)
+    - [CORS Setup](#cors)
+    - [Enable W3C validator Analysis](#w3c-validator)
+    - [Setup User flow](#user-flow)
 - [API Endpoints](#api-endpoints)
 - [Usage Rights](#usage-rights)
 
@@ -105,7 +105,7 @@ For any other MongoDB Database, you will need to set up a new database connectio
 
 <a name="mongodb-collections"></a>
 
-##### Create MongoDB Collections
+#### Create MongoDB Collections
 
 EcoSonar database will contain the following MongoDB collections:
 
@@ -130,7 +130,7 @@ However, if you chose Azure CosmoDB for MongoDB Database as database, then you w
 
 <a name="nodejs"></a>
 
-## Option 1 : launch Node.js server
+## API: option 1 - Node.js
 
 <a name="prerequisites-node"></a>
 
@@ -166,7 +166,7 @@ API can be reached at: http://localhost:3000
 
 <a name="docker"></a>
 
-## Option 2 : launch a Docker container
+## API: option 2 - Docker
 
 <a name="prerequisites-docker"></a>
 
@@ -213,7 +213,7 @@ Instead, we recommend setting up a CI/CD pipeline with the following steps:
 
 <a name="env-setup"></a>
 
-### Add Environment setup
+## Add Environment setup to API
 
 You will need to set up some environment variables to run the API.
 Locally, you can add an `.env` file in the folder `EcoSonar-API`, it will contain the local environment variables of the project.
@@ -221,9 +221,9 @@ Then choose among the variables below the ones required and add it into `.env` f
 
 <a name="database-env-var"></a>
 
-#### Database configuration
+### Database configuration
 
-##### MongoDB Community Server
+#### MongoDB Community Server
 
 ```
 ECOSONAR_ENV_DB_TYPE = 'MongoDB'
@@ -232,7 +232,7 @@ ECOSONAR_ENV_DB_PORT = '27017'
 ECOSONAR_ENV_DB_NAME = 'EcoSonar'
 ```
 
-##### MongoDB Atlas
+#### MongoDB Atlas
 
 ```
 ECOSONAR_ENV_DB_TYPE= 'MongoDB_Atlas'
@@ -243,7 +243,7 @@ ECOSONAR_ENV_CLOUD_PROVIDER= 'local' (the database password will be retrieved fr
 ECOSONAR_ENV_PASSWORD = #password
 ```
 
-###### Azure CosmosDB
+##### Azure CosmosDB
 
 ```
 ECOSONAR_ENV_DB_TYPE= 'CosmosDB'
@@ -259,7 +259,7 @@ ECOSONAR_ENV_SECRET_NAME = #keyVaultSecretName (required only if ECOSONAR_ENV_CL
 
 <a name="database-config"></a>
 
-##### Other database or password manager configuration possible
+#### Other database or password manager configuration possible
 
 If you are not using the same MongoDB database than us, you can develop your own.
 Please check to the `EcoSonar-API/configuration/database.js` to set up a different connection string to your database and `EcoSonar-API/configuration/retrieveDatabasePasswordFromCloud.js` for another password manager solution.
@@ -267,7 +267,7 @@ We would be very happy if you want to share this new set up in a Pull Request in
 
 <a name="cors"></a>
 
-#### CORS Setup
+### CORS Setup
 
 To improve API Security, CORS options need to be configured to allow any other application to send requests to the API.
 To configure it, you can add the following environment variable in your Application Configuration to allow requests coming from your frontend interface:
@@ -284,7 +284,7 @@ ECOSONAR_ENV_LOCAL_DEV_SERVER_URL = #URL1;#URL2
 
 <a name="w3c-validator"></a>
 
-#### Enable W3C validator Analysis
+### Enable W3C validator Analysis
 
 W3C Validator needs to make a request to an external API to audit your url. It means that only 'public' pages can be audited right now. We have raised an issue to the team in charge of W3C Auditor to be able to audit also pages protected by authentication. To be continued...
 In the environment variable, you can set the following parameter to request an audit through the external API or not:
@@ -295,7 +295,7 @@ ECOSONAR_ENV_ALLOW_EXTERNAL_API = `true`or `false`
 
 <a name="user-flow"></a>
 
-#### Setup User flow
+### Setup User flow
 
 If your projects require to set up a user flow to access some of your web pages, you should then enable this parameter to run audits on dedicated browser to ensure cookies are correctly configured. However, it will increase the audit time of your project.
 
