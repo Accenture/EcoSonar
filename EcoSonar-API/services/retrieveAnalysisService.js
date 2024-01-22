@@ -35,6 +35,7 @@ RetrieveAnalysisService.prototype.getUrlAnalysis = async function (projectName, 
       w3cAnalysisLastAnalysis = result.w3cLastAnalysis
     })
     .catch((err) => {
+      console.error(err)
       errorRetrievedW3cAnalysis = err
       w3cAnalysisDeployment = []
       w3cAnalysisLastAnalysis = null
@@ -47,6 +48,7 @@ RetrieveAnalysisService.prototype.getUrlAnalysis = async function (projectName, 
       greenitAnalysisLastAnalysis = formatGreenItAnalysis.greenItUrlAnalysisFormatted(result.lastAnalysis)
     })
     .catch((err) => {
+      console.error(err)
       errorRetrievedGreenItAnalysis = err
       greenitAnalysisDeployment = []
       greenitAnalysisLastAnalysis = null
@@ -58,6 +60,7 @@ RetrieveAnalysisService.prototype.getUrlAnalysis = async function (projectName, 
       lighthouseResultLastAnalysis = formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(result.lastAnalysis)
     })
     .catch((err) => {
+      console.error(err)
       errorRetrievedLighthouseAnalysis = err
       lighthouseResultDeployment = []
       lighthouseResultLastAnalysis = null
@@ -117,6 +120,7 @@ RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectNa
       }
     })
     .catch((err) => {
+      console.error(err)
       catchGreenit = err
     })
   await lighthouseRepository
@@ -135,6 +139,7 @@ RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectNa
       }
     })
     .catch((err) => {
+      console.error(err)
       catchLighthouse = err
     })
 
@@ -151,6 +156,7 @@ RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectNa
     }
   })
     .catch((err) => {
+      console.error(err)
       catchW3c = err
     })
 
