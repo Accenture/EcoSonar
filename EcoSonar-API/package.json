@@ -9,7 +9,7 @@
   "main": "app.js",
   "scripts": {
     "postinstall": "node builder.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "node builder.js",
     "start": "nodemon server.js",
     "lint": "eslint --fix --ext .js ."
@@ -45,6 +45,7 @@
     "eslint-plugin-n": "^15.6.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
+    "jest": "^29.7.0",
     "nodemon": "^3.0.1"
   }
 }

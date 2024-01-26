@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const lighthouseSchema = new Schema({
+const reportSchema = {
   idLighthouseAnalysis: {
     type: String,
     required: true,
@@ -118,6 +118,14 @@ const lighthouseSchema = new Schema({
       type: String,
       required: true
     }
+  }
+}
+
+const lighthouseSchema = new Schema({
+  ...reportSchema,
+  mobile:  {
+    type: reportSchema,
+    required: false
   }
 })
 

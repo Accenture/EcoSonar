@@ -180,7 +180,8 @@ const LighthouseRepository = function () {
               speedIndex: 1,
               totalBlockingTime: 1,
               interactive: 1,
-              dateLighthouseAnalysis: 1
+              dateLighthouseAnalysis: 1,
+              mobile: 1
             }
           )
           .sort({ dateLighthouseAnalysis: 1 })
