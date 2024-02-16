@@ -10,6 +10,8 @@ const BestPracticesRepository = function () {
   this.insertBestPractices = async function (reports) {
     if (reports.length > 0) { reports = checkValues(reports) }
 
+    reports = reports.map((report) => replaceDotWithUnderscoreInKeys(report))
+
     return new Promise((resolve, reject) => {
       if (reports.length > 0) {
         bestpractices
@@ -186,6 +188,32 @@ function checkValues (arrayToInsert) {
     }
   }
   return arrayToInsertSanitized
+}
+
+function replaceDotWithUnderscoreInKeys (obj) {
+  if (typeof obj === 'object' && obj !== null) {
+    const newObj = Array.isArray(obj) ? [] : {}
+
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const newKey = key.replace(/\./g, '_')
+        const value = obj[key]
+
+        if (typeof value === 'object' && value !== null) {
+          // If the value is an object, recursively call the function
+          newObj[newKey] = replaceDotWithUnderscoreInKeys(value)
+        } else {
+          // If the value is not an object, simply assign it to the new key
+          newObj[newKey] = value
+        }
+      }
+    }
+
+    return newObj
+  } else {
+    // If the input is not an object, return it as is
+    return obj
+  }
 }
 
 const bestPracticesRepository = new BestPracticesRepository()
