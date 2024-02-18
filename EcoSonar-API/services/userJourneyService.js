@@ -50,7 +50,12 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
           await applyChange(step.value, element)
           break
         case 'scroll' :
-          await userJourneyService.scrollUntilPercentage(page, step.distancePercentage)
+          var selectors = step.selectors[0][0]
+          await page.evaluate((selectors) => {
+            const element = document.querySelector(selectors);
+            const y = element.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({top: y - 100});
+          }, selectors);
           break
         default:
           break
