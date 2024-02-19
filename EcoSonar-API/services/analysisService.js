@@ -12,68 +12,69 @@ const w3cRepository = require('../dataBase/w3cRepository')
 const formatW3cBestPractices = require('./format/formatW3cBestPractices')
 const formatW3cAnalysis = require('./format/formatW3cAnalysis')
 
-class AnalysisService {}
+class AnalysisService {
 
-/**
- * Insert a new analysis into database
- * @param {string} projectName
- * @param {boolean} autoscroll is used to enable autoscrolling for each tab opened during analysis
- */
-AnalysisService.prototype.insert = async function (projectName, autoscroll) {
-  const allowExternalAPI = process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API
-  let urlProjectList = []
-  let reports = []
-  let systemError = false
+  /**
+   * Insert a new analysis into database
+   * @param {string} projectName
+   * @param {boolean} autoscroll is used to enable autoscrolling for each tab opened during analysis
+   */
+  async insert (projectName, autoscroll) {
+    const allowExternalAPI = process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API
+    let urlProjectList = []
+    let reports = []
+    let systemError = false
 
-  try {
-    urlProjectList = await urlsProjectRepository.findAll(projectName, true)
-  } catch (error) {
-    console.log('GREENIT INSERT - can not retrieved urls from project')
-    systemError = true
-  }
-
-  if (systemError || urlProjectList.length === 0) {
-    console.log('GREENIT INSERT - project has no url to do the audit. Audit stopped')
-  } else {
-    reports = await launchAuditsToUrlList(urlProjectList, autoscroll, projectName, allowExternalAPI)
-    const reportsFormatted = formatAuditsToBeSaved(reports, urlProjectList)
-
-    greenItRepository
-      .insertAll(reportsFormatted.greenitAnalysisFormatted)
-      .then(() => {
-        console.log('GREENIT INSERT - analysis has been insert')
-      })
-      .catch(() => {
-        console.log('GREENIT INSERT - greenit insertion failed')
-      })
-
-    lighthouseRepository
-      .insertAll(reportsFormatted.analysisLighthouseFormatted)
-      .then(() => {
-        console.log('LIGHTHOUSE INSERT - analysis has been insert')
-      })
-      .catch(() => {
-        console.log('LIGHTHOUSE INSERT - lighthouse insertion failed')
-      })
-
-    if (allowExternalAPI === 'true') {
-      w3cRepository.insertAll(reportsFormatted.w3cAnalysisFormatted)
-        .then(() => {
-          console.log('W3C INSERT - analysis has been insert')
-        })
-        .catch(() => {
-          console.log('W3C INSERT - w3c insertion failed')
-        })
+    try {
+      urlProjectList = await urlsProjectRepository.findAll(projectName, true)
+    } catch (error) {
+      console.log('GREENIT INSERT - can not retrieved urls from project')
+      systemError = true
     }
 
-    bestPracticesRepository
-      .insertBestPractices(reportsFormatted.bestPracticesFormatted)
-      .then(() => {
-        console.log('BEST PRACTICES INSERT - best practices have been inserted')
-      })
-      .catch(() => {
-        console.log('BEST PRACTICES INSERT : best practice insertion failed')
-      })
+    if (systemError || urlProjectList.length === 0) {
+      console.log('GREENIT INSERT - project has no url to do the audit. Audit stopped')
+    } else {
+      reports = await launchAuditsToUrlList(urlProjectList, autoscroll, projectName, allowExternalAPI)
+      const reportsFormatted = formatAuditsToBeSaved(reports, urlProjectList)
+
+      greenItRepository
+          .insertAll(reportsFormatted.greenitAnalysisFormatted)
+          .then(() => {
+            console.log('GREENIT INSERT - analysis has been insert')
+          })
+          .catch(() => {
+            console.log('GREENIT INSERT - greenit insertion failed')
+          })
+
+      lighthouseRepository
+          .insertAll(reportsFormatted.analysisLighthouseFormatted)
+          .then(() => {
+            console.log('LIGHTHOUSE INSERT - analysis has been insert')
+          })
+          .catch(() => {
+            console.log('LIGHTHOUSE INSERT - lighthouse insertion failed')
+          })
+
+      if (allowExternalAPI === 'true') {
+        w3cRepository.insertAll(reportsFormatted.w3cAnalysisFormatted)
+            .then(() => {
+              console.log('W3C INSERT - analysis has been insert')
+            })
+            .catch(() => {
+              console.log('W3C INSERT - w3c insertion failed')
+            })
+      }
+
+      bestPracticesRepository
+          .insertBestPractices(reportsFormatted.bestPracticesFormatted)
+          .then(() => {
+            console.log('BEST PRACTICES INSERT - best practices have been inserted')
+          })
+          .catch(() => {
+            console.log('BEST PRACTICES INSERT : best practice insertion failed')
+          })
+    }
   }
 }
 
@@ -109,6 +110,25 @@ async function launchAuditsToUrlList (urlProjectList, autoscroll, projectName, a
   }
 }
 
+function createLighthouseAudit(lighthouseReport, urlProjectList, date) {
+  const formattedLighthouseMetrics = formatLighthouseMetrics.formatLighthouseMetrics(lighthouseReport)
+  const urlProjectAudited = urlProjectList.filter((urlProject) => urlProject.urlName === lighthouseReport.url)
+  const lighthouseAudit = {
+    idLighthouseAnalysis: uniqid(),
+    idUrlLighthouse: urlProjectAudited[0].idKey,
+    dateLighthouseAnalysis: date,
+    performance: formattedLighthouseMetrics.performance,
+    accessibility: formattedLighthouseMetrics.accessibility,
+    largestContentfulPaint: formattedLighthouseMetrics.largestContentfulPaint,
+    cumulativeLayoutShift: formattedLighthouseMetrics.cumulativeLayoutShift,
+    firstContentfulPaint: formattedLighthouseMetrics.firstContentfulPaint,
+    speedIndex: formattedLighthouseMetrics.speedIndex,
+    totalBlockingTime: formattedLighthouseMetrics.totalBlockingTime,
+    interactive: formattedLighthouseMetrics.interactive
+  }
+  return lighthouseAudit;
+}
+
 function formatAuditsToBeSaved (reports, urlProjectList) {
   const greenitAnalysisFormatted = []
   const analysisLighthouseFormatted = []
@@ -140,22 +160,9 @@ function formatAuditsToBeSaved (reports, urlProjectList) {
   // Format Lighthouse Analysis
   for (const lighthouseReport of reports.reportsLighthouse) {
     if (lighthouseReport?.runtimeError === undefined) {
-      const formattedLighthouseMetrics = formatLighthouseMetrics.formatLighthouseMetrics(lighthouseReport)
-      const urlProjectAudited = urlProjectList.filter((urlProject) => urlProject.urlName === lighthouseReport.url)
-      const lighthouseAudit = {
-        idLighthouseAnalysis: uniqid(),
-        idUrlLighthouse: urlProjectAudited[0].idKey,
-        dateLighthouseAnalysis: date,
-        performance: formattedLighthouseMetrics.performance,
-        accessibility: formattedLighthouseMetrics.accessibility,
-        largestContentfulPaint: formattedLighthouseMetrics.largestContentfulPaint,
-        cumulativeLayoutShift: formattedLighthouseMetrics.cumulativeLayoutShift,
-        firstContentfulPaint: formattedLighthouseMetrics.firstContentfulPaint,
-        speedIndex: formattedLighthouseMetrics.speedIndex,
-        totalBlockingTime: formattedLighthouseMetrics.totalBlockingTime,
-        interactive: formattedLighthouseMetrics.interactive
-      }
-      analysisLighthouseFormatted.push(lighthouseAudit)
+      const lighthouseAudit = createLighthouseAudit(lighthouseReport, urlProjectList, date);
+      const lighthouseAuditMobile = createLighthouseAudit(lighthouseReport.mobile, urlProjectList, date);
+      analysisLighthouseFormatted.push({ ...lighthouseAudit, mobile: lighthouseAuditMobile })
       lighthousePerformanceBestPractices.push(formatLighthouseBestPractices.formatPerformance(lighthouseReport))
       lighthouseAccessibilityBestPractices.push(formatLighthouseBestPractices.formatAccessibility(lighthouseReport))
     }
@@ -209,4 +216,4 @@ function formatAuditsToBeSaved (reports, urlProjectList) {
 }
 
 const analysisService = new AnalysisService()
-module.exports = analysisService
+module.exports = { analysisService, formatAuditsToBeSaved }

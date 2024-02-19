@@ -129,7 +129,6 @@ RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectNa
       if (res.deployments.length !== 0) {
         // deployments
         lighthouseAnalysisDeployments = formatLighthouseAnalysis.lighthouseAnalysisFormattedDeployments(res.deployments)
-
         // lastAnalysis
         lighthouseProjectLastAnalysis = formatLighthouseAnalysis.lighthouseProjectLastAnalysisFormatted(res.lastAnalysis)
       } else {
