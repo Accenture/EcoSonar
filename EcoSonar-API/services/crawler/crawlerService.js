@@ -7,15 +7,6 @@ const tempUrlsProjectRepository = require('../../dataBase/tempurlsProjectReposit
 class CrawlerService { }
 
 /**
- * VARIABLES
- */
-let webSitePrefixWithoutProtocol
-let webSitePrefixWithProtocol
-let websiteProtocol
-let alternativeProtocol
-let seenUrls
-
-/**
  *
  * @param {*} projectName the name of the project
  * @param {*} mainUrl the main url used to start crawling
@@ -25,7 +16,7 @@ let seenUrls
 CrawlerService.prototype.launchCrawl = async function (projectName, mainUrl, savedAsPermanent) {
   let crawledUrls = []
   let projectUrls = []
-  seenUrls = []
+  const seenUrls = []
 
   const browserArgs = [
     '--no-sandbox', // can't run inside docker without
@@ -48,9 +39,9 @@ CrawlerService.prototype.launchCrawl = async function (projectName, mainUrl, sav
   })
 
   try {
-    getWebsiteProtocolAndPrefix(mainUrl)
+    const websiteDetails = getWebsiteProtocolAndPrefix(mainUrl)
     await authenticationService.loginIfNeeded(browser)
-    await recursiveCrawl(mainUrl, browser, crawledUrls)
+    await recursiveCrawl(mainUrl, browser, crawledUrls, seenUrls, websiteDetails)
   } catch (error) {
     console.error(error)
   } finally { browser.close() }
@@ -83,6 +74,9 @@ CrawlerService.prototype.launchCrawl = async function (projectName, mainUrl, sav
  * This function extract the websiteProtocol (http or https) and the website name from the given entry URL
  */
 function getWebsiteProtocolAndPrefix (url) {
+  let websiteProtocol
+  let alternativeProtocol
+  let webSitePrefixWithoutProtocol
   if (url.includes('http://')) {
     websiteProtocol = 'http://'
     alternativeProtocol = 'https://'
@@ -101,7 +95,14 @@ function getWebsiteProtocolAndPrefix (url) {
   } else {
     webSitePrefixWithoutProtocol = urlWithoutWebsiteProtocol
   }
-  webSitePrefixWithProtocol = websiteProtocol + webSitePrefixWithoutProtocol
+  const webSitePrefixWithProtocol = websiteProtocol + webSitePrefixWithoutProtocol
+
+  return {
+    websiteProtocol,
+    alternativeProtocol,
+    webSitePrefixWithoutProtocol,
+    webSitePrefixWithProtocol
+  }
 }
 
 /**
@@ -110,10 +111,10 @@ function getWebsiteProtocolAndPrefix (url) {
    * @returns a array of URL
    * Crawler extract every URL into the website, then crawl them recursively until every URL has already been seen.
    */
-async function recursiveCrawl (url, browser, crawledUrls) {
+async function recursiveCrawl (url, browser, crawledUrls, seenUrls, websiteDetails) {
   try {
     if (!seenUrls.includes(url)) {
-      if (CrawlerService.prototype.checkUrl(url)) {
+      if (checkUrl(url, seenUrls)) {
         // CRAWLING PAGE
         console.log('CRAWLING', url)
         seenUrls.push(url)
@@ -132,9 +133,9 @@ async function recursiveCrawl (url, browser, crawledUrls) {
           .get()
 
         for (const link of links) {
-          const retrievedUrl = CrawlerService.prototype.getUrl(link)
+          const retrievedUrl = getUrl(link, websiteDetails)
           if (retrievedUrl) {
-            await recursiveCrawl(retrievedUrl, browser, crawledUrls)
+            await recursiveCrawl(retrievedUrl, browser, crawledUrls, seenUrls, websiteDetails)
           }
         }
       }
@@ -204,17 +205,17 @@ async function saveUrlsCrawled (projectName, urlsList, savedAsPermanent) {
  * @returns a formatted link
  * Avoid issue with relatives URL by formatting links to be crawled. Ex : given '/about' when crawling, function will construct an usable URL with websiteProtocol and websitePrefix to be : 'https://nameofthewebsite.com/about'
  */
-CrawlerService.prototype.getUrl = function (link) {
+function getUrl (link, websiteDetails) {
   // Exclude links that are outside website
-  if ((link.includes(websiteProtocol) || link.includes(alternativeProtocol)) && link.startsWith(webSitePrefixWithProtocol)) {
+  if ((link.includes(websiteDetails.websiteProtocol) || link.includes(websiteDetails.alternativeProtocol)) && link.startsWith(websiteDetails.webSitePrefixWithProtocol)) {
     return undefined
   } else {
     // If the link is part of the website
-    if (!link.includes(websiteProtocol) && !link.includes(webSitePrefixWithoutProtocol) && !link.startsWith('/')) {
-      return `${websiteProtocol}${webSitePrefixWithoutProtocol}/${link}`
-    } else if (!link.includes(websiteProtocol) && !link.includes(webSitePrefixWithoutProtocol) && link.startsWith('/')) {
-      return `${websiteProtocol}${webSitePrefixWithoutProtocol}${link}`
-    } else if (link.includes(websiteProtocol) && link.includes(webSitePrefixWithoutProtocol)) {
+    if (!link.includes(websiteDetails.websiteProtocol) && !link.includes(websiteDetails.webSitePrefixWithoutProtocol) && !link.startsWith('/')) {
+      return `${websiteDetails.websiteProtocol}${websiteDetails.webSitePrefixWithoutProtocol}/${link}`
+    } else if (!link.includes(websiteDetails.websiteProtocol) && !link.includes(websiteDetails.webSitePrefixWithoutProtocol) && link.startsWith('/')) {
+      return `${websiteDetails.websiteProtocol}${websiteDetails.webSitePrefixWithoutProtocol}${link}`
+    } else if (link.includes(websiteDetails.websiteProtocol) && link.includes(websiteDetails.webSitePrefixWithoutProtocol)) {
       return link
     } else {
       return undefined
@@ -228,7 +229,7 @@ CrawlerService.prototype.getUrl = function (link) {
  * Exclude the url that return a file or a mailing redirection
  * @returns a boolean depending on the result of the check
  */
-CrawlerService.prototype.checkUrl = function (url) {
+function checkUrl (url, seenUrls) {
   const invalidUrl = ['.csv', '.pdf', 'mailto:', '.jpg', '.jpeg', '.gif', '.docx', '.txt', '.bmp', '#']
   const result = invalidUrl.some((element) => url.includes(element))
   if (result) {
@@ -241,18 +242,15 @@ CrawlerService.prototype.checkUrl = function (url) {
 /**
  *
  * @param {string} projectName project name
- * retrieve the temporary urls saved from last crawling in the database for this project
+ * retrieve the temporary urls saved from last crawlings in the database for this project
  * @returns a list of urls crawled saved
  */
 CrawlerService.prototype.retrieveCrawledUrl = async function (projectName) {
   return new Promise((resolve, reject) => {
     tempUrlsProjectRepository.findUrls(projectName)
       .then((result) => {
-        if (result && result.urlsList.length > 0) {
-          resolve(result.urlsList)
-        } else {
-          reject(new Error('No crawled urls were saved for this project'))
-        }
+        const urlsCrawled = result ? result.urlsList : []
+        resolve(urlsCrawled)
       }).catch((error) => {
         reject(error)
       })

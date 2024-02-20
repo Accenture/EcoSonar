@@ -1,5 +1,6 @@
 const formatCompliance = require('./formatCompliance')
 const metricsW3c = require('../../utils/metricsW3c.json')
+
 class FormatW3cAnalysis {}
 
 /**
@@ -14,28 +15,22 @@ class FormatW3cAnalysis {}
  * @returns a formatted deployment grouped by date to be used in the graph
  */
 FormatW3cAnalysis.prototype.w3cAnalysisFormattedDeployments = function (deployments) {
-  let j = 0
-  const formattedDeployments = []
-  let formattedMetrics
+  let formattedDeployments = []
 
   try {
-    while (j < deployments.length) {
-      // For each category of error we subtract a value from the score depending on how many of this error type are present
-      formattedMetrics = {
-        score: deployments[j].score,
-        dateAnalysis: deployments[j].dateW3cAnalysis,
-        w3cBestPractices: deployments[j].w3cBestPractices
+    formattedDeployments = deployments.map((el) => {
+      return {
+        score: el.score,
+        dateAnalysis: el.dateW3cAnalysis,
+        w3cBestPractices: el.w3cBestPractices
       }
-
-      formattedDeployments[j] = formattedMetrics
-
-      j++
-    }
-    return this.formatDeploymentsForGraphs(formattedDeployments)
+    })
+    formattedDeployments = this.formatDeploymentsForGraphs(formattedDeployments)
   } catch (error) {
-    console.log(error)
-    console.log('W3C - error during the formatting of project analysis')
+    console.error(error)
+    console.error('W3C - error during the formatting of project analysis')
   }
+  return formattedDeployments
 }
 
 /**
@@ -46,31 +41,40 @@ FormatW3cAnalysis.prototype.w3cAnalysisFormattedDeployments = function (deployme
 FormatW3cAnalysis.prototype.formatDeploymentsForGraphs = function (formattedDeployments) {
   const duplicatedDeployments = []
   let totalw3cPractices = []
+  let finalDeployment = []
 
-  for (const i of formattedDeployments) {
-    // We filter deployments to find the values with the same date
-    const duplicatedValuesArray = formattedDeployments.filter((element) => compareFullDate(element.dateAnalysis, i.dateAnalysis))
-    for (const value of duplicatedValuesArray) {
-      if (value.w3cBestPractices !== undefined) {
-        for (const practice of value.w3cBestPractices) {
-          totalw3cPractices.push(practice)
+  try {
+    for (const i of formattedDeployments) {
+      // We filter deployments to find the values with the same date
+      const duplicatedValuesArray = formattedDeployments.filter((element) => compareFullDate(element.dateAnalysis, i.dateAnalysis))
+      for (const value of duplicatedValuesArray) {
+        if (value.w3cBestPractices !== undefined) {
+          for (const practice of value.w3cBestPractices) {
+            totalw3cPractices.push(practice)
+          }
         }
       }
-    }
 
-    totalw3cPractices = formatW3c(totalw3cPractices)
-    const score = this.calculateScore(totalw3cPractices)
-    duplicatedDeployments.push({ score, dateAnalysis: duplicatedValuesArray[0].dateAnalysis })
+      totalw3cPractices = formatW3c(totalw3cPractices)
+      const score = this.calculateScore(totalw3cPractices)
+      duplicatedDeployments.push({ score, dateAnalysis: duplicatedValuesArray[0].dateAnalysis })
+    }
+    // Sanitizing duplicatedDeployments
+    finalDeployment = getUniqueListByDate(duplicatedDeployments, 'dateAnalysis')
+  } catch (error) {
+    console.error(error)
+    console.error('W3C - error during the formatting of project analysis')
   }
-  // Sanitizing duplicatedDeployments
-  const finalDeployment = getUniqueListByDate(duplicatedDeployments, 'dateAnalysis')
-  function getUniqueListByDate (arr, key) {
-    return [...new Map(arr.map((item) => [item[key], item])).values()]
-  }
-  function compareFullDate (firstDate, secondDate) {
-    return firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear()
-  }
+
   return finalDeployment
+}
+
+function getUniqueListByDate (arr, key) {
+  return [...new Map(arr.map((item) => [item[key], item])).values()]
+}
+
+function compareFullDate (firstDate, secondDate) {
+  return firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear()
 }
 
 /**
@@ -79,7 +83,7 @@ FormatW3cAnalysis.prototype.formatDeploymentsForGraphs = function (formattedDepl
  * @returns a formatted analysis to be merged in accessibility item
  */
 FormatW3cAnalysis.prototype.w3cLastAnalysisFormatted = function (latestW3cAnalysis) {
-  const w3c = { totalInfo: 0, totalWarning: 0, totalError: 0, totalFatalError: 0, score: 0 }
+  let w3c = null
   let w3cMetricArray = []
   let score = 0
   let totalInfo = 0
@@ -93,10 +97,8 @@ FormatW3cAnalysis.prototype.w3cLastAnalysisFormatted = function (latestW3cAnalys
         w3cMetricArray.push(metric)
       }
     }
-
     w3cMetricArray = formatW3c(w3cMetricArray)
     score = this.calculateScore(w3cMetricArray)
-
     for (const practice of w3cMetricArray) {
       if (practice.type === 'info') totalInfo += 1
       if (practice.type === 'warning') totalWarning += 1
@@ -104,19 +106,20 @@ FormatW3cAnalysis.prototype.w3cLastAnalysisFormatted = function (latestW3cAnalys
       if (practice.type === 'fatal error') totalFatalError += 1
     }
 
-    // Setting the returned object
-    w3c.score = Math.round(score)
-    w3c.grade = formatCompliance.getAccessibilityGrade(w3c.score)
-    w3c.dateAnalysis = latestW3cAnalysis[0].dateW3cAnalysis
-    w3c.totalWarning = totalWarning
-    w3c.totalError = totalError
-    w3c.totalFatalError = totalFatalError
-    w3c.totalInfo = totalInfo
-    return w3c
+    w3c = {
+      totalInfo,
+      totalWarning,
+      totalError,
+      totalFatalError,
+      score: Math.round(score),
+      grade: formatCompliance.getAccessibilityGrade(score),
+      dateAnalysis: latestW3cAnalysis[0].dateW3cAnalysis
+    }
   } catch (error) {
-    console.log(error)
-    console.log('W3C - error during the formatting of project analysis')
+    console.error(error)
+    console.error('W3C - error during the formatting of project analysis')
   }
+  return w3c
 }
 
 /**
@@ -179,7 +182,8 @@ function formatW3c (errorsList) {
     }
     return errorsListWithoutDuplicat
   } catch (err) {
-    console.log('W3C - Error during the deletion of duplicate errors for w3c analysis')
+    console.error(err)
+    console.error('W3C - Error during the deletion of duplicate errors for w3c analysis')
   }
 }
 const formatW3cAnalysis = new FormatW3cAnalysis()

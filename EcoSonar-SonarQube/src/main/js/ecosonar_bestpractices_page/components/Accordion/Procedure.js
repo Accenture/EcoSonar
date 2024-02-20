@@ -6,12 +6,12 @@ export default function Procedure (props) {
   const [procedureName, setProcedureName] = useState('')
 
   useEffect(() => {
-    if (procedure === 'scoreImpact') {
-      setProcedureName('Score Impact')
+    if (procedure === 'quickWins') {
+      setProcedureName('Quick Wins')
     } else if (procedure === 'highestImpact') {
       setProcedureName('Highest Impact')
     } else {
-      setProcedureName('Quick Wins')
+      setProcedureName('Score Impact')
     }
   })
   return (

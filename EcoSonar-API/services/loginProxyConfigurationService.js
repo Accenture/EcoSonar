@@ -6,36 +6,28 @@ class LoginProxyConfigurationService {}
 
 LoginProxyConfigurationService.prototype.insertLoginCredentials = async function (projectName, loginCredentials) {
   let projectSettingsRegistered = null
-  let systemError = null
-  const succesMessage = 'INSERT LOGIN CONFIGURATION - Success'
+  let systemError = false
+
   await projectsRepository.getProjectSettings(projectName)
     .then((projectSettings) => {
       projectSettingsRegistered = projectSettings
-    }).catch((error) => {
-      if (error instanceof SystemError) {
-        systemError = new SystemError()
-      }
+    }).catch(() => {
+      systemError = true
     })
-  if (projectSettingsRegistered === null) {
+  if (!systemError && projectSettingsRegistered === null) {
     await projectsRepository.createLoginConfiguration(projectName, loginCredentials)
-      .then(() => {
-        console.log(succesMessage)
-      })
       .catch(() => {
-        systemError = new SystemError()
+        systemError = true
       })
-  } else {
-    await projectsRepository.updateLoginConfiguration(projectName, projectSettingsRegistered.procedure, loginCredentials)
-      .then(() => {
-        console.log(succesMessage)
-      })
+  } else if (!systemError) {
+    await projectsRepository.updateLoginConfiguration(projectName, loginCredentials)
       .catch(() => {
-        systemError = new SystemError()
+        systemError = true
       })
   }
   return new Promise((resolve, reject) => {
-    if (systemError !== null) {
-      reject(systemError)
+    if (systemError) {
+      reject(new SystemError())
     } else {
       resolve()
     }
@@ -44,36 +36,28 @@ LoginProxyConfigurationService.prototype.insertLoginCredentials = async function
 
 LoginProxyConfigurationService.prototype.insertProxyConfiguration = async function (projectName, proxy) {
   let projectSettingsRegistered = null
-  let systemError = null
-  const succesMessage = 'INSERT PROXY CONFIGURATION - Success'
+  let systemError = false
+
   await projectsRepository.getProjectSettings(projectName)
     .then((projectSettings) => {
       projectSettingsRegistered = projectSettings
-    }).catch((error) => {
-      if (error instanceof SystemError) {
-        systemError = new SystemError()
-      }
+    }).catch(() => {
+      systemError = true
     })
-  if (projectSettingsRegistered === null) {
+  if (!systemError && projectSettingsRegistered === null) {
     await projectsRepository.createProxyConfiguration(projectName, proxy)
-      .then(() => {
-        console.log(succesMessage)
-      })
       .catch(() => {
-        systemError = new SystemError()
+        systemError = true
       })
-  } else {
-    await projectsRepository.updateProxyConfiguration(projectName, projectSettingsRegistered.procedure, proxy)
-      .then(() => {
-        console.log(succesMessage)
-      })
+  } else if (!systemError) {
+    await projectsRepository.updateProxyConfiguration(projectName, proxy)
       .catch(() => {
-        systemError = new SystemError()
+        systemError = true
       })
   }
   return new Promise((resolve, reject) => {
-    if (systemError !== null) {
-      reject(systemError)
+    if (systemError) {
+      reject(new SystemError())
     } else {
       resolve()
     }
@@ -86,7 +70,8 @@ LoginProxyConfigurationService.prototype.getLoginCredentials = async function (p
   const username = process.env.ECOSONAR_ENV_AUTHENTICATION_USERNAME || ''
   const password = process.env.ECOSONAR_ENV_AUTHENTICATION_PASSWORD || ''
   let loginInformations = {}
-  let error = null
+  let error = false
+
   if (configSettings === 'env' && authenticationUrl !== '' && username !== '' && password !== '') {
     loginInformations = {
       authentication_url: authenticationUrl,
@@ -114,13 +99,13 @@ LoginProxyConfigurationService.prototype.getLoginCredentials = async function (p
           }
         }
       })
-      .catch((errorRepository) => {
-        error = errorRepository
+      .catch(() => {
+        error = true
       })
   }
   return new Promise((resolve, reject) => {
-    if (error !== null) {
-      reject(error)
+    if (error) {
+      reject(new SystemError())
     } else if (Object.entries(loginInformations).length === 0) {
       reject(new Error('Your project does not have login saved.'))
     } else {
@@ -134,7 +119,8 @@ LoginProxyConfigurationService.prototype.getProxyConfiguration = async function 
   const ipAddress = process.env.ECOSONAR_ENV_PROXY_IP_ADDRESS || ''
   const port = process.env.ECOSONAR_ENV_PROXY_PORT || ''
   let proxyInformations = {}
-  let error = null
+  let error = false
+
   if (configSettings === 'env' && ipAddress !== '' && port !== '') {
     proxyInformations = {
       ipAddress,
@@ -155,13 +141,13 @@ LoginProxyConfigurationService.prototype.getProxyConfiguration = async function 
           proxyInformations = result.proxy
         }
       })
-      .catch((errorRepository) => {
-        error = errorRepository
+      .catch(() => {
+        error = true
       })
   }
   return new Promise((resolve, reject) => {
-    if (error !== null) {
-      reject(error)
+    if (error) {
+      reject(new SystemError())
     } else if (Object.entries(proxyInformations).length === 0) {
       reject(new Error('Your project does not have proxy configuration saved.'))
     } else {
@@ -171,21 +157,59 @@ LoginProxyConfigurationService.prototype.getProxyConfiguration = async function 
 }
 
 LoginProxyConfigurationService.prototype.deleteLoginCredentials = async function (projectName) {
-  const result = await projectsRepository.getProjectSettings(projectName)
-  if (result === null) {
-    throw new Error('Project not found')
-  } else {
-    projectsRepository.deleteLoginCredentials(projectName, result.procedure, result.proxy)
+  let projectRegistered = null
+  let systemError = false
+
+  await projectsRepository.getProjectSettings(projectName)
+    .then((result) => {
+      projectRegistered = result
+    })
+    .catch(() => {
+      systemError = true
+    })
+  if (!systemError && projectRegistered === null) {
+    return Promise.reject(new Error('Project not found'))
+  } else if (!systemError) {
+    projectsRepository.deleteLoginCredentials(projectName, projectRegistered.procedure, projectRegistered.proxy)
+      .catch(() => {
+        systemError = true
+      })
   }
+  return new Promise((resolve, reject) => {
+    if (systemError) {
+      reject(new SystemError())
+    } else {
+      resolve()
+    }
+  })
 }
 
 LoginProxyConfigurationService.prototype.deleteProxyConfiguration = async function (projectName) {
-  const result = await projectsRepository.getProjectSettings(projectName)
-  if (result === null) {
-    throw new Error('Project not found')
-  } else {
-    projectsRepository.deleteProxyConfiguration(projectName, result.procedure, result.login)
+  let projectRegistered = null
+  let systemError = false
+
+  await projectsRepository.getProjectSettings(projectName)
+    .then((result) => {
+      projectRegistered = result
+    })
+    .catch(() => {
+      systemError = true
+    })
+  if (!systemError && projectRegistered === null) {
+    return Promise.reject(new Error('Project not found'))
+  } else if (!systemError) {
+    projectsRepository.deleteProxyConfiguration(projectName, projectRegistered.procedure, projectRegistered.login)
+      .catch(() => {
+        systemError = true
+      })
   }
+  return new Promise((resolve, reject) => {
+    if (systemError) {
+      reject(new SystemError())
+    } else {
+      resolve()
+    }
+  })
 }
 
 const loginproxyConfigurationService = new LoginProxyConfigurationService()

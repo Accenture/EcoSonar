@@ -76,6 +76,7 @@ EnumAudits.prototype.performanceNamesToReturn = function () {
     usesLongCacheTtl: 'uses-long-cache-ttl',
     usesResponsiveImages: 'uses-responsive-images',
     offscreenImages: 'offscreen-images',
+    unminifiedJavascript: 'unminified-javascript',
     unusedCssRules: 'unused-css-rules',
     unusedJavascript: 'unused-javascript',
     usesOptimizedImages: 'uses-optimized-images',
@@ -83,13 +84,12 @@ EnumAudits.prototype.performanceNamesToReturn = function () {
     usesTextCompression: 'uses-text-compression',
     usesHttp2: 'uses-http2',
     efficientAnimatedContent: 'efficient-animated-content',
+    duplicatedJavascript: 'duplicated-javascript',
     legacyJavascript: 'legacy-javascript',
     totalByteWeight: 'total-byte-weight',
     noDocumentWrite: 'no-document-write',
     layoutShiftElements: 'layout-shift-elements',
-    usesPassiveEventListeners: 'uses-passive-event-listeners',
-    unminifiedJavascript: 'unminified-javascript',
-    duplicatedJavascript: 'duplicated-javascript'
+    usesPassiveEventListeners: 'uses-passive-event-listeners'
   }
 }
 

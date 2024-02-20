@@ -42,7 +42,6 @@ const TempUrlsProjectRepository = function () {
   /**
    * get urls crawled for the project in the collection temporaryurlsProject
    * @param {string} projectName project name
-   * @param {Array} urls urls crawled to be saved
    * @returns list of urls crawled
    */
   this.findUrls = async function (name) {

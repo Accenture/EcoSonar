@@ -30,14 +30,9 @@ export function getUrlsConfiguration (projectName) {
         console.log('CONFIG URL SERVICE - GET : ' + response.data.length + ' urls retrieved')
         resolve(response.data)
       })
-      .catch((error) => {
-        if (error.response && error.response.status === 400) {
-          console.error('CONFIG URL SERVICE - GET : {} has no url registered', projectName)
-          reject(new Error(errors.noUrlAssigned))
-        } else {
-          console.error('CONFIG URL SERVICE  - GET : An error occured while retrieving URLs for project ' + projectName)
-          reject(new Error(formatError(errors.errorRetrievingURL, projectName)))
-        }
+      .catch(() => {
+        console.error('CONFIG URL SERVICE  - GET : An error occured while retrieving URLs for project ' + projectName)
+        reject(new Error(formatError(errors.errorRetrievingURL, projectName)))
       })
   })
 }

@@ -30,6 +30,12 @@ async function waitForSelectors (selectors, frame, options) {
 
 async function waitForSelector (selector, frame, options) {
   let element = null
+  const firstSelector = selector[0]
+  if (selector.length === 1 && firstSelector.lastIndexOf('*') === firstSelector.length - 1 && firstSelector.indexOf('#') === 0) {
+    const idStartsWith = firstSelector.substring(1, firstSelector.length - 2)
+    return await frame.waitForSelector(`[id^="${idStartsWith}"]`)
+  }
+
   for (let i = 0; i < selector.length; i++) {
     const part = selector[i]
     if (part.startsWith('aria')) {

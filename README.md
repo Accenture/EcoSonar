@@ -60,7 +60,7 @@ Example of Architecture deployed on Azure:
 - MongoDB database
 - Private network: protects the data stored in the database and makes it only accessible to the specified services.
 - Subnet associated with the private network: connection between the database and the API
-- Password Manager: store the password to access the database from the API and credentials used to audits pages requiring authentication
+- Password Manager: store the password to access the database from the API
 
 <a name="installation"></a>
 
@@ -68,7 +68,8 @@ Example of Architecture deployed on Azure:
 
 To install EcoSonar locally, you have two options:
 
-1. Use Docker
+1. Use Docker Compose
+
 Run the following commands:
 ```
 cd EcoSonar-SonarQube
@@ -80,10 +81,10 @@ docker-compose build
 docker-compose up
 ```
 
-2. Launch each component seperately.
+2. Launch each component separately.
 Follow instructions in both Readme file:
-https://github.com/Accenture/EcoSonar/blob/main/EcoSonar-API/README.md
-https://github.com/Accenture/EcoSonar/blob/main/EcoSonar-SonarQube/README.md
+- https://github.com/Accenture/EcoSonar/blob/main/EcoSonar-API/README.md
+- https://github.com/Accenture/EcoSonar/blob/main/EcoSonar-SonarQube/README.md
 
 
 <a name="ecocode-config"></a>
@@ -91,7 +92,7 @@ https://github.com/Accenture/EcoSonar/blob/main/EcoSonar-SonarQube/README.md
 ## Ecocode Configuration
 
 For specific details on Ecocode, please look at their GitHub repository: https://github.com/green-code-initiative/ecoCode .
-You will find here `https://github.com/Accenture/EcoSonar/tree/main/EcoSonar-SonarQube/ecocode` the EcoCode Sonarqube plugin that needs to be imported into your Sonarqube instance.
+You will find here `https://github.com/Accenture/EcoSonar/tree/main/EcoSonar-SonarQube/ecocode` the EcoCode Sonarqube plugins that needs to be imported into your Sonarqube instance.
 To install the ecocode plugins, please follow instruction from EcoSonar SonarQube plugin : https://github.com/Accenture/EcoSonar/blob/main/EcoSonar-SonarQube/README.md
 
 When using Sonarqube as code analysis, a default Quality Profile is set up for each language. If you want to use EcoCode rules related to eco-design, you will have to:
@@ -112,7 +113,7 @@ When using Sonarqube as code analysis, a default Quality Profile is set up for e
 
 ![EcoSonar Default Quality Profile](./images/ecosonar-default-quality-profile.webp)
 
-Do the same setup for each languague you wish to use with Ecocode rules.
+Do the same setup for each language you wish to use with Ecocode rules.
 
 <a name="audit"></a>
 

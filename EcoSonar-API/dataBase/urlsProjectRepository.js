@@ -1,9 +1,5 @@
 const uniqid = require('uniqid')
 const urlsprojects = require('./models/urlsprojects')
-const greenits = require('./models/greenits')
-const bestpractices = require('./models/bestpractices')
-const w3cs = require('./models/w3cs')
-const lighthouses = require('./models/lighthouses')
 const SystemError = require('../utils/SystemError')
 
 const UrlsProjectRepository = function () {
@@ -40,46 +36,27 @@ const UrlsProjectRepository = function () {
             }
             reject(errors)
           } else {
-            const systemError = new SystemError()
-            reject(systemError)
+            reject(new SystemError())
           }
         })
     })
   }
 
   /**
-     * deletion on the table urlsProject
-     * @param {id url} key
-     */
-  this.delete = async function (projectNameReq, urlNameReq) {
-    let empty = false
-    let errDelete = false
-    try {
-      const idKey = await urlsprojects.find({ projectName: projectNameReq, urlName: urlNameReq }, { idKey: 1 })
-      if (idKey.length === 0) {
-        empty = true
-      } else {
-        await greenits.deleteMany({ idUrlGreen: idKey[0].idKey })
-        await bestpractices.deleteOne({ idUrl: idKey[0].idKey })
-        await w3cs.deleteMany({ idUrlW3c: idKey[0].idKey })
-        await lighthouses.deleteMany({ idUrlLighthouse: idKey[0].idKey })
-        await urlsprojects.deleteOne({ projectName: projectNameReq, urlName: urlNameReq })
-      }
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
-      errDelete = true
-    }
+   * Deletion of an url
+   * @param {Object} url url to be deleted
+   */
+  this.deleteUrl = async function (url) {
     return new Promise((resolve, reject) => {
-      if (errDelete) {
-        const systemError = new SystemError()
-        reject(systemError)
-      } else if (empty) {
-        console.log(urlNameReq + ' in ' + projectNameReq + ' not found')
-        reject(new Error(urlNameReq + ' in ' + projectNameReq + ' not found'))
-      } else {
-        console.log('analysis linked to url ' + urlNameReq + ' from ' + projectNameReq + ' were deleted as well as url')
-        resolve()
-      }
+      urlsprojects.deleteOne({ urlName: url[0].urlName })
+        .then((result) => {
+          console.log(`DELETE URL - On URL PROJECT ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
@@ -103,24 +80,18 @@ const UrlsProjectRepository = function () {
 
   /**
    * list all urls of a project
-   * @param {string} projectName name of the project
-   * @param {boolean} getUrlNameOnly retrieve only parameter url from the collection
+   * @param {string} projectNameReq name of the project
    */
-  this.findAll = async function (projectNameReq, getUrlNameOnly) {
+  this.findAll = async function (projectNameReq) {
     return new Promise((resolve, reject) => {
-      let res
-      try {
-        if (getUrlNameOnly) {
-          res = urlsprojects.find({ projectName: projectNameReq })
-        } else {
-          res = urlsprojects.find({ projectName: projectNameReq }, { urlName: 1 })
-        }
-        resolve(res)
-      } catch (error) {
-        console.error('\x1b[31m%s\x1b[0m', error)
-        const systemError = new SystemError()
-        reject(systemError)
-      }
+      urlsprojects.find({ projectName: projectNameReq })
+        .then((result) => {
+          resolve(result)
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
@@ -136,8 +107,7 @@ const UrlsProjectRepository = function () {
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
-          const systemError = new SystemError()
-          reject(systemError)
+          reject(new SystemError())
         })
     })
   }
@@ -149,43 +119,63 @@ const UrlsProjectRepository = function () {
    * @returns user flow for the project and url defined
    */
   this.getUserFlow = async function (projectName, urlName) {
-    let systemError = null
-    let result
-    try {
-      result = await urlsprojects.findOne({ projectName, urlName }, { idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error.message)
-      console.log(`Error when retrieving user flow for ${urlName}`)
-      systemError = new SystemError()
-    }
     return new Promise((resolve, reject) => {
-      if (systemError !== null) {
-        reject(systemError)
-      } else {
-        resolve(result)
-      }
+      urlsprojects.findOne({ projectName, urlName }, { idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
+        .then((result) => {
+          resolve(result)
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
   /**
-   * Deletion of user flow for a specified url
+   * Deletion of user flow for a specified url in a project
+   * @param {string} projectName project name of the url
    * @param {string} urlName url to delete user flow
    */
   this.deleteUserFlow = async function (projectName, urlName) {
-    let systemError = null
-    try {
-      await urlsprojects.updateOne({ projectName, urlName }, { $unset: { userFlow: '' } })
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error.message)
-      systemError = new SystemError()
+    return new Promise((resolve, reject) => {
+      urlsprojects.updateOne({ projectName, urlName }, { $unset: { userFlow: '' } })
+        .then(() => { resolve() })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
+    })
+  }
+
+  this.findUrl = async function (projectName, urlName) {
+    return new Promise((resolve, reject) => {
+      urlsprojects.find({ projectName, urlName }, { idKey: 1 })
+        .then((result) => { resolve(result) })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
+    })
+  }
+  /**
+   * get all projects in database that match a regexp
+   * @param {string} filterName regexp for the project name
+   * @returns an array with the projectName for all projects found
+   */
+  this.findAllProjectsNames = async function (filterName) {
+    let query = {}
+    if (filterName !== null) {
+      query = { projectName: { $regex: new RegExp(filterName, 'i') } }
     }
     return new Promise((resolve, reject) => {
-      if (systemError !== null) {
-        console.log('error during deletion of user flow for ' + urlName)
-        reject(systemError)
-      } else {
-        resolve()
-      }
+      urlsprojects.find(query)
+        .then((res) => {
+          resolve(res)
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 }

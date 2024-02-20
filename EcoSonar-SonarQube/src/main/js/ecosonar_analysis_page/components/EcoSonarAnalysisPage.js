@@ -69,7 +69,7 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
   initEcoSonarAnalysisPage (projectName) {
     getAnalysisForProjectConfiguration(projectName)
       .then((analysis) => {
-        if (analysis.deployments !== undefined) {
+        if (analysis !== undefined && analysis.lastAnalysis.greenit !== null && analysis.lastAnalysis.lighthouse !== null && analysis.lastAnalysis.w3c !== null && analysis.deployments.greenit.length !== 0 && analysis.deployments.lighthouse.length !== 0 && analysis.deployments.lighthouse.w3c !== 0) {
           const dateGreenitLastAnalysis = analysis.lastAnalysis.greenit !== null && analysis.lastAnalysis.greenit.dateAnalysis
             ? `${new Date(analysis.lastAnalysis.greenit.dateAnalysis).toDateString()} - ${new Date(analysis.lastAnalysis.greenit.dateAnalysis).toLocaleTimeString([], { hour12: false })}  `
             : null
@@ -157,9 +157,7 @@ export default class EcoSonarAnalysisPage extends React.PureComponent {
         }
       })
       .catch((result) => {
-        if (result instanceof Error) {
-          this.setState({ error: result.message, loading: false })
-        }
+        this.setState({ error: result.message, loading: false })
       })
     getUrlsConfiguration(this.props.project.key)
       .then((urlList) => {

@@ -20,20 +20,19 @@ class AnalysisService {}
  * @param {boolean} autoscroll is used to enable autoscrolling for each tab opened during analysis
  */
 AnalysisService.prototype.insert = async function (projectName, autoscroll) {
-  const allowExternalAPI = process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API
+  const allowExternalAPI = process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API || 'false'
   let urlProjectList = []
   let reports = []
   let systemError = false
 
-  try {
-    urlProjectList = await urlsProjectRepository.findAll(projectName, true)
-  } catch (error) {
-    console.log('GREENIT INSERT - can not retrieved urls from project')
-    systemError = true
-  }
+  await urlsProjectRepository.findAll(projectName)
+    .then((urls) => { urlProjectList = urls })
+    .catch(() => {
+      systemError = true
+    })
 
   if (systemError || urlProjectList.length === 0) {
-    console.log('GREENIT INSERT - project has no url to do the audit. Audit stopped')
+    console.warn('GREENIT INSERT - project has no url to do the audit. Audit stopped')
   } else {
     reports = await launchAuditsToUrlList(urlProjectList, autoscroll, projectName, allowExternalAPI)
     const reportsFormatted = formatAuditsToBeSaved(reports, urlProjectList)
@@ -41,28 +40,28 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
     greenItRepository
       .insertAll(reportsFormatted.greenitAnalysisFormatted)
       .then(() => {
-        console.log('GREENIT INSERT - analysis has been insert')
+        console.log('GREENIT INSERT - analysis has been inserted')
       })
       .catch(() => {
-        console.log('GREENIT INSERT - greenit insertion failed')
+        console.error('GREENIT INSERT - greenit insertion failed')
       })
 
     lighthouseRepository
       .insertAll(reportsFormatted.analysisLighthouseFormatted)
       .then(() => {
-        console.log('LIGHTHOUSE INSERT - analysis has been insert')
+        console.log('LIGHTHOUSE INSERT - analysis has been inserted')
       })
       .catch(() => {
-        console.log('LIGHTHOUSE INSERT - lighthouse insertion failed')
+        console.error('LIGHTHOUSE INSERT - lighthouse insertion failed')
       })
 
     if (allowExternalAPI === 'true') {
       w3cRepository.insertAll(reportsFormatted.w3cAnalysisFormatted)
         .then(() => {
-          console.log('W3C INSERT - analysis has been insert')
+          console.log('W3C INSERT - analysis has been inserted')
         })
         .catch(() => {
-          console.log('W3C INSERT - w3c insertion failed')
+          console.error('W3C INSERT - w3c insertion failed')
         })
     }
 
@@ -72,7 +71,7 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
         console.log('BEST PRACTICES INSERT - best practices have been inserted')
       })
       .catch(() => {
-        console.log('BEST PRACTICES INSERT : best practice insertion failed')
+        console.error('BEST PRACTICES INSERT : best practices insertion failed')
       })
   }
 }
@@ -86,21 +85,21 @@ async function launchAuditsToUrlList (urlProjectList, autoscroll, projectName, a
   try {
     reportsGreenit = await greenItAnalysis.analyse(urlList, autoscroll, projectName)
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
   try {
     reportsLighthouse = await lighthouseAnalysis.lighthouseAnalysis(urlList, projectName)
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
   if (allowExternalAPI === 'true') {
     try {
       reportsW3c = await w3cAnalysis.w3cAnalysisWithAPI(urlList)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   } else {
-    console.log('INSERT ANALYSIS - Usage of external API is not allowed, W3C analysis skipped')
+    console.warn('INSERT ANALYSIS - Usage of external API is not allowed, W3C analysis skipped')
   }
   return {
     reportsGreenit,

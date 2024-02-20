@@ -1,7 +1,5 @@
 const lighthouses = require('./models/lighthouses')
-const urlsprojects = require('./models/urlsprojects')
 const SystemError = require('../utils/SystemError')
-const formatLighthouseAnalysis = require('../services/format/formatLighthouseAnalysis')
 
 const LighthouseRepository = function () {
   /**
@@ -17,10 +15,8 @@ const LighthouseRepository = function () {
             resolve()
           })
           .catch((err) => {
-            console.error('\x1b[31m%s\x1b[0m', 'LIGHTHOUSE - error during insertion of analysis')
-            console.error('\x1b[31m%s\x1b[0m', err.message)
-            const systemError = new SystemError()
-            reject(systemError)
+            console.error('\x1b[31m%s\x1b[0m', err)
+            reject(new SystemError())
           })
       } else {
         console.log('LIGHTHOUSE - None of the urls analysed could be inserted')
@@ -37,12 +33,17 @@ const LighthouseRepository = function () {
    */
   this.findAllAnalysis = async function () {
     return new Promise((resolve, reject) => {
-      lighthouses.find({})
+      lighthouses.find({}, {
+        dateLighthouseAnalysis: 1,
+        performance: 1,
+        accessibility: 1,
+        idUrlLighthouse: 1
+      })
         .then((res) => {
           resolve(res)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error.message)
+          console.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -50,238 +51,108 @@ const LighthouseRepository = function () {
 
   /**
    * find last analysis for one url in a project
-   * @param {string} projectNameReq name of the project
-   * @param {string} urlNameReq url id key representing the url saved in database
+   * @param {string} urlIdKey id key of the url saved
    * @returns last ligthouse analysis for url
    */
-  this.findAnalysisUrl = async function (projectNameReq, urlNameReq) {
-    let urlMatching
-    let allAnalysis
-    let stringErr = null
-    let systemError = null
-    try {
-      urlMatching = await urlsprojects.find(
-        { projectName: projectNameReq, urlName: urlNameReq },
-        { idKey: 1 }
-      )
-      if (urlMatching.length === 0) {
-        stringErr =
-          'url : ' +
-          urlNameReq +
-          ' or project : ' +
-          projectNameReq +
-          ' not found'
-      } else {
-        allAnalysis = await lighthouses
-          .find(
-            { idUrlLighthouse: urlMatching[0].idKey },
-            {
-              dateLighthouseAnalysis: 1,
-              performance: 1,
-              accessibility: 1,
-              cumulativeLayoutShift: 1,
-              largestContentfulPaint: 1,
-              firstContentfulPaint: 1,
-              speedIndex: 1,
-              totalBlockingTime: 1,
-              interactive: 1
-            }
-          )
-          .sort({ dateLighthouseAnalysis: 1 })
-        if (allAnalysis.length === 0) {
-          stringErr = 'Lighthouse - No lighthouse analysis found for ' + urlNameReq
-          console.log(stringErr)
-        }
-      }
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
-      console.log('An error occured while retrieving lighthouse analysis')
-      systemError = new SystemError()
-    }
+  this.findAnalysisUrl = async function (urlIdKey) {
     return new Promise((resolve, reject) => {
-      if (systemError !== null) {
-        reject(systemError)
-      } else if (stringErr !== null) {
-        reject(new Error(stringErr))
-      } else {
-        const lastAnalysis = {
-          dateLighthouseAnalysis: allAnalysis[allAnalysis.length - 1].dateLighthouseAnalysis,
-          performance: allAnalysis[allAnalysis.length - 1].performance,
-          accessibility: allAnalysis[allAnalysis.length - 1].accessibility,
-          cumulativeLayoutShift: allAnalysis[allAnalysis.length - 1].cumulativeLayoutShift,
-          largestContentfulPaint: allAnalysis[allAnalysis.length - 1].largestContentfulPaint,
-          firstContentfulPaint: allAnalysis[allAnalysis.length - 1].firstContentfulPaint,
-          speedIndex: allAnalysis[allAnalysis.length - 1].speedIndex,
-          totalBlockingTime: allAnalysis[allAnalysis.length - 1].totalBlockingTime,
-          interactive: allAnalysis[allAnalysis.length - 1].interactive
-        }
-
-        let i = 0
-        let element
-        const deployments = []
-        while (i < allAnalysis.length) {
-          element = {
-            dateAnalysis: allAnalysis[i].dateLighthouseAnalysis,
-            performanceScore: allAnalysis[i].performance.score,
-            accessibilityScore: allAnalysis[i].accessibility.score,
-            cumulativeLayoutShift: allAnalysis[i].cumulativeLayoutShift.score,
-            largestContentfulPaint: allAnalysis[i].largestContentfulPaint.score,
-            firstContentfulPaint: allAnalysis[i].firstContentfulPaint.score,
-            speedIndex: allAnalysis[i].speedIndex.score,
-            totalBlockingTime: allAnalysis[i].totalBlockingTime.score,
-            interactive: allAnalysis[i].interactive.score
+      lighthouses
+        .find(
+          { idUrlLighthouse: urlIdKey },
+          {
+            dateLighthouseAnalysis: 1,
+            performance: 1,
+            accessibility: 1,
+            cumulativeLayoutShift: 1,
+            largestContentfulPaint: 1,
+            firstContentfulPaint: 1,
+            speedIndex: 1,
+            totalBlockingTime: 1,
+            interactive: 1
           }
-          deployments.push(element)
-          i++
-        }
-
-        const formattedDeployments = formatLighthouseAnalysis.formatDeploymentsForGraphs(deployments)
-
-        const analysis = { deployments: formattedDeployments, lastAnalysis }
-        resolve(analysis)
-      }
+        )
+        .sort({ dateLighthouseAnalysis: 1 })
+        .then((result) => {
+          resolve(result)
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
   /**
    * find last lighthouse analysis for one Project
-   * @param {string} projectNameReq project name
+   * @param {array} urls list of urls id keys
    * @returns last lighthouse analysis for the project
    */
-  this.findAnalysisProject = async function (projectNameReq) {
-    let stringErr = null
-    let systemError = null
-    let deployments, resultats
-    try {
-      const resList = await urlsprojects.find(
-        { projectName: projectNameReq },
-        { idKey: 1 }
-      )
-      if (resList.length === 0) {
-        stringErr = 'url or project :' + projectNameReq + ' not found'
-      } else {
-        // create a list of idKey
-        let i = 0
-        const listIdKey = []
-        while (i < resList.length) {
-          listIdKey[i] = resList[i].idKey
-          i++
-        }
-
-        deployments = await lighthouses
-          .find(
-            { idUrlLighthouse: listIdKey },
-            {
-              performance: 1,
-              accessibility: 1,
-              largestContentfulPaint: 1,
-              cumulativeLayoutShift: 1,
-              firstContentfulPaint: 1,
-              speedIndex: 1,
-              totalBlockingTime: 1,
-              interactive: 1,
-              dateLighthouseAnalysis: 1
-            }
-          )
-          .sort({ dateLighthouseAnalysis: 1 })
-
-        if (deployments.length !== 0) {
-          const dateLastAnalysis =
-            deployments[deployments.length - 1].dateLighthouseAnalysis
-          const lastDeployment = deployments.filter(
-            (deployment) =>
-              deployment.dateLighthouseAnalysis.getTime() ===
-              dateLastAnalysis.getTime()
-          )
-          resultats = {
-            deployments,
-            lastAnalysis: lastDeployment
-          }
-        } else {
-          console.log('no lighthouse analysis found for ' + projectNameReq)
-          resultats = { deployments: [], lastAnalysis: null }
-        }
-      }
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
-      console.log(
-        'error during generation of ' + projectNameReq + ' lighthouse analysis'
-      )
-      systemError = new SystemError()
-    }
+  this.findAnalysisProject = async function (listIdKey) {
     return new Promise((resolve, reject) => {
-      if (systemError !== null) {
-        reject(systemError)
-      } else if (stringErr !== null) {
-        reject(new Error(stringErr))
-      } else {
-        resolve(resultats)
-      }
+      lighthouses
+        .find(
+          { idUrlLighthouse: listIdKey },
+          {
+            performance: 1,
+            accessibility: 1,
+            largestContentfulPaint: 1,
+            cumulativeLayoutShift: 1,
+            firstContentfulPaint: 1,
+            speedIndex: 1,
+            totalBlockingTime: 1,
+            interactive: 1,
+            dateLighthouseAnalysis: 1
+          }
+        )
+        .sort({ dateLighthouseAnalysis: 1 })
+        .then((result) => { resolve(result) })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
   /**
    * find Lighthouse Scores for one Project
-   * @param {string} projectNameReq project name
-   * @returns ligthouse score for last analysis in the project
+   * @param {array} listIdKey list of urls id keys
+   * @returns ligthouse score for analysis in the project
    */
-  this.findScoreProject = async function (projectNameReq) {
-    let stringErr = null
-    let systemError = null
-    let deployments, result
-    try {
-      const resList = await urlsprojects.find(
-        { projectName: projectNameReq },
-        { idKey: 1 }
-      )
-      if (resList.length === 0) {
-        stringErr = 'url or project :' + projectNameReq + ' not found'
-      } else {
-        // create a list of idKey
-        const listIdKey = []
-        for (let i = 0; i < resList.length; i++) {
-          listIdKey[i] = resList[i].idKey
-        }
-        deployments = await lighthouses
-          .find(
-            { idUrlLighthouse: listIdKey },
-            {
-              performance: 1,
-              accessibility: 1,
-              dateLighthouseAnalysis: 1
-            }
-          )
-          .sort({ dateLighthouseAnalysis: 1 })
-        if (deployments.length !== 0) {
-          const dateLastAnalysis = deployments[deployments.length - 1].dateLighthouseAnalysis
-          const lastDeployment = deployments.filter(
-            (deployment) =>
-              deployment.dateLighthouseAnalysis.getTime() ===
-              dateLastAnalysis.getTime()
-          )
-          result = {
-            scores: lastDeployment
-          }
-        } else {
-          console.log('Lighthouse - No lighthouse analysis found for ' + projectNameReq)
-          result = { scores: null }
-        }
-      }
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
-      console.log(
-        'error during generation of ' + projectNameReq + ' lighthouse analysis'
-      )
-      systemError = new SystemError()
-    }
+  this.findScoreProject = async function (listIdKey) {
     return new Promise((resolve, reject) => {
-      if (systemError !== null) {
-        reject(systemError)
-      } else if (stringErr !== null) {
-        reject(new Error(stringErr))
-      } else {
-        resolve(result)
-      }
+      lighthouses
+        .find(
+          { idUrlLighthouse: listIdKey },
+          {
+            performance: 1,
+            accessibility: 1,
+            dateLighthouseAnalysis: 1
+          }
+        )
+        .sort({ dateLighthouseAnalysis: 1 })
+        .then((result) => { resolve(result) })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
+    })
+  }
+
+  /**
+   * Deletion of all lighthouses analysis for a url
+   * @param {Object} url url to be deleted
+   */
+  this.deleteAnalysisFromUrl = async function (url) {
+    return new Promise((resolve, reject) => {
+      lighthouses.deleteMany({ idUrlLighthouse: url[0].idKey })
+        .then((result) => {
+          console.log(`DELETE URL - On Lighthouse ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 

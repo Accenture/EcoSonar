@@ -2,6 +2,8 @@ import React from 'react'
 import { insertUrlsConfiguration } from '../../../services/configUrlService'
 import CrawledUrlItem from './CrawledUrlItem'
 import { crawl, getCrawl } from '../../../services/crawlerService'
+import errors from '../../../utils/errors.json'
+import formatError from '../../../format/formatError'
 
 export default function CrawlerPage (props) {
   const {
@@ -89,7 +91,11 @@ export default function CrawlerPage (props) {
     setCrawlerErrorMessage('')
     await getCrawl(projectName).then((response) => {
       setCrawlerLoading(false)
-      setCrawledUrls(response)
+      if (response.length > 0) {
+        setCrawledUrls(response)
+      } else {
+        setCrawlerErrorMessage(formatError(errors.errorCrawlingEmpty, projectName))
+      }
       setCrawlerLaunched(false)
     }).catch((error) => {
       setCrawlerLoading(false)

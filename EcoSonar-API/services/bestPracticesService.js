@@ -4,19 +4,11 @@ const lighthousePerformanceData = require('../utils/bestPractices/lighthousePerf
 
 class BestPracticesServices { }
 
-BestPracticesServices.prototype.getAllBestPracticesRules = async function () {
-  const allBestPracticesRules = {
-    greenitDocs: {},
-    lighthousePerformanceDocs: {},
-    lighthouseAccessbilityDocs: {}
-  }
-  try {
-    allBestPracticesRules.greenitDocs = greenItData
-    allBestPracticesRules.lighthousePerformanceDocs = lighthousePerformanceData
-    allBestPracticesRules.lighthouseAccessbilityDocs = lighthouseAccessibilityData
-    return allBestPracticesRules
-  } catch (error) {
-    return error
+BestPracticesServices.prototype.getAllBestPracticesRules = function () {
+  return {
+    greenitDocs: greenItData,
+    lighthousePerformanceDocs: lighthousePerformanceData,
+    lighthouseAccessbilityDocs: lighthouseAccessibilityData
   }
 }
 

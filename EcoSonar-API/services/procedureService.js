@@ -1,36 +1,27 @@
 const projectsRepository = require('../dataBase/projectsRepository')
-const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
+const SystemError = require('../utils/SystemError')
 
 class ProcedureService { }
 
 ProcedureService.prototype.saveProcedure = async function (projectName, selectedProcedure) {
-  // selected procedure can be equal to 'quick wins', 'highest impact', 'smart impact', 'score impact'
-  let projectExist
+  let project = null
+  let systemError = false
+
   await projectsRepository.getProjectSettings(projectName)
-    .then((result) => {
-      projectExist = result
-    }).catch(() => {
-      projectExist = null
-    })
-  let allUrls = []
-  if (projectExist === null) {
-    allUrls = await urlsProjectRepository.findAll(projectName, true)
-  }
+    .then((result) => { project = result })
+    .catch(() => { systemError = true })
+
   return new Promise((resolve, reject) => {
-    if (projectExist !== null) {
+    if (!systemError && project !== null) {
       projectsRepository.updateProjectProcedure(projectName, selectedProcedure)
         .then(() => resolve())
         .catch((error) => reject(error))
+    } else if (!systemError) {
+      projectsRepository.createProcedure(projectName, selectedProcedure)
+        .then(() => resolve())
+        .catch((error) => reject(error))
     } else {
-      if (allUrls.length > 0) {
-        projectsRepository.createProcedure(projectName, selectedProcedure)
-          .then(() => resolve())
-          .catch((error) => reject(error))
-      } else {
-        const errorMessage = 'Project not found'
-        console.error(errorMessage)
-        reject(new Error(errorMessage))
-      }
+      reject(new SystemError())
     }
   })
 }
@@ -40,7 +31,7 @@ ProcedureService.prototype.getProcedure = async function (projectName) {
     projectsRepository.getProjectSettings(projectName)
       .then((existingProject) => {
         if (existingProject === null || existingProject.procedure === undefined) {
-          reject(new Error('No procedure found for project ' + projectName))
+          resolve({ procedure: '' })
         }
         resolve({ procedure: existingProject.procedure })
       }).catch((err) => {

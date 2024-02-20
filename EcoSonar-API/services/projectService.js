@@ -7,13 +7,12 @@ const greenItRepository = require('../dataBase/greenItRepository')
 const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
 const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
 const tempurlsProjectRepository = require('../dataBase/tempurlsProjectRepository')
-const scores = ['ecoIndex', 'perfScore', 'accessScore', 'w3cScore']
 
 class ProjectService { }
 
 /**
  * get an average of all score for all projects of the database of last analysis
- * @param {date} Date limit date of analysis
+ * @param {string} date limit date of analysis
  * @returns nbr of projects and an average for each score  on the database at each date
  */
 ProjectService.prototype.getAllInformationsAverage = async function (date) {
@@ -22,6 +21,7 @@ ProjectService.prototype.getAllInformationsAverage = async function (date) {
       .then((result) => {
         const resultformatted = { nbProjects: result.nbProjects, ecoIndex: null, perfScore: null, accessScore: null, w3cScore: null }
         const scoreNbProject = { ecoIndex: null, perfScore: null, accessScore: null, w3cScore: null }
+        const scores = ['ecoIndex', 'perfScore', 'accessScore', 'w3cScore']
         Object.keys(result.projects).forEach(project => {
           for (const scoreType of scores) {
             if (resultformatted[scoreType] !== null) {
@@ -40,13 +40,73 @@ ProjectService.prototype.getAllInformationsAverage = async function (date) {
         })
         resolve(resultformatted)
       }).catch((err) => {
-        reject(new Error(err))
+        reject(err)
       })
   })
 }
 
-function selectRightAnalysisByDateAndUrl (searchDate, projectsAnalysis, urlFieldName) {
-  const allAnalysisPerUrl = []
+/**
+ * get informations about all project of the database on last analysis
+ * @param {string} date limit date of analysis
+ * @param {Object} sortBy content to sort projects: {"type": "", "order": "" }
+ * @param {string} filterName filter on a string
+ * @param {Object} filterScore filter content on a score: {"cat": "", "score": , "select": "" }
+ * @returns all the informations for each project on the database at the defined date
+ */
+ProjectService.prototype.getAllProjectInformations = async function (date, sortBy, filterName, filterScore) {
+  let analysisPerProject = {}
+  let resultWithFilters = { nbProjects: null, projects: {} }
+
+  try {
+    date = validateAndConvertDate(date)
+  } catch (err) {
+    return Promise.reject(err)
+  }
+
+  try {
+    analysisPerProject = await retrieveAnalysisService.getAllProjectScoresAverage(filterName)
+  } catch (err) {
+    return Promise.reject(err)
+  }
+
+  return new Promise((resolve, reject) => {
+    try {
+      for (const analysis of analysisPerProject) {
+        if (analysis.lighthouse.length > 0 || analysis.greenIt.length > 0 || analysis.w3c > 0) {
+          const lighthouseAnalysis = selectRightAnalysisByDateAndUrl(date, analysis.lighthouse, 'idUrlLighthouse', 'dateLighthouseAnalysis')
+          const greenItAnalysis = selectRightAnalysisByDateAndUrl(date, analysis.greenIt, 'idUrlGreen', 'dateGreenAnalysis')
+          const w3cAnalysis = selectRightAnalysisByDateAndUrl(date, analysis.w3c, 'idUrlW3c', 'dateW3cAnalysis')
+
+          if (Object.keys(greenItAnalysis).length !== 0 || Object.keys(lighthouseAnalysis).length !== 0 || Object.keys(w3cAnalysis).length !== 0) {
+            let allUrls = [...(Object.keys(greenItAnalysis).length !== 0 ? Object.keys(greenItAnalysis) : []), ...(Object.keys(lighthouseAnalysis).length !== 0 ? Object.keys(lighthouseAnalysis) : []), ...(Object.keys(w3cAnalysis).length ? Object.keys(w3cAnalysis) : [])]
+            allUrls = Array.from(new Set(allUrls.map(JSON.stringify)))
+
+            const projectInfos = {
+              ecoIndex: getFieldScore(greenItAnalysis, 'ecoIndex'),
+              perfScore: getFieldScore2(lighthouseAnalysis, 'performance', 'score'),
+              accessScore: getFieldScore2(lighthouseAnalysis, 'accessibility', 'score'),
+              w3cScore: getFieldScore(w3cAnalysis, 'score'),
+              nbUrl: allUrls.length,
+              dateAnalysis: getDateAnalysis(lighthouseAnalysis, greenItAnalysis, w3cAnalysis)
+            }
+            resultWithFilters.projects[analysis.name] = projectInfos
+          }
+        }
+      }
+      if (filterScore !== null) {
+        resultWithFilters = filterByScore(resultWithFilters, filterScore.cat, filterScore.score, filterScore.select)
+      }
+      resultWithFilters.nbProjects = Object.keys(resultWithFilters.projects).length ?? 0
+      resolve(sortProjects(resultWithFilters, sortBy))
+    } catch (err) {
+      console.error(err)
+      reject(new Error(err.message))
+    }
+  })
+}
+
+function selectRightAnalysisByDateAndUrl (searchDate, projectsAnalysis, urlFieldName, dateFieldName) {
+  const allAnalysisPerUrl = {}
   const groupedAnalysisByIdKeys = projectsAnalysis.reduce((acc, obj) => {
     if (!acc[obj[urlFieldName]]) {
       acc[obj[urlFieldName]] = []
@@ -55,20 +115,20 @@ function selectRightAnalysisByDateAndUrl (searchDate, projectsAnalysis, urlField
     return acc
   }, {})
   Object.keys(groupedAnalysisByIdKeys).forEach(id => {
-    const retainedAnalysis = filterPerDate(searchDate, groupedAnalysisByIdKeys[id])
+    const retainedAnalysis = filterPerDate(searchDate, groupedAnalysisByIdKeys[id], dateFieldName)
     allAnalysisPerUrl[id] = retainedAnalysis
   })
   return allAnalysisPerUrl
 }
 
-function filterPerDate (searchDate, projectsAnalysis) {
-  const allDates = Object.keys(projectsAnalysis)
+function filterPerDate (searchDate, projectsAnalysis, dateFieldName) {
+  const allDates = projectsAnalysis.map(analysis => analysis[dateFieldName])
   const allDatesInRange = searchDate === null ? allDates : allDates.filter(date => new Date(date) <= searchDate)
 
   if (allDatesInRange.length === 0) return null
 
   const selectedDate = allDatesInRange.reduce((a, b) => new Date(a) > new Date(b) ? a : b)
-  return projectsAnalysis[selectedDate]
+  return projectsAnalysis.find(analysis => analysis[dateFieldName].getTime() === selectedDate.getTime())
 }
 
 function filterByScore (projectsList, filterCategory, filterLevel, filterDirection) {
@@ -86,6 +146,7 @@ function sortProjects (resultList, sortParams) {
   if (!sortParams) return resultList
 
   const { type, order } = sortParams
+  const scores = ['ecoIndex', 'perfScore', 'accessScore', 'w3cScore']
   let sortedProjects = {}
 
   if (type === 'name') {
@@ -93,7 +154,7 @@ function sortProjects (resultList, sortParams) {
   } else if (scores.includes(type)) {
     sortedProjects = sortByScore(resultList.projects, type, order)
   } else {
-    console.error('sort type does not exist')
+    console.error('Sort type does not exist, no sorting applied')
     return resultList
   }
 
@@ -120,48 +181,60 @@ function sortByScore (projects, type, order) {
 }
 
 function validateAndConvertDate (dateToValidate) {
-  return new Promise((resolve, reject) => {
-    if (dateToValidate !== null) {
-      const regex = /^\d{4}-\d{2}-\d{2}$/
-      if (regex.test(dateToValidate)) {
-        resolve(new Date(dateToValidate))
-      } else {
-        reject(new Error('Bad date format: YYYY-MM-DD'))
-      }
+  if (dateToValidate !== null) {
+    const regex = /^\d{4}-\d{2}-\d{2}$/
+    if (regex.test(dateToValidate)) {
+      return new Date(dateToValidate)
     } else {
-      resolve(null)
+      throw new Error('Bad date format: YYYY-MM-DD')
     }
-  })
+  } else {
+    return null
+  }
 }
 
 function getFieldScore (analysis, fieldToSum) {
+  let sumScore = 0
   if (!analysis) {
     return null
   }
-  const countUrls = Object.keys(analysis).length
+  let countUrls = Object.keys(analysis).length ?? 0
   if (countUrls === 0) {
     return null
   }
-  let sumScore = 0
   for (const url in analysis) {
-    sumScore += analysis[url][fieldToSum]
+    if (analysis[url] !== null) {
+      sumScore += analysis[url][fieldToSum]
+    } else {
+      countUrls--
+    }
   }
-  return Math.round(sumScore / countUrls)
+  if (countUrls === 0) {
+    return null // all analysis were empty
+  }
+  return parseFloat((sumScore / countUrls).toFixed(2))
 }
 
 function getFieldScore2 (analysis, fieldToSum1, fieldToSum2) {
   if (!analysis) {
     return null
   }
-  const countUrls = Object.keys(analysis).length
+  let countUrls = Object.keys(analysis).length
   if (countUrls === 0) {
     return null
   }
   let sumScore = 0
   for (const url in analysis) {
-    sumScore += analysis[url][fieldToSum1][fieldToSum2]
+    if (analysis[url] !== null) {
+      sumScore += analysis[url][fieldToSum1][fieldToSum2]
+    } else {
+      countUrls--
+    }
   }
-  return Math.round(sumScore / countUrls)
+  if (countUrls === 0) {
+    return null // all analysis were empty
+  }
+  return parseFloat((sumScore / countUrls).toFixed(2))
 }
 
 function getDateAnalysis (lighthouseAnalysis, greenItAnalysis, w3cAnalysis) {
@@ -187,95 +260,22 @@ function getDateAnalysis (lighthouseAnalysis, greenItAnalysis, w3cAnalysis) {
 }
 
 /**
- * get informations about all project of the database on last analysis
- * @param {date} date limit date of analysis
- * @param {sortBy} object content to sort projects: {"type": "", "order": "" }
- * @param {filterName} string filter on a string
- * @param {filterScore} object filter content on a score: {"cat": "", "score": , "select": "" }
- * @returns all the informations for each project on the database at each date
- */
-ProjectService.prototype.getAllProjectInformations = async function (date, sortBy, filterName, filterScore) {
-  let error = null
-  try {
-    date = await validateAndConvertDate(date)
-  } catch (err) {
-    error = err
-  }
-  let AnalysisPerProject = {}
-  if (error === null) {
-    try {
-      AnalysisPerProject = await retrieveAnalysisService.getProjectScoresAverageAll(filterName, date)
-    } catch (err) {
-      error = err
-    }
-    if (error === null) {
-      return new Promise((resolve, reject) => {
-        let resultwithfilter = { nbProjects: null, projects: {} }
-        try {
-          for (const analysis of AnalysisPerProject) {
-            if (analysis.lighthouse.length > 0 || analysis.greenIt.length > 0 || analysis.w3c > 0) {
-              const lighthouseAnalysis = selectRightAnalysisByDateAndUrl(date, analysis.lighthouse, 'idUrlLighthouse')
-              const greenItAnalysis = selectRightAnalysisByDateAndUrl(date, analysis.greenIt, 'idUrlGreen')
-              const w3cAnalysis = selectRightAnalysisByDateAndUrl(date, analysis.w3c, 'idUrlW3c')
-
-              let projectInfos = {}
-
-              if (greenItAnalysis !== null || lighthouseAnalysis !== null || w3cAnalysis !== null) {
-                let allUrls = [...(greenItAnalysis !== null ? Object.keys(greenItAnalysis) : []), ...(lighthouseAnalysis !== null ? Object.keys(lighthouseAnalysis) : []), ...(w3cAnalysis !== null ? Object.keys(w3cAnalysis) : [])]
-                allUrls = Array.from(new Set(allUrls.map(JSON.stringify)))
-
-                projectInfos = {
-                  ecoIndex: getFieldScore(greenItAnalysis, 'ecoIndex'),
-                  perfScore: getFieldScore2(lighthouseAnalysis, 'performance', 'score'),
-                  accessScore: getFieldScore2(lighthouseAnalysis, 'accessibility', 'score'),
-                  w3cScore: getFieldScore(w3cAnalysis, 'score'),
-                  nbUrl: allUrls.length,
-                  dateAnalysis: getDateAnalysis(lighthouseAnalysis, greenItAnalysis, w3cAnalysis)
-                }
-                resultwithfilter.projects[analysis.name] = projectInfos
-              }
-            }
-          }
-        } catch (err) {
-          console.error(err)
-          reject(new SystemError(err))
-        }
-        if (error !== null) {
-          reject(new SystemError())
-        } else {
-          if (filterScore !== null) {
-            resultwithfilter = filterByScore(resultwithfilter, filterScore.cat, filterScore.score, filterScore.select)
-          }
-          resultwithfilter.nbProjects = Object.keys(resultwithfilter.projects).length
-          resolve(sortProjects(resultwithfilter, sortBy))
-        }
-      })
-    } else {
-      return Promise.reject(new Error(error))
-    }
-  } else {
-    return Promise.reject(new Error(error))
-  }
-}
-
-/**
  * Delete all part the project (project, urls and analysis)
  * @param {string} projectName name of the project to delete
  */
 ProjectService.prototype.deleteProject = async function (projectName) {
   let urlsProjects = []
   let systemError = false
-  try {
-    await urlsProjectRepository.findAll(projectName, true)
-      .then((result) => {
-        urlsProjects = result.map((e) => e.idKey)
-      })
-  } catch (error) {
-    console.error('\x1b[31m%s\x1b[0m', error.message)
-    systemError = true
-  }
+
+  await urlsProjectRepository.findAll(projectName)
+    .then((result) => {
+      urlsProjects = result.map((e) => e.idKey)
+    }).catch(() => {
+      systemError = true
+    })
+
   if (systemError) {
-    Promise.reject(new SystemError())
+    return Promise.reject(new SystemError())
   }
   try {
     await lighthouseRepository.deleteProject(urlsProjects)
@@ -286,7 +286,7 @@ ProjectService.prototype.deleteProject = async function (projectName) {
     await tempurlsProjectRepository.deleteProject(projectName)
     await projectsRepository.deleteProjectPerProjectName(projectName)
   } catch (error) {
-    console.error('\x1b[31m%s\x1b[0m', error.message)
+    console.error(error)
     systemError = true
   }
   return new Promise((resolve, reject) => {

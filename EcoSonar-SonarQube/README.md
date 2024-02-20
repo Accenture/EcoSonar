@@ -1,5 +1,16 @@
 # Plugin SonarQube EcoSonar
 
+## Summary
+
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Build the EcoSonar SonarQube Plugin](#build)
+  - [Install Sonarqube Plugins (EcoSonar + Ecocode) manually](#install)
+
+
+<a name="introduction"></a>
+
 ## Introduction
 
 This plugin aims to embed EcoSonar Audits, Recommendations as well as Configuration.
@@ -9,7 +20,11 @@ It fulfills three purposes :
 - static code analysis with green coding rules implemented by EcoCode project
 - add EcoSonar audit reports directly into Sonarqube projet User Interface
 
+<a name="getting-started"></a>
+
 ## Getting Started
+
+<a name="prerequisites"></a>
 
 ### Prerequisites
 
@@ -18,9 +33,11 @@ It fulfills three purposes :
   https://docs.sonarqube.org/latest/setup/install-cluster/
   No constraint on the edition type. Please check with your infrastructure team which edition are you allowed to use.
 - Java : version 17 if Sonarqube version is 9.9 or above, otherwise version 11
-- Maven - 3.8.3
+- Maven minimum version 3.8.3
 
-### Build the SonarQube Plugin related to EcoSonar
+<a name="build"></a>
+
+### Build the EcoSonar SonarQube Plugin 
 
 To build the plugin JAR file, first you need to retrieve the URL of the deployed server for EcoSonar API.
 Then run the following commands:
@@ -40,6 +57,8 @@ mvn clean package -Durl=#EcoSonar-API-URL
 ```
 
 If you are running EcoSonar locally, EcoSonar-API-URL should be by default `http://localhost:3000`.
+
+<a name="install"></a>
 
 ### Install Sonarqube Plugins (EcoSonar + Ecocode) manually
 

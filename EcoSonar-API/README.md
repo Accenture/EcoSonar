@@ -18,6 +18,11 @@ Then, the API can allow you to retrieve pre-formatted audit results using json f
         - [Create a MongoDB Community Server](#mongodb-server)
         - [Create a MongoDB Atlas Database](#mongodb-atlas)
       - [Create MongoDB Collections](#mongodb-collections)
+  - [Add Environment setup to API](#env-setup)
+    - [Database configuration](#database-env-var)
+    - [CORS Setup](#cors)
+    - [Enable W3C validator Analysis](#w3c-validator)
+    - [Setup User flow](#user-flow)
   - [API: option 1 - Node.js](#nodejs)
     - [Prerequisites](#prerequisites-node)
     - [Installation](#installation-node)
@@ -25,11 +30,6 @@ Then, the API can allow you to retrieve pre-formatted audit results using json f
     - [Prerequisites](#prerequisites-docker)
     - [Installation](#installation-api)
     - [Our advice for Server Deployment](#docker-deployment)
-  - [Add Environment setup to API](#env-setup)
-    - [Database configuration](#database-env-var)
-    - [CORS Setup](#cors)
-    - [Enable W3C validator Analysis](#w3c-validator)
-    - [Setup User flow](#user-flow)
 - [API Endpoints](#api-endpoints)
 - [Usage Rights](#usage-rights)
 
@@ -50,6 +50,15 @@ In both cases, it will be necessary to set up a new MongoDB database.
 
 ## MongoDB Database
 
+You will need to choose the most adequate MongoDB database according to your infrastructure.
+By default, we have implemented connection with
+
+- MongoDB Community Server : https://www.mongodb.com/try/download/community
+- MongoDB Atlas : https://www.mongodb.com/atlas
+- Azure CosmosDB : https://azure.microsoft.com/en-us/products/cosmos-db/#overview
+
+For any other MongoDB Database, you will need to set up a new database connection in the file `EcoSonar-API/configuration/database.js`.
+
 <a name="installation"></a>
 
 ### Installation
@@ -60,14 +69,7 @@ If the MongoDB database is already created, you can skip this step and retrieve 
 
 #### Create a MongoDB Database
 
-You will need to choose the most adequate MongoDB database according to your infrastructure.
-By default, we have implemented connection with
-
-- MongoDB Community Server : https://www.mongodb.com/try/download/community
-- MongoDB Atlas : https://www.mongodb.com/atlas
-- Azure CosmosDB : https://azure.microsoft.com/en-us/products/cosmos-db/#overview
-
-For any other MongoDB Database, you will need to set up a new database connection in the file `EcoSonar-API/configuration/database.js`.
+Locally, we advise you to use a MongoDB Community Server.
 
 <a name="mongodb-server"></a>
 
@@ -126,90 +128,8 @@ However, if you chose Azure CosmoDB for MongoDB Database as database, then you w
 4. projects : `_id`
 5. urlsprojects : `_id`, `idKey`
 6. w3cs : `_id`, `idW3cAnalysis`, `dateW3cAnalysis`
-7. tempurlsprojects: `_id`, `idKey`
+7. tempurlsprojects: `_id`
 
-<a name="nodejs"></a>
-
-## API: option 1 - Node.js
-
-<a name="prerequisites-node"></a>
-
-### Prerequisites
-
-- Node.js https://nodejs.org/fr/ (at least v16)
-
-<a name="installation-node"></a>
-
-### Installation
-
-1. Retrieve source code :
-
-```
-git clone https://github.com/Accenture/EcoSonar
-```
-
-2. Go into the Folder EcoSonar-API
-
-3. Install npm packages :
-
-```
-npm install
-```
-
-4. Launch the API
-
-```
-npm start
-```
-
-API can be reached at: http://localhost:3000
-
-<a name="docker"></a>
-
-## API: option 2 - Docker
-
-<a name="prerequisites-docker"></a>
-
-### Prerequisites
-
-- Docker (Note : for Windows, a licence is now required if you need to use Docker Desktop at an Enterprise Level)
-
-<a name="installation-api"></a>
-
-### Installation
-
-1. Retrieve source code :
-
-```
-git clone https://github.com/Accenture/EcoSonar
-```
-
-2. Go into the Folder EcoSonar-API
-3. Build Docker image :
-
-```
-docker build -t imageName .
-```
-
-4. Launch a Docker Server :
-
-```
-docker container run -d -p 3000:3000 imageName
-```
-
-API can be reached at: http://localhost:3000
-
-<a name="docker-deployment"></a>
-
-#### Our advice for Server Deployment
-
-Instead, we recommend setting up a CI/CD pipeline with the following steps:
-
-1. Build the Docker image
-2. Push the Docker image into the Docker Registry
-3. Stop the server
-4. Deploy the server using the newly imported image and correct API configuration
-5. Start the server
 
 <a name="env-setup"></a>
 
@@ -302,6 +222,95 @@ If your projects require to set up a user flow to access some of your web pages,
 ```
 ECOSONAR_ENV_USER_JOURNEY_ENABLED = `true`or `false`
 ```
+
+
+<a name="nodejs"></a>
+
+## API: option 1 - Node.js
+
+<a name="prerequisites-node"></a>
+
+### Prerequisites
+
+- Node.js https://nodejs.org/fr/ (at least v16)
+
+<a name="installation-node"></a>
+
+### Installation
+
+1. Retrieve source code :
+
+```
+git clone https://github.com/Accenture/EcoSonar
+```
+
+2. Go into the Folder EcoSonar-API
+
+3. Set up the environment variables accordingly.
+
+4. Install npm packages :
+
+```
+npm install
+```
+
+5. Launch the API
+
+```
+npm start
+```
+
+API can be reached at: http://localhost:3000
+
+<a name="docker"></a>
+
+## API: option 2 - Docker
+
+<a name="prerequisites-docker"></a>
+
+### Prerequisites
+
+- Docker (Note : for Windows, a licence is now required if you need to use Docker Desktop at an Enterprise Level)
+
+<a name="installation-api"></a>
+
+### Installation
+
+1. Retrieve source code :
+
+```
+git clone https://github.com/Accenture/EcoSonar
+```
+
+2. Go into the Folder EcoSonar-API
+
+3. Set up the environment variables accordingly.
+
+4. Build Docker image :
+
+```
+docker build -t imageName .
+```
+
+5. Launch a Docker Server :
+
+```
+docker container run -d -p 3000:3000 imageName
+```
+
+API can be reached at: http://localhost:3000
+
+<a name="docker-deployment"></a>
+
+#### Our advice for Server Deployment
+
+Instead, we recommend setting up a CI/CD pipeline with the following steps:
+
+1. Build the Docker image
+2. Push the Docker image into the Docker Registry
+3. Stop the server
+4. Deploy the server using the newly imported image and correct API configuration
+5. Start the server
 
 <a name="api-endpoints"></a>
 

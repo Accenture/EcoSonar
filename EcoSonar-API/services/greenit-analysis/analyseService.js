@@ -23,7 +23,6 @@ async function analyse (urlList, autoscroll, projectName) {
     console.log('Your EcoSonar project is using user journey to audit your website, GreenIT analysis will be made into different Chromium browser for right cookies configuration')
     reports = await launchAllAnalysisOnDifferentBrowser(browserArgs, urlList, projectName, autoscroll)
   } else {
-    console.log('Your EcoSonar project is not using user journey to audit your website, GreenIT analysis will be made into the same Chromium Browser')
     reports = await launchAllAnalysisOnSameBrowser(browserArgs, urlList, projectName, autoscroll)
   }
   return reports
@@ -46,12 +45,13 @@ async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projec
     try {
       const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
       if (loginSucceeded) {
-        // analyse each page
         report = await createGreenITReports(browser, projectName, [url], autoscroll)
         reports = reports.concat(report)
+      } else {
+        console.warn('Could not log in, audit for greenit-analysis is skipped')
       }
     } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error.message)
+      console.error('\x1b[31m%s\x1b[0m', error)
     } finally {
       await closeBrowser(browser)
     }
@@ -77,6 +77,8 @@ async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName
     if (loginSucceeded) {
       // analyse each page
       reports = await createGreenITReports(browser, projectName, urlList, autoscroll)
+    } else {
+      console.warn('Could not log in, audit for greenit-analysis is skipped')
     }
   } catch (error) {
     console.error('\x1b[31m%s\x1b[0m', error)
@@ -94,7 +96,7 @@ async function closeBrowser (browser) {
     } else {
       return Promise.resolve()
     }
-  })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error.message))
+  })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error))
   await browser.close()
 }
 

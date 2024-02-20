@@ -5,6 +5,8 @@ import { getUrlsConfiguration } from './../../services/configUrlService'
 import ProcedureChoice from './Procedure/ProcedureChoice'
 import AccessibilityAlert from '../../utils/AccessibilityAlert'
 import BestPracticesBody from './BestPracticesBody'
+import formatError from '../../format/formatError'
+import errors from '../../utils/errors.json'
 
 export default function BestPracticesPage (props) {
   const [loading, setLoading] = useState(true)
@@ -27,7 +29,11 @@ export default function BestPracticesPage (props) {
     setLoading(true)
     getProcedure(props.project.key)
       .then((procedure) => {
-        setSavedProcedure(procedure.procedure)
+        if (procedure.procedure === '') {
+          setSavedProcedure('scoreImpact')
+        } else {
+          setSavedProcedure(procedure.procedure)
+        }
         setEditProcedureMode(false)
         getUrlsConfiguration(props.project.key)
           .then((data) => {
@@ -42,7 +48,11 @@ export default function BestPracticesPage (props) {
           })
         getBestPractices(props.project.key)
           .then((data) => {
-            setResultData(data)
+            if (Object.keys(data).length === 0) {
+              setError(formatError(errors.noAnalysisLaunched, props.project.key))
+            } else {
+              setResultData(data)
+            }
             setLoading(false)
           })
           .catch((result) => {
@@ -69,7 +79,11 @@ export default function BestPracticesPage (props) {
     if (event.target.value === 'All') {
       getBestPractices(props.project.key)
         .then((data) => {
-          setResultData(data)
+          if (Object.keys(data).length === 0) {
+            setError(formatError(errors.noAnalysisLaunched, props.project.key))
+          } else {
+            setResultData(data)
+          }
         })
         .catch((result) => {
           if (result instanceof Error) {
@@ -82,7 +96,11 @@ export default function BestPracticesPage (props) {
     } else {
       getBestPracticesForUrl(props.project.key, event.target.value)
         .then((data) => {
-          setResultData(data)
+          if (Object.keys(data).length === 0) {
+            setError(formatError(errors.noAnalysisFoundForURL, props.project.key, event.target.value))
+          } else {
+            setResultData(data)
+          }
         })
         .catch((result) => {
           if (result instanceof Error) {
@@ -127,7 +145,11 @@ export default function BestPracticesPage (props) {
           })
         getBestPractices(props.project.key)
           .then((data) => {
-            setResultData(data)
+            if (Object.keys(data).length === 0) {
+              setError(formatError(errors.noAnalysisLaunched, props.project.key))
+            } else {
+              setResultData(data)
+            }
           })
           .catch((result) => {
             if (result instanceof Error) {
@@ -144,6 +166,7 @@ export default function BestPracticesPage (props) {
         setLoading(false)
       })
   }
+
   function setResultData (data) {
     setBestPracticesEcodesign(data.ecodesign)
 

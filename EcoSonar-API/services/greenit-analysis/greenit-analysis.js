@@ -95,8 +95,8 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
     let harObj
     let userJourney
     await userJourneyService.getUserFlow(projectName, url)
-      .then((userflow) => {
-        userJourney = userflow
+      .then((result) => {
+        userJourney = result
       }).catch((error) => {
         console.log(error.message)
       })
@@ -105,7 +105,6 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
       console.log('GREENIT Analysis - Page requires user journey')
     } else {
       ({ page, harObj } = await launchPageWithoutUserJourney(browser, url, autoscroll))
-      console.log('GREENIT Analysis - Page does not require user journey')
     }
 
     try {
@@ -155,7 +154,7 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
       page.close()
       result.success = true
     } catch (error) {
-      console.log('\x1b[31m%s\x1b[0m', 'Error on URL ' + url)
+      console.error('\x1b[31m%s\x1b[0m', 'Error on URL ' + url)
       console.error('\x1b[31m%s\x1b[0m', error)
       result.success = false
     }

@@ -1,5 +1,9 @@
 const tempUrlsProjectRepository = require('../dataBase/tempurlsProjectRepository')
 const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
+const greenItRepository = require('../dataBase/greenItRepository')
+const lighthouseRepository = require('../dataBase/lighthouseRepository')
+const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
+const w3cRepository = require('../dataBase/w3cRepository')
 const SystemError = require('../utils/SystemError')
 
 class UrlConfigurationService {
@@ -13,11 +17,8 @@ class UrlConfigurationService {
  */
 UrlConfigurationService.prototype.getAll = function (projectName) {
   return new Promise((resolve, reject) => {
-    urlsProjectRepository.findAll(projectName, false)
+    urlsProjectRepository.findAll(projectName)
       .then((results) => {
-        if (results.length === 0) {
-          reject(new Error('Your project has no url assigned into EcoSonar. You must at least add one url if you want to analyse ecodesign practices.'))
-        }
         const resultatsFormatted = results.map((res) => res.urlName)
         resolve(resultatsFormatted)
       })
@@ -30,7 +31,7 @@ UrlConfigurationService.prototype.getAll = function (projectName) {
 
 /**
  * @param {String} projectName is the name of the project on wich we try to insert urls
- * @param {*} urlList is the list of the URLs to be inserted
+ * @param {*} urlToBeAdded is the list of the URLs to be inserted
  * This function will do 2 checks :
  * 1 - Verify into database if URL isn't already registered
  * 2-  Verify that every URLs in the list is different
@@ -40,46 +41,45 @@ UrlConfigurationService.prototype.getAll = function (projectName) {
  * URLs are trimmed to avoid issues with copy-paste adding whitespace and tab charactes
  * @reject in case of error, the function reject error type and description
  */
-UrlConfigurationService.prototype.insert = async function (projectName, urlList) {
-  // Initializing parameters
-
+UrlConfigurationService.prototype.insert = async function (projectName, urlToBeAdded) {
   let systemError = false
   let urlAlreadyAddedInProject = []
   let errorRegexp = []
-  // Retrieving URLs in database for project
-  await urlsProjectRepository.findAll(projectName, true)
-    .then((urlListResult) => { urlAlreadyAddedInProject = urlListResult.map((res) => res.urlName) })
+
+  await urlsProjectRepository.findAll(projectName)
+    .then((urls) => { urlAlreadyAddedInProject = urls.map((res) => res.urlName) })
     .catch((error) => {
       if (error instanceof SystemError) {
         systemError = true
       }
     })
 
-  const { errorArray, notInsertedArray } = verifyNoDuplication(urlList, urlAlreadyAddedInProject)
+  const { errorArray, notInsertedArray } = verifyNoDuplication(urlToBeAdded, urlAlreadyAddedInProject)
 
-  if (notInsertedArray.length === 0 && !systemError) {
-    urlsProjectRepository.insertAll(projectName, urlList)
+  if (!systemError && notInsertedArray.length === 0) {
+    urlsProjectRepository.insertAll(projectName, urlToBeAdded)
       .catch((error) => {
         if (error instanceof SystemError) {
           systemError = true
+        } else {
+          errorRegexp = error
         }
-        errorRegexp = error
       })
   }
 
-  if (notInsertedArray.length === 0 && !systemError && errorRegexp.length === 0) {
-    systemError = await removeTemporaryUrlsThatWereSaved(projectName, urlList)
+  if (!systemError && notInsertedArray.length === 0 && errorRegexp.length === 0) {
+    systemError = await removeTemporaryUrlsThatWereSaved(projectName, urlToBeAdded)
   }
 
   return new Promise((resolve, reject) => {
     if (notInsertedArray.length > 0) {
-      console.log('URL CONFIGURATION SERVICE - Some urls are duplicated')
+      console.error('URL CONFIGURATION SERVICE - Some urls are duplicated')
       reject(errorArray)
     } else if (errorRegexp.length > 0) {
-      console.log('URL CONFIGURATION SERVICE - Some urls are invalid')
+      console.error('URL CONFIGURATION SERVICE - Some urls are invalid')
       reject(errorRegexp)
     } else if (systemError) {
-      console.log('URL CONFIGURATION SERVICE - An error occured when reaching the database')
+      console.error('URL CONFIGURATION SERVICE - An error occured when reaching the database')
       reject(new SystemError())
     } else {
       resolve()
@@ -87,14 +87,15 @@ UrlConfigurationService.prototype.insert = async function (projectName, urlList)
   })
 }
 
-function verifyNoDuplication (urlList, urlAlreadyAddedInProject) {
+function verifyNoDuplication (urlToBeAdded, urlAlreadyAddedInProject) {
   const errorArray = []
   const notInsertedArray = []
   let index = 0
-  while (index < urlList.length) {
-    const newList = urlList.filter((url) => url.trim() === urlList[index].trim())
-    if (urlAlreadyAddedInProject.includes(urlList[index].trim()) || newList.length > 1) {
-      notInsertedArray.push(urlList[index].trim())
+  while (index < urlToBeAdded.length) {
+    const urlToBeChecked = urlToBeAdded[index].trim()
+    const listWithDuplicates = urlToBeAdded.filter((url) => url.trim() === urlToBeChecked)
+    if (urlAlreadyAddedInProject.includes(urlToBeChecked) || listWithDuplicates.length > 1) {
+      notInsertedArray.push(urlToBeChecked)
       errorArray[index] = 'URL was duplicated or already inserted'
     } else {
       errorArray[index] = ''
@@ -131,11 +132,32 @@ async function removeTemporaryUrlsThatWereSaved (projectName, urlList) {
  * Delete a url into a project
  */
 UrlConfigurationService.prototype.delete = async function (projectName, urlName) {
-  return new Promise((resolve, reject) => {
-    urlsProjectRepository.delete(projectName, urlName)
-      .then((res) => { resolve(res) })
-      .catch((error) => { reject(error) })
-  })
+  let systemError = false
+  let urlToDelete = []
+
+  await urlsProjectRepository.findAll(projectName)
+    .then((result) => {
+      urlToDelete = result.filter((e) => e.urlName === urlName)
+    }).catch(() => {
+      systemError = true
+    })
+
+  if (!systemError && urlToDelete.length > 0) {
+    try {
+      await lighthouseRepository.deleteAnalysisFromUrl(urlToDelete)
+      await greenItRepository.deleteAnalysisFromUrl(urlToDelete)
+      await w3cRepository.deleteAnalysisFromUrl(urlToDelete)
+      await bestPracticesRepository.deleteAnalysisFromUrl(urlToDelete)
+      await urlsProjectRepository.deleteUrl(urlToDelete)
+      return Promise.resolve()
+    } catch (error) {
+      return Promise.reject(new SystemError())
+    }
+  } else if (systemError) {
+    return Promise.reject(new SystemError())
+  } else {
+    return Promise.reject(new Error(urlName + ' in ' + projectName + ' not found'))
+  }
 }
 
 const urlConfigurationService = new UrlConfigurationService()

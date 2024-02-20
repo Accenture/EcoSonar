@@ -1,6 +1,5 @@
 const validator = require('html-validator')
 const puppeteer = require('puppeteer')
-const userJourneyService = require('../userJourneyService')
 const authenticationService = require('../authenticationService')
 
 class W3cAnalysis {}
@@ -22,13 +21,13 @@ W3cAnalysis.prototype.w3cAnalysisWithAPI = async function (urlsList) {
       const resultForUrl = await validator(options)
       if (resultForUrl.messages[0].type === 'non-document-error') {
         console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : URL ${url} cannot be found`)
-        console.log('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
+        console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
       } else {
         reports.push(resultForUrl)
         console.log(`W3C ANALYSIS : Analyse ended for ${url} `)
       }
     } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error.message)
+      console.error('\x1b[31m%s\x1b[0m', error)
     }
   }
   return reports
@@ -36,6 +35,7 @@ W3cAnalysis.prototype.w3cAnalysisWithAPI = async function (urlsList) {
 
 /**
  * This function run the W3C Validator locally by setting the validator to WHATWG. It needs no external connection to the W3C API.
+ * NOT CONNECTED TO EXISTING ECOSONAR ANALYSIS
  * @param {Array} urlsList is a list of urls that needs to be analysed by W3C HTML Validator
  * @returns a list of HTML issues
  */
@@ -77,7 +77,6 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) 
 
       for (const url of urlsList) {
         const page = await browser.newPage()
-        await userJourneyService.playUserJourney(url, browser)
         await page.setCacheEnabled(false)
         // Set BypassCSP allow pupeteer to insert script inside the created page, without it CSP using pages would block the script used later in the function
         page.setBypassCSP(true)
@@ -89,7 +88,7 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) 
           htmlResults.push({ url, html })
         } catch {
           console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : An error happened on URL ${url}`)
-          console.log('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
+          console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
         }
         await page.close()
       }
@@ -106,12 +105,15 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) 
           const resultForHtml = await validator(options)
           resultForUrlsList.push(htmlResult.url, resultForHtml)
           console.log(`W3C ANALYSIS : Analyse ended for ${htmlResult.url} `)
-        } catch {
-          console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : An error happoened on URL ${htmlResult.url}`)
+        } catch (error) {
+          console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : An error happened on URL ${htmlResult.url}`)
+          console.error(error)
         }
       }
 
       return resultForUrlsList
+    } else {
+      console.warn('Could not log in, audit for w3c analysis is skipped')
     }
   } catch (error) {
     console.error('\x1b[31m%s\x1b[0m', error)

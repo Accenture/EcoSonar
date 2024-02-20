@@ -1,5 +1,6 @@
 const ecodesignMetric = require('../../utils/feature_importance_model.json')
 const quickWinsConfig = require('../../utils/quick_wins_configuration.json')
+
 class BestPracticesSorting { }
 
 BestPracticesSorting.prototype.sortByHighestImpact = function (list) {
@@ -12,7 +13,7 @@ BestPracticesSorting.prototype.sortByHighestImpact = function (list) {
   const complianceNA = {}
   for (const practice in ecodesignMetric) {
     for (const metric in ecodesignMetric[practice]) {
-      if (list.ecodesign[metric] !== undefined) {
+      if (list.ecodesign && list.ecodesign[metric] !== undefined) {
         if (list.ecodesign[metric].compliance === 'A') {
           complianceA[metric] = list.ecodesign[metric]
           list.ecodesign[metric] = undefined
@@ -26,17 +27,12 @@ BestPracticesSorting.prototype.sortByHighestImpact = function (list) {
       }
     }
   }
-  const sizeComplianceNA = Object.keys(complianceNA).length
-  const sizeComplianceA = Object.keys(complianceA).length
 
-  if (sizeComplianceA !== 0) {
-    newList.ecodesign = jsonConcat(newList.ecodesign, complianceA)
-  }
-  if (sizeComplianceNA !== 0) {
-    newList.ecodesign = jsonConcat(newList.ecodesign, complianceNA)
+  addBestPracticesMissingFromHighestImpactModel(list, newList.ecodesign, complianceA, complianceNA)
+  if (Object.keys(newList.ecodesign).length === 0) {
+    newList.ecodesign = undefined
   }
 
-  addBestPracticesMissing(list, newList)
   return newList
 }
 
@@ -69,7 +65,11 @@ BestPracticesSorting.prototype.sortByQuickWins = function (list) {
     bestPracticesWithDifficulty10)
 
   addBestPracticesMissing(list, bestPracticesWithDifficultySorted)
-  const bestPracticesSorted = Object.assign(bestPracticesWithDifficultySorted, bestPracticesA, bestPracticesNA)
+  let bestPracticesSorted = Object.assign(bestPracticesWithDifficultySorted, bestPracticesA, bestPracticesNA)
+
+  if (Object.keys(bestPracticesSorted).length === 0) {
+    bestPracticesSorted = undefined
+  }
 
   return {
     ecodesign: bestPracticesSorted,
@@ -91,7 +91,7 @@ BestPracticesSorting.prototype.sortByQuickWins = function (list) {
     const bpNA = []
     const bpA = []
     for (const practice in quickWinsConfig) {
-      if (list.ecodesign[practice] !== undefined && list.ecodesign[practice].compliance !== 'N.A' && list.ecodesign[practice].compliance !== 'A') {
+      if (list.ecodesign && list.ecodesign[practice] !== undefined && list.ecodesign[practice].compliance !== 'N.A' && list.ecodesign[practice].compliance !== 'A') {
         if (quickWinsConfig[practice].difficulty === 10) {
           sortingByIncreasingScore(bpWithDifficulty10, list.ecodesign, practice)
         } else if (quickWinsConfig[practice].difficulty === 9) {
@@ -114,10 +114,10 @@ BestPracticesSorting.prototype.sortByQuickWins = function (list) {
           sortingByIncreasingScore(bpWithDifficulty1, list.ecodesign, practice)
         }
         list.ecodesign[practice] = undefined
-      } else if (list.ecodesign[practice] !== undefined && list.ecodesign[practice].compliance === 'N.A') {
+      } else if (list.ecodesign && list.ecodesign[practice] !== undefined && list.ecodesign[practice].compliance === 'N.A') {
         sortingByIncreasingScore(bpNA, list.ecodesign, practice)
         list.ecodesign[practice] = undefined
-      } else if (list.ecodesign[practice] !== undefined) {
+      } else if (list.ecodesign && list.ecodesign[practice] !== undefined) {
         sortingByIncreasingScore(bpA, list.ecodesign, practice)
         list.ecodesign[practice] = undefined
       }
@@ -137,13 +137,6 @@ BestPracticesSorting.prototype.sortByQuickWins = function (list) {
       bpA
     }
   }
-}
-
-function jsonConcat (json1, json2) {
-  for (const key in json2) {
-    json1[key] = json2[key]
-  }
-  return json1
 }
 
 function sortingByIncreasingScore (bestPracticeWithDifficultyX, listEcoDesign, practice) {
@@ -181,6 +174,26 @@ function addBestPracticesMissing (list, newList) {
         list.ecodesign[metric] = undefined
       }
     }
+  }
+}
+
+function addBestPracticesMissingFromHighestImpactModel (list, newList, complianceA, complianceNA) {
+  for (const practice in list) {
+    for (const metric in list[practice]) {
+      if (list.ecodesign[metric] !== undefined && list.ecodesign[metric].compliance === 'A') {
+        complianceA[metric] = list.ecodesign[metric]
+        list.ecodesign[metric] = undefined
+      } else if (list.ecodesign[metric] !== undefined && list.ecodesign[metric].compliance === 'N.A') {
+        complianceNA[metric] = list.ecodesign[metric]
+        list.ecodesign[metric] = undefined
+      } else if (list.ecodesign[metric] !== undefined) {
+        newList[metric] = list.ecodesign[metric]
+        list.ecodesign[metric] = undefined
+      }
+    }
+  }
+  if (newList) {
+    Object.assign(newList, complianceA, complianceNA)
   }
 }
 

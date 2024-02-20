@@ -1,7 +1,7 @@
 const greenItRepository = require('../dataBase/greenItRepository')
 const lighthouseRepository = require('../dataBase/lighthouseRepository')
 const w3cRepository = require('../dataBase/w3cRepository')
-const projectsRepository = require('../dataBase/projectsRepository')
+const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
 const formatLighthouseAnalysis = require('./format/formatLighthouseAnalysis')
 const SystemError = require('../utils/SystemError')
 const formatGreenItAnalysis = require('./format/formatGreenItAnalysis')
@@ -10,82 +10,139 @@ const formatW3cAnalysis = require('./format/formatW3cAnalysis')
 class RetrieveAnalysisService { }
 
 /**
- * Get an analysis (GreenIt & Lighthouse) from a given project and URL
+ * Get an analysis (GreenIt & Lighthouse & W3C) from a given project and URL
  * @param {string} projectName
  * @param {string} urlName
  * @returns {Object} Returns a formatted analysis
  */
-
 RetrieveAnalysisService.prototype.getUrlAnalysis = async function (projectName, urlName) {
-  let greenitAnalysisDeployment
-  let lighthouseResultDeployment
-  let w3cAnalysisDeployment
-  let w3cAnalysisLastAnalysis
-  let lighthouseResultLastAnalysis
-  let greenitAnalysisLastAnalysis
-  let errorRetrievedGreenItAnalysis = null
-  let errorRetrievedLighthouseAnalysis = null
-  let errorRetrievedW3cAnalysis = null
+  let urlProject = []
+  let systemError = false
+  let greenitAnalysisDeployment = []
+  let lighthouseResultDeployment = []
+  let w3cAnalysisDeployment = []
+  let w3cAnalysisLastAnalysis = null
+  let lighthouseResultLastAnalysis = null
+  let greenitAnalysisLastAnalysis = null
 
-  // Fetching analysis for each tool
-  await w3cRepository
-    .findAnalysisUrl(projectName, urlName)
-    .then((result) => {
-      w3cAnalysisDeployment = result.deployments
-      w3cAnalysisLastAnalysis = result.w3cLastAnalysis
-    })
-    .catch((err) => {
-      console.error(err)
-      errorRetrievedW3cAnalysis = err
-      w3cAnalysisDeployment = []
-      w3cAnalysisLastAnalysis = null
-    })
+  await urlsProjectRepository.findUrl(projectName, urlName)
+    .then((result) => { urlProject = result })
+    .catch(() => { systemError = true })
 
-  await greenItRepository
-    .findAnalysisUrl(projectName, urlName)
-    .then((result) => {
-      greenitAnalysisDeployment = result.deployments
-      greenitAnalysisLastAnalysis = formatGreenItAnalysis.greenItUrlAnalysisFormatted(result.lastAnalysis)
-    })
-    .catch((err) => {
-      console.error(err)
-      errorRetrievedGreenItAnalysis = err
-      greenitAnalysisDeployment = []
-      greenitAnalysisLastAnalysis = null
-    })
-  await lighthouseRepository
-    .findAnalysisUrl(projectName, urlName)
-    .then((result) => {
-      lighthouseResultDeployment = result.deployments
-      lighthouseResultLastAnalysis = formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(result.lastAnalysis)
-    })
-    .catch((err) => {
-      console.error(err)
-      errorRetrievedLighthouseAnalysis = err
-      lighthouseResultDeployment = []
-      lighthouseResultLastAnalysis = null
-    })
+  if (urlProject.length > 0) {
+    await w3cRepository
+      .findAnalysisUrl(urlProject[0].idKey)
+      .then((result) => {
+        if (result.length > 0) {
+          const lastIndex = result.length - 1
+          const lastAnalysis = [{
+            idUrlW3c: result[lastIndex].idUrlW3c,
+            dateW3cAnalysis: result[lastIndex].dateW3cAnalysis,
+            score: result[lastIndex].score,
+            w3cBestPractices: result[lastIndex].w3cBestPractices
+          }]
+          w3cAnalysisLastAnalysis = formatW3cAnalysis.w3cLastAnalysisFormatted(lastAnalysis)
 
-  // Creating the response content
+          const deployments = result.map((deployment) => {
+            return {
+              idUrlW3c: deployment.idUrlW3c,
+              dateW3cAnalysis: deployment.dateW3cAnalysis,
+              score: deployment.score,
+              w3cBestPractices: deployment.w3cBestPractices
+            }
+          })
+          w3cAnalysisDeployment = formatW3cAnalysis.w3cAnalysisFormattedDeployments(deployments)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+
+    await greenItRepository
+      .findAnalysisUrl(urlProject[0].idKey)
+      .then((result) => {
+        if (result.length > 0) {
+          const lastIndex = result.length - 1
+          const lastAnalysis = {
+            domSize: result[lastIndex].domSize,
+            nbRequest: result[lastIndex].nbRequest,
+            responsesSize: result[lastIndex].responsesSize,
+            ecoIndex: result[lastIndex].ecoIndex,
+            grade: result[lastIndex].grade
+          }
+          greenitAnalysisLastAnalysis = formatGreenItAnalysis.greenItUrlAnalysisFormatted(lastAnalysis)
+          const deployments = result.map((deployment) => {
+            return {
+              dateGreenAnalysis: deployment.dateGreenAnalysis,
+              domSize: deployment.domSize,
+              nbRequest: deployment.nbRequest,
+              responsesSize: deployment.responsesSize,
+              ecoIndex: deployment.ecoIndex
+            }
+          })
+          greenitAnalysisDeployment = formatGreenItAnalysis.formatDeploymentsForGraphs(deployments)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+
+    await lighthouseRepository
+      .findAnalysisUrl(urlProject[0].idKey)
+      .then((result) => {
+        if (result.length > 0) {
+          const lastIndex = result.length - 1
+          const lastAnalysis = {
+            dateLighthouseAnalysis: result[lastIndex].dateLighthouseAnalysis,
+            performance: result[lastIndex].performance,
+            accessibility: result[lastIndex].accessibility,
+            cumulativeLayoutShift: result[lastIndex].cumulativeLayoutShift,
+            largestContentfulPaint: result[lastIndex].largestContentfulPaint,
+            firstContentfulPaint: result[lastIndex].firstContentfulPaint,
+            speedIndex: result[lastIndex].speedIndex,
+            totalBlockingTime: result[lastIndex].totalBlockingTime,
+            interactive: result[lastIndex].interactive
+          }
+          lighthouseResultLastAnalysis = formatLighthouseAnalysis.lighthouseUrlAnalysisFormatted(lastAnalysis)
+          const deployments = result.map((deployment) => {
+            return {
+              dateAnalysis: deployment.dateLighthouseAnalysis,
+              performanceScore: deployment.performance.score,
+              accessibilityScore: deployment.accessibility.score,
+              cumulativeLayoutShift: deployment.cumulativeLayoutShift.score,
+              largestContentfulPaint: deployment.largestContentfulPaint.score,
+              firstContentfulPaint: deployment.firstContentfulPaint.score,
+              speedIndex: deployment.speedIndex.score,
+              totalBlockingTime: deployment.totalBlockingTime.score,
+              interactive: deployment.interactive.score
+            }
+          })
+          lighthouseResultDeployment = formatLighthouseAnalysis.formatDeploymentsForGraphs(deployments)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+  }
+
   return new Promise((resolve, reject) => {
-    if (errorRetrievedGreenItAnalysis instanceof SystemError || errorRetrievedLighthouseAnalysis instanceof SystemError || errorRetrievedW3cAnalysis instanceof SystemError) {
+    if (systemError) {
       reject(new SystemError())
-    } else if (errorRetrievedGreenItAnalysis !== null && errorRetrievedLighthouseAnalysis !== null && errorRetrievedW3cAnalysis !== null) {
-      reject(new Error('No analysis found for url ' + urlName + ' in project ' + projectName))
-    }
-    const analysis = {
-      deployments: {
-        greenit: greenitAnalysisDeployment,
-        lighthouse: lighthouseResultDeployment,
-        w3c: w3cAnalysisDeployment
-      },
-      lastAnalysis: {
-        greenit: greenitAnalysisLastAnalysis,
-        lighthouse: lighthouseResultLastAnalysis,
-        w3c: w3cAnalysisLastAnalysis
+    } else {
+      const analysis = {
+        deployments: {
+          greenit: greenitAnalysisDeployment,
+          lighthouse: lighthouseResultDeployment,
+          w3c: w3cAnalysisDeployment
+        },
+        lastAnalysis: {
+          greenit: greenitAnalysisLastAnalysis,
+          lighthouse: lighthouseResultLastAnalysis,
+          w3c: w3cAnalysisLastAnalysis
+        }
       }
+      resolve(analysis)
     }
-    resolve(analysis)
   })
 }
 
@@ -96,94 +153,88 @@ RetrieveAnalysisService.prototype.getUrlAnalysis = async function (projectName, 
    */
 
 RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectName) {
+  let urlsIdKey = []
+  let systemError = false
   let greenitAnalysisDeployments = []
   let lighthouseAnalysisDeployments = []
   let w3cAnalysisDeployment = []
-  let greenitLastAnalysis, lighthouseProjectLastAnalysis, w3cProjectLastAnalysis
-  let catchLighthouse = null
-  let catchGreenit = null
-  let catchW3c = null
-  let errRetrievedAnalysisGreenit = null
-  let errRetrievedLighthouseAnalysis = null
-  let errRetrievedW3cAnalysis = null
+  let greenitLastAnalysis = null
+  let lighthouseProjectLastAnalysis = null
+  let w3cProjectLastAnalysis = null
 
-  await greenItRepository
-    .findAnalysisProject(projectName)
-    .then((res) => {
-      if (res.deployments.length !== 0) {
-        greenitAnalysisDeployments = formatGreenItAnalysis.formatDeploymentsForGraphs(res.deployments)
-        greenitLastAnalysis = formatGreenItAnalysis.greenItProjectLastAnalysisFormatted(res.lastAnalysis)
-      } else {
-        greenitLastAnalysis = null
-        greenitAnalysisDeployments = []
-        errRetrievedAnalysisGreenit = 'GET ANALYSIS PROJECT - No greenit analysis found for project ' + projectName
-      }
-    })
-    .catch((err) => {
-      console.error(err)
-      catchGreenit = err
-    })
-  await lighthouseRepository
-    .findAnalysisProject(projectName)
-    .then((res) => {
-      if (res.deployments.length !== 0) {
-        // deployments
-        lighthouseAnalysisDeployments = formatLighthouseAnalysis.lighthouseAnalysisFormattedDeployments(res.deployments)
+  await urlsProjectRepository.findAll(projectName)
+    .then((result) => { urlsIdKey = result.map((el) => el.idKey) })
+    .catch(() => { systemError = true })
 
-        // lastAnalysis
-        lighthouseProjectLastAnalysis = formatLighthouseAnalysis.lighthouseProjectLastAnalysisFormatted(res.lastAnalysis)
-      } else {
-        errRetrievedLighthouseAnalysis = 'GET ANALYSIS PROJECT - No lighthouse Analysis found for project ' + projectName
-        lighthouseAnalysisDeployments = []
-        lighthouseProjectLastAnalysis = null
-      }
-    })
-    .catch((err) => {
-      console.error(err)
-      catchLighthouse = err
-    })
+  if (urlsIdKey.length > 0) {
+    await greenItRepository
+      .findAnalysisProject(urlsIdKey)
+      .then((result) => {
+        if (result.length > 0) {
+          const dateLastAnalysis = result[result.length - 1].dateGreenAnalysis
+          const lastAnalysis = result.filter((greenitAnalysis) => greenitAnalysis.dateGreenAnalysis.getTime() === dateLastAnalysis.getTime())
+          greenitLastAnalysis = formatGreenItAnalysis.greenItProjectLastAnalysisFormatted(lastAnalysis)
+          greenitAnalysisDeployments = formatGreenItAnalysis.formatDeploymentsForGraphs(result)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+    await lighthouseRepository
+      .findAnalysisProject(urlsIdKey)
+      .then((result) => {
+        if (result.length > 0) {
+          const dateLastAnalysis = result[result.length - 1].dateLighthouseAnalysis
+          const lastAnalysis = result.filter(
+            (deployment) =>
+              deployment.dateLighthouseAnalysis.getTime() ===
+              dateLastAnalysis.getTime()
+          )
+          lighthouseProjectLastAnalysis = formatLighthouseAnalysis.lighthouseProjectLastAnalysisFormatted(lastAnalysis)
+          lighthouseAnalysisDeployments = formatLighthouseAnalysis.lighthouseAnalysisFormattedDeployments(result)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
 
-  await w3cRepository.findAnalysisProject(projectName).then((res) => {
-    if (res.deployments.length !== 0) {
-      w3cAnalysisDeployment = formatW3cAnalysis.w3cAnalysisFormattedDeployments(res.deployments)
-
-      // lastAnalysis
-      w3cProjectLastAnalysis = formatW3cAnalysis.w3cLastAnalysisFormatted(res.lastAnalysis)
-    } else {
-      errRetrievedW3cAnalysis = 'GET ANALYSIS PROJECT - No W3C Analysis found for project ' + projectName
-      w3cAnalysisDeployment = []
-      w3cProjectLastAnalysis = null
-    }
-  })
-    .catch((err) => {
-      console.error(err)
-      catchW3c = err
-    })
+    await w3cRepository.findAnalysisProject(urlsIdKey)
+      .then((result) => {
+        if (result.length > 0) {
+          const dateLastAnalysis = result[result.length - 1].dateW3cAnalysis
+          const lastAnalysis = result.filter(
+            (deployment) =>
+              deployment.dateW3cAnalysis.getTime() ===
+              dateLastAnalysis.getTime()
+          )
+          w3cProjectLastAnalysis = formatW3cAnalysis.w3cLastAnalysisFormatted(lastAnalysis)
+          w3cAnalysisDeployment = formatW3cAnalysis.w3cAnalysisFormattedDeployments(result)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+  }
 
   return new Promise((resolve, reject) => {
-    if (catchGreenit instanceof SystemError || catchLighthouse instanceof SystemError || catchW3c instanceof SystemError) {
+    if (systemError) {
       reject(new SystemError())
-    } else if (catchGreenit !== null || catchLighthouse !== null || catchW3c !== null) {
-      reject(new Error('GET ANALYSIS PROJECT - error during generation of ' + projectName + ' analysis'))
-    }
-
-    if (errRetrievedLighthouseAnalysis && errRetrievedAnalysisGreenit && errRetrievedW3cAnalysis) reject(new Error('GET ANALYSIS PROJECT - No Analysis found for project ' + projectName))
-
-    // Creating the response content
-    const allAnalysis = {
-      allowW3c: process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API,
-      deployments: {
-        greenit: greenitAnalysisDeployments,
-        lighthouse: lighthouseAnalysisDeployments,
-        w3c: w3cAnalysisDeployment
-      },
-      lastAnalysis: {
-        greenit: greenitLastAnalysis,
-        lighthouse: lighthouseProjectLastAnalysis,
-        w3c: w3cProjectLastAnalysis
+    } else {
+      const analysis = {
+        allowW3c: process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API || 'false',
+        deployments: {
+          greenit: greenitAnalysisDeployments,
+          lighthouse: lighthouseAnalysisDeployments,
+          w3c: w3cAnalysisDeployment
+        },
+        lastAnalysis: {
+          greenit: greenitLastAnalysis,
+          lighthouse: lighthouseProjectLastAnalysis,
+          w3c: w3cProjectLastAnalysis
+        }
       }
+      resolve(analysis)
     }
-    resolve(allAnalysis)
   })
 }
 
@@ -206,18 +257,19 @@ function regroupUrlIdKeyByProjectName (projects) {
 /**
    * Get the average of scores (EcoIndex & Performance & Accessibility) from all projects at a range of date
    * @param {string} filterName by default equal to null, if stirng is not null allow to filter project by their name
-   * @returns {Object} Returns the formatted average scores
+   * @returns {Array} Returns the formatted list of projects with analysis for each type of audit
    */
-RetrieveAnalysisService.prototype.getProjectScoresAverageAll = async function (filterName = null) {
+RetrieveAnalysisService.prototype.getAllProjectScoresAverage = async function (filterName = null) {
   const result = []
-  let error = null
+  let systemError = false
   try {
     const allLighthouseAnalysis = await lighthouseRepository.findAllAnalysis()
     const allgreenITAnalysis = await greenItRepository.findAllAnalysis()
     const allW3CAnalysis = await w3cRepository.findAllAnalysis()
 
-    let projects = await projectsRepository.findAllProjectsNames(filterName)
+    let projects = await urlsProjectRepository.findAllProjectsNames(filterName)
     projects = regroupUrlIdKeyByProjectName(projects)
+
     for (const project of projects) {
       const analysisOfProjectLighthouse = groupByProject(project.IdKeys, 'idUrlLighthouse', allLighthouseAnalysis)
       const analysisOfProjectGreenIt = groupByProject(project.IdKeys, 'idUrlGreen', allgreenITAnalysis)
@@ -230,10 +282,10 @@ RetrieveAnalysisService.prototype.getProjectScoresAverageAll = async function (f
       })
     }
   } catch (err) {
-    error = err
+    systemError = true
   }
   return new Promise((resolve, reject) => {
-    if (error !== null) {
+    if (systemError) {
       reject(new SystemError())
     } else {
       resolve(result)
@@ -247,83 +299,94 @@ RetrieveAnalysisService.prototype.getProjectScoresAverageAll = async function (f
    * @returns {Object} Returns the formatted scores for the given project
    */
 RetrieveAnalysisService.prototype.getProjectScores = async function (projectName) {
-  let ecoIndex = 0
-  let accessScore = 0
-  let perfScore = 0
-  let w3cScore = 0
-  let catchLighthouse = null
-  let catchGreenit = null
-  let catchW3c = null
-  let errRetrievedAnalysisGreenit = null
-  let errRetrievedLighthouseAnalysis = null
-  let errRetrievedW3cAnalysis = null
+  let urlsIdKey = []
+  let systemError = false
+  let ecoIndex = null
+  let accessScore = null
+  let perfScore = null
+  let w3cScore = null
 
-  await greenItRepository
-    .findScoreProject(projectName)
-    .then((res) => {
-      if (res.scores !== null) {
-        for (const score of res.scores) {
-          ecoIndex += score.ecoIndex
-        }
-        ecoIndex = ecoIndex / res.scores.length
-      } else {
-        ecoIndex = null
-        console.log('GET ECOSONAR PROJECT SCORES - No greenit analysis found for project ' + projectName)
-        errRetrievedAnalysisGreenit = 'No greenit analysis found for project ' + projectName
-      }
-    })
-    .catch((err) => {
-      ecoIndex = null
-      catchGreenit = err
-    })
-  await lighthouseRepository
-    .findScoreProject(projectName)
-    .then((res) => {
-      if (res.scores !== null) {
-        for (const score of res.scores) {
-          accessScore += score.accessibility.score
-          perfScore += score.performance.score
-        }
-        accessScore = accessScore / res.scores.length
-        perfScore = perfScore / res.scores.length
-      } else {
-        accessScore = null
-        perfScore = null
-        console.log('GET ECOSONAR PROJECT SCORES - No lighthouse Analysis found for project ' + projectName)
-        errRetrievedLighthouseAnalysis = 'No lighthouse Analysis found for project ' + projectName
-      }
-    })
-    .catch((err) => {
-      accessScore = null
-      perfScore = null
-      catchLighthouse = err
-    })
+  await urlsProjectRepository.findAll(projectName)
+    .then((result) => { urlsIdKey = result.map((el) => el.idKey) })
+    .catch(() => { systemError = true })
 
-  await w3cRepository.findAnalysisProject(projectName).then((res) => {
-    if (res.deployments.length !== 0) {
-      const w3cProjectLastAnalysis = formatW3cAnalysis.w3cLastAnalysisFormatted(res.lastAnalysis)
-      w3cScore = w3cProjectLastAnalysis.score
-    } else {
-      w3cScore = null
-      console.log('GET ECOSONAR PROJECT SCORES - No W3C Analysis found for project ' + projectName)
-      errRetrievedW3cAnalysis = 'No W3C Analysis found for project ' + projectName
-    }
-  })
-    .catch((err) => {
-      w3cScore = null
-      catchW3c = err
-    })
+  if (urlsIdKey.length > 0) {
+    await greenItRepository
+      .findScoreProject(urlsIdKey)
+      .then((res) => {
+        if (res.length > 0) {
+          const dateLastAnalysis = res[res.length - 1].dateGreenAnalysis
+          const lastAnalysis = res.filter((greenitAnalysis) => greenitAnalysis.dateGreenAnalysis.getTime() === dateLastAnalysis.getTime())
+          ecoIndex = 0
+          for (const score of lastAnalysis) {
+            ecoIndex += score.ecoIndex
+          }
+          ecoIndex = ecoIndex / lastAnalysis.length
+        } else {
+          console.log('Greenit - no greenit analysis found for ' + projectName)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+
+    await lighthouseRepository
+      .findScoreProject(urlsIdKey)
+      .then((res) => {
+        if (res.length > 0) {
+          const dateLastAnalysis = res[res.length - 1].dateLighthouseAnalysis
+          const lastAnalysis = res.filter(
+            (deployment) =>
+              deployment.dateLighthouseAnalysis.getTime() ===
+            dateLastAnalysis.getTime()
+          )
+          accessScore = 0
+          perfScore = 0
+          for (const score of lastAnalysis) {
+            accessScore += score.accessibility.score
+            perfScore += score.performance.score
+          }
+          accessScore = accessScore / lastAnalysis.length
+          perfScore = perfScore / lastAnalysis.length
+        } else {
+          console.log('No lighthouse Analysis found for project ' + projectName)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+
+    await w3cRepository.findAnalysisProject(urlsIdKey)
+      .then((res) => {
+        if (res.length > 0) {
+          const dateLastAnalysis = res[res.length - 1].dateW3cAnalysis
+          const lastAnalysis = res.filter(
+            (deployment) =>
+              deployment.dateW3cAnalysis.getTime() ===
+            dateLastAnalysis.getTime()
+          )
+          const w3cProjectLastAnalysis = formatW3cAnalysis.w3cLastAnalysisFormatted(lastAnalysis)
+          w3cScore = w3cProjectLastAnalysis.score
+        } else {
+          console.log('No W3C Analysis found for project ' + projectName)
+        }
+      })
+      .catch(() => {
+        systemError = true
+      })
+  }
 
   return new Promise((resolve, reject) => {
-    if (catchGreenit instanceof SystemError || catchLighthouse instanceof SystemError || catchW3c instanceof SystemError) {
+    if (systemError) {
       reject(new SystemError())
-    } else if (errRetrievedLighthouseAnalysis !== null && errRetrievedAnalysisGreenit !== null && errRetrievedW3cAnalysis !== null) reject(new Error('No Analysis found for project ' + projectName))
-    resolve({
-      ecoIndex: ecoIndex !== null ? Math.round(ecoIndex) : null,
-      perfScore: perfScore !== null ? Math.round(perfScore) : null,
-      accessibilityScore: accessScore !== null ? Math.round(accessScore) : null,
-      w3cScore: w3cScore !== null ? Math.round(w3cScore) : null
-    })
+    } else {
+      resolve({
+        ecoIndex: ecoIndex !== null ? Math.round(ecoIndex) : null,
+        perfScore: perfScore !== null ? Math.round(perfScore) : null,
+        accessibilityScore: accessScore !== null ? Math.round(accessScore) : null,
+        w3cScore: w3cScore !== null ? Math.round(w3cScore) : null
+      })
+    }
   })
 }
 

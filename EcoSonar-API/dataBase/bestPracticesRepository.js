@@ -1,5 +1,4 @@
 const bestpractices = require('./models/bestpractices')
-const urlsprojects = require('./models/urlsprojects')
 const SystemError = require('../utils/SystemError')
 
 const BestPracticesRepository = function () {
@@ -8,8 +7,9 @@ const BestPracticesRepository = function () {
    * @param {Array} reports array containing the result of greenIt analysis (including metrics and best practices)
    */
   this.insertBestPractices = async function (reports) {
-    if (reports.length > 0) { reports = checkValues(reports) }
-
+    if (reports.length > 0) {
+      reports = checkValues(reports)
+    }
     reports = reports.map((report) => replaceDotWithUnderscoreInKeys(report))
 
     return new Promise((resolve, reject) => {
@@ -21,8 +21,7 @@ const BestPracticesRepository = function () {
           })
           .catch((error) => {
             console.error('\x1b[31m%s\x1b[0m', error)
-            const systemError = new SystemError()
-            reject(systemError)
+            reject(new SystemError())
           })
       } else {
         console.log('None of the urls analyzed could be inserted')
@@ -32,122 +31,57 @@ const BestPracticesRepository = function () {
   }
 
   /**
-   * deletion of one or more analysis of best practices on the table bestPractices
-   * @param {string} projectNameReq
+   * Deletion of all best practices recommendation for a url
+   * @param {Object} url url to be deleted
    */
-  this.delete = async function (projectNameReq) {
-    let empty = false
-    let errDelete = false
-    let resAnalysis
-    try {
-      const resList = await urlsprojects.find({ projectName: projectNameReq }, { idKey: 1 })
-      if (resList.length === 0) {
-        empty = true
-      } else {
-        const listIdKey = resList.map((url) => url.idKey)
-        resAnalysis = await bestpractices.deleteMany({ idUrl: listIdKey })
-      }
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
-      errDelete = true
-    }
+  this.deleteAnalysisFromUrl = async function (url) {
     return new Promise((resolve, reject) => {
-      if (errDelete) {
-        const systemError = new SystemError()
-        console.log('error during deletion of best practices analysis in ' + projectNameReq)
-        reject(systemError)
-      } else if (empty) {
-        console.log('Best practices analysis for ' + projectNameReq + ' not found')
-        reject(new Error('Best practices analysis for ' + projectNameReq + ' not found'))
-      } else {
-        if (resAnalysis.deletedCount >= 1) {
-          console.log('Best practices analysis of project ' + projectNameReq + ' where deleted')
-        } else {
-          console.log('no best practices analysis found in ' + projectNameReq)
-        }
-        resolve()
-      }
+      bestpractices.deleteMany({ idUrl: url[0].idKey })
+        .then((result) => {
+          console.log(`DELETE URL - On best practices ${result.deletedCount} objects removed`)
+          resolve()
+        })
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
   /**
    * find All analysis of best practices  for a project on the table bestPractices
-   * @param {string} projectNameReq
+   * @param {Array} listIdKey list of urls id keys
    * @returns {Array} best practices reports for the last analysis run on project
    */
-  this.findAll = async function (projectNameReq) {
-    let hasNoUrl = false
-    let systemError = null
-    let results = []
-    let latestBestPracticeReports = []
-    try {
-      const resList = await urlsprojects.find({ projectName: projectNameReq }, { idKey: 1 })
-      if (resList.length === 0) {
-        hasNoUrl = true
-      } else {
-        let i = 0
-        const listIdKey = []
-        while (i < resList.length) {
-          listIdKey[i] = resList[i].idKey
-          i++
-        }
-        results = await bestpractices
-          .find({ idUrl: listIdKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
-          .sort({ dateAnalysisBestPractices: 1 })
-        const latestBestPracticeDate = new Date(
-          Math.max(...results.map(element => { return new Date(element.dateAnalysisBestPractices) }))
-        )
-        latestBestPracticeReports = results.filter(element => element.dateAnalysisBestPractices.getTime() === latestBestPracticeDate.getTime())
-      }
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
-      console.log('error during generation of ' + projectNameReq + ' best practices analysis')
-      systemError = new SystemError()
-    }
+  this.findBestPracticesForProject = async function (listIdKey) {
     return new Promise((resolve, reject) => {
-      if (systemError !== null) {
-        reject(systemError)
-      } else if (hasNoUrl) {
-        reject(new Error('No analysis found for project' + projectNameReq))
-      } else {
-        resolve(latestBestPracticeReports)
-      }
+      bestpractices
+        .find({ idUrl: listIdKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
+        .sort({ dateAnalysisBestPractices: 1 })
+        .then((result) => resolve(result))
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
   /**
    * find analysis of best practices  for an URL on the table bestPractices
-   * @param {string} projectName
-   * @param {string} urlName
-   * @returns {Array} best practices reports for the last analysis run on URL
+   * @param {string} urlIdKey id key of the url saved
+   * @returns {Array} best practices report for the last analysis run on URL
    */
-  this.find = async function (projectName, urlName) {
-    let hasNoUrl = false
-    let systemError = null
-    let result
-    try {
-      const resList = await urlsprojects.find({ projectName, urlName }, { idKey: 1 })
-      if (resList.length < 1) {
-        hasNoUrl = true
-      } else {
-        result = await bestpractices
-          .find({ idUrl: resList[0].idKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
-          .sort({ dateAnalysisBestPractices: -1 })
-          .limit(1)
-      }
-    } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
-      console.log(`Error during generation of ${urlName} best practices analysis`)
-      systemError = new SystemError()
-    }
+  this.findBestPracticesForUrl = async function (urlIdKey) {
     return new Promise((resolve, reject) => {
-      if (systemError !== null) {
-        reject(systemError)
-      } else if (hasNoUrl) {
-        reject(new Error(`No analysis found for url ${urlName} into project ${projectName}`))
-      } else {
-        resolve(result)
-      }
+      bestpractices
+        .find({ idUrl: urlIdKey }, { bestPractices: 1, lighthousePerformanceBestPractices: 1, lighthouseAccessibilityBestPractices: 1, dateAnalysisBestPractices: 1 })
+        .sort({ dateAnalysisBestPractices: -1 })
+        .limit(1)
+        .then((result) => resolve(result))
+        .catch((error) => {
+          console.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
     })
   }
 
@@ -184,7 +118,7 @@ function checkValues (arrayToInsert) {
     if (analysis.bestPractices) {
       arrayToInsertSanitized.push(analysis)
     } else {
-      console.log(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
+      console.warn(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
     }
   }
   return arrayToInsertSanitized

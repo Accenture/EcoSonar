@@ -5,6 +5,9 @@ import GraphPanelForUrl from './GraphPanel/GraphPanelForUrl'
 import GreenItPanelPerUrl from './GreenItPanel/GreenItPanelPerUrl'
 import LightHousePanelPerUrl from './LighthousePanel/LighthousePanelPerUrl'
 import W3cPanelPerUrl from './W3cPanel/W3cPanelPerUrl'
+import formatError from '../../format/formatError'
+import errors from '../../utils/errors.json'
+
 export default class AnalysisPerUrlPanel extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -63,7 +66,7 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
     })
     getAnalysisUrlConfiguration(this.state.projectName, this.state.selectedUrl)
       .then((res) => {
-        if (res !== undefined) {
+        if (res !== undefined && res.lastAnalysis.greenit !== null && res.lastAnalysis.lighthouse !== null && res.lastAnalysis.w3c !== null && res.deployments.greenit.length !== 0 && res.deployments.lighthouse.length !== 0 && res.deployments.lighthouse.w3c !== 0) {
           this.setState({
             greenItLastAnalysis: res.lastAnalysis.greenit,
             lighthouseLastAnalysis: res.lastAnalysis.lighthouse,
@@ -84,12 +87,12 @@ export default class AnalysisPerUrlPanel extends React.PureComponent {
             speedIndexUrl: res.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.speedIndex]),
             totalBlockingTimeUrl: res.deployments.lighthouse.map((analysis) => [analysis.dateAnalysis, analysis.totalBlockingTime])
           })
+        } else {
+          this.setState({ error: formatError(errors.noAnalysisFoundForURL, this.state.projectName, this.state.selectedUrl), loading: false })
         }
       })
       .catch((result) => {
-        if (result instanceof Error) {
-          this.setState({ error: result.message, loading: false })
-        }
+        this.setState({ error: result.message, loading: false })
       })
   }
 

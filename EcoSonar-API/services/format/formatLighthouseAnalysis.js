@@ -1,8 +1,9 @@
 const formatCompliance = require('./formatCompliance')
+
 class FormatLighthouseAnalysis {}
 
 FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (analysis) {
-  let formattedAnalysis
+  let formattedAnalysis = null
   try {
     formattedAnalysis = {
       performance: { displayValue: analysis.performance.score, complianceLevel: formatCompliance.getEcodesignGrade(analysis.performance.score) },
@@ -40,14 +41,14 @@ FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (an
       }
     }
   } catch (err) {
-    console.log(err)
-    console.log('LIGHTHOUSE - error during the formatting of project analysis')
+    console.error(err)
+    console.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
   return formattedAnalysis
 }
 
 FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = function (res) {
-  let analysis
+  let analysis = null
   let j = 0
   let count, performance, dateAnalysis, accessibility, largestContentfulPaint, cumulativeLayoutShift, firstContentfulPaint, speedIndex, totalBlockingTime, interactive
 
@@ -145,106 +146,108 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
         }
       }
     }
-    return analysis
   } catch (err) {
-    console.log(err)
-    console.log('LIGHTHOUSE - error during the formatting of project analysis')
+    console.error(err)
+    console.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
+  return analysis
+
   function calculateAverageScore (score, toFixParam) {
     return (score / count).toFixed(toFixParam)
   }
 }
 
 FormatLighthouseAnalysis.prototype.lighthouseAnalysisFormattedDeployments = function (res) {
-  let j = 0
-  const deployments = []
-
-  let formattedMetrics
+  let deployments = []
 
   try {
-    while (j < res.length) {
-      formattedMetrics = {
-        performanceScore: res[j].performance.score,
-        accessibilityScore: res[j].accessibility.score,
-        dateAnalysis: res[j].dateLighthouseAnalysis,
-        largestContentfulPaint: res[j].largestContentfulPaint.score,
-        cumulativeLayoutShift: res[j].cumulativeLayoutShift.score,
-        firstContentfulPaint: res[j].firstContentfulPaint.score,
-        speedIndex: res[j].speedIndex.score,
-        totalBlockingTime: res[j].totalBlockingTime.score,
-        interactive: res[j].interactive.score
+    deployments = res.map((el) => {
+      return {
+        performanceScore: el.performance.score,
+        accessibilityScore: el.accessibility.score,
+        dateAnalysis: el.dateLighthouseAnalysis,
+        largestContentfulPaint: el.largestContentfulPaint.score,
+        cumulativeLayoutShift: el.cumulativeLayoutShift.score,
+        firstContentfulPaint: el.firstContentfulPaint.score,
+        speedIndex: el.speedIndex.score,
+        totalBlockingTime: el.totalBlockingTime.score,
+        interactive: el.interactive.score
       }
-
-      deployments[j] = formattedMetrics
-
-      j++
-    }
-    return this.formatDeploymentsForGraphs(deployments)
+    })
+    deployments = this.formatDeploymentsForGraphs(deployments)
   } catch (err) {
-    console.log(err)
-    console.log('LIGHTHOUSE - error during the formatting of project analysis')
+    console.error(err)
+    console.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
+  return deployments
 }
 
 FormatLighthouseAnalysis.prototype.formatDeploymentsForGraphs = function (deployments) {
   const duplicatedDeployments = []
+  let finalDeployment = []
 
-  for (const i of deployments) {
-    // We filter deployments to find the values with the same date
-    const duplicatedValuesArray = deployments.filter((element) => compareFullDate(element.dateAnalysis, i.dateAnalysis))
-    const sumElement = {
-      performanceScore: 0,
-      accessibilityScore: 0,
-      dateAnalysis: duplicatedValuesArray[0].dateAnalysis,
-      largestContentfulPaint: 0,
-      cumulativeLayoutShift: 0,
-      firstContentfulPaint: 0,
-      speedIndex: 0,
-      totalBlockingTime: 0,
-      interactive: 0,
-      numberOfValues: 0
+  try {
+    for (const i of deployments) {
+      // We filter deployments to find the values with the same date
+      const duplicatedValuesArray = deployments.filter((element) => compareFullDate(element.dateAnalysis, i.dateAnalysis))
+      const sumElement = {
+        performanceScore: 0,
+        accessibilityScore: 0,
+        dateAnalysis: duplicatedValuesArray[0].dateAnalysis,
+        largestContentfulPaint: 0,
+        cumulativeLayoutShift: 0,
+        firstContentfulPaint: 0,
+        speedIndex: 0,
+        totalBlockingTime: 0,
+        interactive: 0,
+        numberOfValues: 0
+      }
+
+      // We add up every element with the same date (only DD/MM/YYYY) in one (sumElement)
+      duplicatedValuesArray.forEach((element) => {
+        sumElement.performanceScore += element.performanceScore
+        sumElement.accessibilityScore += element.accessibilityScore
+        sumElement.largestContentfulPaint += element.largestContentfulPaint
+        sumElement.cumulativeLayoutShift += element.cumulativeLayoutShift
+        sumElement.firstContentfulPaint += element.firstContentfulPaint
+        sumElement.speedIndex += element.speedIndex
+        sumElement.totalBlockingTime += element.totalBlockingTime
+        sumElement.interactive += element.interactive
+        sumElement.numberOfValues++
+      })
+
+      duplicatedDeployments.push(sumElement)
     }
 
-    // We add up every element with the same date (only DD/MM/YYYY) in one (sumElement)
-    duplicatedValuesArray.forEach((element) => {
-      sumElement.performanceScore += element.performanceScore
-      sumElement.accessibilityScore += element.accessibilityScore
-      sumElement.largestContentfulPaint += element.largestContentfulPaint
-      sumElement.cumulativeLayoutShift += element.cumulativeLayoutShift
-      sumElement.firstContentfulPaint += element.firstContentfulPaint
-      sumElement.speedIndex += element.speedIndex
-      sumElement.totalBlockingTime += element.totalBlockingTime
-      sumElement.interactive += element.interactive
-      sumElement.numberOfValues++
-    })
+    // Sanitizing duplicatedDeployments
+    finalDeployment = getUniqueListByDate(duplicatedDeployments, 'dateAnalysis')
 
-    duplicatedDeployments.push(sumElement)
+    // Finally we calculate the average for each date
+    for (const i of finalDeployment) {
+      i.performanceScore = Math.round(i.performanceScore / i.numberOfValues)
+      i.accessibilityScore = Math.round(i.accessibilityScore / i.numberOfValues)
+      i.largestContentfulPaint = Math.round(i.largestContentfulPaint / i.numberOfValues)
+      i.cumulativeLayoutShift = Math.round(i.cumulativeLayoutShift / i.numberOfValues)
+      i.firstContentfulPaint = Math.round(i.firstContentfulPaint / i.numberOfValues)
+      i.speedIndex = Math.round(i.speedIndex / i.numberOfValues)
+      i.totalBlockingTime = Math.round(i.totalBlockingTime / i.numberOfValues)
+      i.interactive = Math.round(i.interactive / i.numberOfValues)
+      delete i.numberOfValues
+    }
+  } catch (err) {
+    console.error(err)
+    console.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
 
-  // Sanitizing duplicatedDeployments
-  const finalDeployment = getUniqueListByDate(duplicatedDeployments, 'dateAnalysis')
-
-  function getUniqueListByDate (arr, key) {
-    return [...new Map(arr.map(item => [item[key], item])).values()]
-  }
-
-  // Finally we calculate the average for each date
-  for (const i of finalDeployment) {
-    i.performanceScore = Math.round(i.performanceScore / i.numberOfValues)
-    i.accessibilityScore = Math.round(i.accessibilityScore / i.numberOfValues)
-    i.largestContentfulPaint = Math.round(i.largestContentfulPaint / i.numberOfValues)
-    i.cumulativeLayoutShift = Math.round(i.cumulativeLayoutShift / i.numberOfValues)
-    i.firstContentfulPaint = Math.round(i.firstContentfulPaint / i.numberOfValues)
-    i.speedIndex = Math.round(i.speedIndex / i.numberOfValues)
-    i.totalBlockingTime = Math.round(i.totalBlockingTime / i.numberOfValues)
-    i.interactive = Math.round(i.interactive / i.numberOfValues)
-    delete i.numberOfValues
-  }
-
-  function compareFullDate (firstDate, secondDate) {
-    return (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear())
-  }
   return finalDeployment
+}
+
+function getUniqueListByDate (arr, key) {
+  return [...new Map(arr.map(item => [item[key], item])).values()]
+}
+
+function compareFullDate (firstDate, secondDate) {
+  return (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear())
 }
 
 const formatLighthouseAnalysis = new FormatLighthouseAnalysis()

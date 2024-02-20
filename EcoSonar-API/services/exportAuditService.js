@@ -6,35 +6,28 @@ const SystemError = require('../utils/SystemError')
 class ExportAuditService { }
 
 ExportAuditService.prototype.exportAudit = async function (projectName) {
-  // get Urls
   let urls = []
   let analysis = null
+
   await urlConfigurationService.getAll(projectName)
     .then((results) => {
       urls = results
     })
-    .catch((error) => {
-      if (error instanceof SystemError) {
-        return new SystemError()
-      }
-      console.log('EXPORT EXCEL - No url retrieved for project ' + projectName)
+    .catch(() => {
+      return new SystemError()
     })
-  // get project analysis
+
   await retrieveAnalysisService.getProjectAnalysis(projectName)
     .then((results) => {
       analysis = results
-    }).catch((error) => {
-      if (error instanceof SystemError) {
-        return new SystemError()
-      }
-      console.log('EXPORT EXCEL - Analysis for project could not be retrieved')
+    }).catch(() => {
+      return new SystemError()
     })
 
   if (urls.length === 0 || analysis == null) {
     throw new Error('Export Audit is not possible because urls were not inserted into project or analysis for project could not be retrieved')
   }
 
-  // date
   const dateGreenitLastAnalysis = analysis.lastAnalysis.greenit !== null && analysis.lastAnalysis.greenit.dateAnalysis
     ? `${new Date(analysis.lastAnalysis.greenit.dateAnalysis).toDateString()} - ${new Date(analysis.lastAnalysis.greenit.dateAnalysis).toLocaleTimeString([], { hour12: false })}  `
     : null
@@ -47,9 +40,7 @@ ExportAuditService.prototype.exportAudit = async function (projectName) {
   } else if (dateLighthouseLastAnalysis !== null) {
     dateLastAnalysis = dateLighthouseLastAnalysis
   }
-  // analysis
-  let analysisGreenit = analysis.lastAnalysis.greenit
-  let analysisW3c = analysis.lastAnalysis.w3c
+
   let lighthousePerformance, lighthouseAccessibility, lighthouseMetrics
   if (analysis.lastAnalysis.lighthouse) {
     lighthousePerformance = {
@@ -101,32 +92,47 @@ ExportAuditService.prototype.exportAudit = async function (projectName) {
         x: 0, y: 0, width: 10000, height: 20000, firstSheet: 0, activeTab: 0, visibility: 'visible'
       }
     ]
-    // project page
-    formatExcelSheet('', 0, workbook, projectName, analysisGreenit, analysisW3c, lighthouseAccessibility, lighthousePerformance, lighthouseMetrics, dateLastAnalysis)
-    // url pages
+
+    const analysisForProject = {
+      analysisGreenit: analysis.lastAnalysis.greenit,
+      analysisW3c: analysis.lastAnalysis.w3c,
+      lighthouseAccessibility,
+      lighthousePerformance,
+      lighthouseMetrics
+    }
+    formatExcelSheet('', 0, workbook, projectName, analysisForProject, dateLastAnalysis)
+
     for (const [index, url] of urls.entries()) {
       await retrieveAnalysisService.getUrlAnalysis(projectName, url)
         .then((res) => {
-          analysisGreenit = res.lastAnalysis.greenit
-          analysisW3c = res.lastAnalysis.w3c
           lighthouseAccessibility = res.lastAnalysis.lighthouse !== null ? res.lastAnalysis.lighthouse.accessibility : null
           lighthousePerformance = res.lastAnalysis.lighthouse !== null ? res.lastAnalysis.lighthouse.performance : null
-          lighthouseMetrics = res.lastAnalysis.lighthouse
-          formatExcelSheet(url, index + 1, workbook, projectName, analysisGreenit, analysisW3c, lighthouseAccessibility, lighthousePerformance, lighthouseMetrics, dateLastAnalysis)
+
+          const analysisForUrl = {
+            analysisGreenit: res.lastAnalysis.greenit,
+            analysisW3c: res.lastAnalysis.w3c,
+            lighthouseAccessibility,
+            lighthousePerformance,
+            lighthouseMetrics: res.lastAnalysis.lighthouse
+          }
+          formatExcelSheet(url, index + 1, workbook, projectName, analysisForUrl, dateLastAnalysis)
         })
-        .catch((error) => {
-          console.error(error.message)
-          console.log('Analysis for URL ' + url + ' could not be resolved ')
+        .catch(() => {
+          console.error('Analysis for URL ' + url + ' could not be resolved ')
         })
     }
     return workbook.xlsx.writeBuffer()
   } catch (err) {
-    console.error(err.message)
+    console.error(err)
     return new Error('Could not export Audit to Excel for projet ' + projectName)
   }
 }
 
-function formatExcelSheet (urlName, index, workbook, projectName, analysisGreenit, analysisW3c, lighthouseAccessibility, lighthousePerformance, lighthouseMetrics, dateLastAnalysis) {
+function formatExcelSheet (urlName, index, workbook, projectName, analysis, dateLastAnalysis) {
+  if (checkAnalysisIsEmpty(analysis)) {
+    return
+  }
+
   let sheet
   if (urlName !== '') {
     sheet = workbook.addWorksheet('url' + index)
@@ -196,33 +202,33 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   // score and grade
   row = sheet.getRow(rowIndex)
   row.getCell(1).value = 'EcoIndex project grade (average)'
-  if (analysisGreenit !== null) {
-    row.getCell(2).value = analysisGreenit.grade
-    setColor(row.getCell(2), analysisGreenit.grade)
+  if (analysis.analysisGreenit !== null) {
+    row.getCell(2).value = analysis.analysisGreenit.grade
+    setColor(row.getCell(2), analysis.analysisGreenit.grade)
   } else {
     row.getCell(2).value = 'no analysis'
     setColor(row.getCell(2), '')
   }
   row.getCell(3).value = 'Lighthouse Performance grade (average)'
-  if (lighthousePerformance !== null) {
-    row.getCell(4).value = lighthousePerformance.complianceLevel
-    setColor(row.getCell(4), lighthousePerformance.complianceLevel)
+  if (analysis.lighthousePerformance !== null) {
+    row.getCell(4).value = analysis.lighthousePerformance.complianceLevel
+    setColor(row.getCell(4), analysis.lighthousePerformance.complianceLevel)
   } else {
     row.getCell(4).value = 'no analysis'
     setColor(row.getCell(4), '')
   }
   row.getCell(5).value = 'Lighthouse Accessibility grade (average)'
-  if (lighthouseAccessibility !== null) {
-    row.getCell(6).value = lighthouseAccessibility.complianceLevel
-    setColor(row.getCell(6), lighthouseAccessibility.complianceLevel)
+  if (analysis.lighthouseAccessibility !== null) {
+    row.getCell(6).value = analysis.lighthouseAccessibility.complianceLevel
+    setColor(row.getCell(6), analysis.lighthouseAccessibility.complianceLevel)
   } else {
     row.getCell(6).value = 'no analysis'
     setColor(row.getCell(6), '')
   }
   row.getCell(7).value = 'W3C validator grade'
-  if (analysisW3c !== null) {
-    row.getCell(8).value = analysisW3c.grade
-    setColor(row.getCell(8), analysisW3c.grade)
+  if (analysis.analysisW3c !== null) {
+    row.getCell(8).value = analysis.analysisW3c.grade
+    setColor(row.getCell(8), analysis.analysisW3c.grade)
   } else {
     row.getCell(8).value = 'no analysis'
     setColor(row.getCell(8), '')
@@ -270,33 +276,33 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
 
   row = sheet.getRow(rowIndex)
   row.getCell(1).value = 'EcoIndex project score (average)'
-  if (analysisGreenit !== null) {
-    row.getCell(2).value = analysisGreenit.ecoIndex
-    setColor(row.getCell(2), analysisGreenit.grade)
+  if (analysis.analysisGreenit !== null) {
+    row.getCell(2).value = analysis.analysisGreenit.ecoIndex
+    setColor(row.getCell(2), analysis.analysisGreenit.grade)
   } else {
     row.getCell(2).value = 'no analysis'
     setColor(row.getCell(2), '')
   }
   row.getCell(3).value = 'Lighthouse Performance score (average)'
-  if (lighthousePerformance !== null) {
-    row.getCell(4).value = lighthousePerformance.displayValue
-    setColor(row.getCell(4), lighthousePerformance.complianceLevel)
+  if (analysis.lighthousePerformance !== null) {
+    row.getCell(4).value = analysis.lighthousePerformance.displayValue
+    setColor(row.getCell(4), analysis.lighthousePerformance.complianceLevel)
   } else {
     row.getCell(4).value = 'no analysis'
     setColor(row.getCell(4), '')
   }
   row.getCell(5).value = 'Lighthouse Accessibility score (average)'
-  if (lighthouseAccessibility !== null) {
-    row.getCell(6).value = lighthouseAccessibility.displayValue
-    setColor(row.getCell(6), lighthouseAccessibility.complianceLevel)
+  if (analysis.lighthouseAccessibility !== null) {
+    row.getCell(6).value = analysis.lighthouseAccessibility.displayValue
+    setColor(row.getCell(6), analysis.lighthouseAccessibility.complianceLevel)
   } else {
     row.getCell(6).value = 'no analysis'
     setColor(row.getCell(6), '')
   }
   row.getCell(7).value = 'W3C validator score'
-  if (analysisW3c !== null) {
-    row.getCell(8).value = analysisW3c.score
-    setColor(row.getCell(8), analysisW3c.grade)
+  if (analysis.analysisW3c !== null) {
+    row.getCell(8).value = analysis.analysisW3c.score
+    setColor(row.getCell(8), analysis.analysisW3c.grade)
   } else {
     row.getCell(8).value = 'no analysis'
     setColor(row.getCell(8), '')
@@ -366,11 +372,11 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     top: { style: 'thick' }
   }
   row = sheet.getRow(rowIndex)
-  if (analysisGreenit !== null) {
+  if (analysis.analysisGreenit !== null) {
     row.getCell(1).value = 'Size of the DOM (average)'
-    row.getCell(2).value = analysisGreenit.domSize.displayValue
-    row.getCell(3).value = analysisGreenit.domSize.complianceLevel
-    setColor(row.getCell(3), analysisGreenit.domSize.complianceLevel)
+    row.getCell(2).value = analysis.analysisGreenit.domSize.displayValue
+    row.getCell(3).value = analysis.analysisGreenit.domSize.complianceLevel
+    setColor(row.getCell(3), analysis.analysisGreenit.domSize.complianceLevel)
     // formatting
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
@@ -385,9 +391,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     }
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of requests (average)'
-    row.getCell(2).value = analysisGreenit.nbRequest.displayValue
-    row.getCell(3).value = analysisGreenit.nbRequest.complianceLevel
-    setColor(row.getCell(3), analysisGreenit.nbRequest.complianceLevel)
+    row.getCell(2).value = analysis.analysisGreenit.nbRequest.displayValue
+    row.getCell(3).value = analysis.analysisGreenit.nbRequest.complianceLevel
+    setColor(row.getCell(3), analysis.analysisGreenit.nbRequest.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -403,9 +409,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
 
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Size of the page (Kb) (average)'
-    row.getCell(2).value = analysisGreenit.responsesSize.displayValue
-    row.getCell(3).value = analysisGreenit.responsesSize.complianceLevel
-    setColor(row.getCell(3), analysisGreenit.responsesSize.complianceLevel)
+    row.getCell(2).value = analysis.analysisGreenit.responsesSize.displayValue
+    row.getCell(3).value = analysis.analysisGreenit.responsesSize.complianceLevel
+    setColor(row.getCell(3), analysis.analysisGreenit.responsesSize.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' },
@@ -472,13 +478,13 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   }
 
   row = sheet.getRow(rowIndex)
-  if (lighthouseMetrics !== null) {
+  if (analysis.lighthouseMetrics !== null) {
     row.getCell(1).value = 'Largest Contentful Paint (s) (average)'
-    row.getCell(2).value = lighthouseMetrics.largestContentfulPaint.displayValue
-    row.getCell(3).value = lighthouseMetrics.largestContentfulPaint.complianceLevel
-    row.getCell(4).value = lighthouseMetrics.largestContentfulPaint.score
-    setColor(row.getCell(3), lighthouseMetrics.largestContentfulPaint.complianceLevel)
-    setColor(row.getCell(4), lighthouseMetrics.largestContentfulPaint.complianceLevel)
+    row.getCell(2).value = analysis.lighthouseMetrics.largestContentfulPaint.displayValue
+    row.getCell(3).value = analysis.lighthouseMetrics.largestContentfulPaint.complianceLevel
+    row.getCell(4).value = analysis.lighthouseMetrics.largestContentfulPaint.score
+    setColor(row.getCell(3), analysis.lighthouseMetrics.largestContentfulPaint.complianceLevel)
+    setColor(row.getCell(4), analysis.lighthouseMetrics.largestContentfulPaint.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -495,11 +501,11 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
 
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Cumulative Layout Shift (average)'
-    row.getCell(2).value = lighthouseMetrics.cumulativeLayoutShift.displayValue
-    row.getCell(3).value = lighthouseMetrics.cumulativeLayoutShift.complianceLevel
-    row.getCell(4).value = lighthouseMetrics.cumulativeLayoutShift.score
-    setColor(row.getCell(3), lighthouseMetrics.cumulativeLayoutShift.complianceLevel)
-    setColor(row.getCell(4), lighthouseMetrics.cumulativeLayoutShift.complianceLevel)
+    row.getCell(2).value = analysis.lighthouseMetrics.cumulativeLayoutShift.displayValue
+    row.getCell(3).value = analysis.lighthouseMetrics.cumulativeLayoutShift.complianceLevel
+    row.getCell(4).value = analysis.lighthouseMetrics.cumulativeLayoutShift.score
+    setColor(row.getCell(3), analysis.lighthouseMetrics.cumulativeLayoutShift.complianceLevel)
+    setColor(row.getCell(4), analysis.lighthouseMetrics.cumulativeLayoutShift.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -516,11 +522,11 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
 
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'First Contentful Paint (s) (average)'
-    row.getCell(2).value = lighthouseMetrics.firstContentfulPaint.displayValue
-    row.getCell(3).value = lighthouseMetrics.firstContentfulPaint.complianceLevel
-    row.getCell(4).value = lighthouseMetrics.firstContentfulPaint.score
-    setColor(row.getCell(3), lighthouseMetrics.firstContentfulPaint.complianceLevel)
-    setColor(row.getCell(4), lighthouseMetrics.firstContentfulPaint.complianceLevel)
+    row.getCell(2).value = analysis.lighthouseMetrics.firstContentfulPaint.displayValue
+    row.getCell(3).value = analysis.lighthouseMetrics.firstContentfulPaint.complianceLevel
+    row.getCell(4).value = analysis.lighthouseMetrics.firstContentfulPaint.score
+    setColor(row.getCell(3), analysis.lighthouseMetrics.firstContentfulPaint.complianceLevel)
+    setColor(row.getCell(4), analysis.lighthouseMetrics.firstContentfulPaint.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -537,11 +543,11 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
 
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Speed Index (s) (average)'
-    row.getCell(2).value = lighthouseMetrics.speedIndex.displayValue
-    row.getCell(3).value = lighthouseMetrics.speedIndex.complianceLevel
-    row.getCell(4).value = lighthouseMetrics.speedIndex.score
-    setColor(row.getCell(3), lighthouseMetrics.speedIndex.complianceLevel)
-    setColor(row.getCell(4), lighthouseMetrics.speedIndex.complianceLevel)
+    row.getCell(2).value = analysis.lighthouseMetrics.speedIndex.displayValue
+    row.getCell(3).value = analysis.lighthouseMetrics.speedIndex.complianceLevel
+    row.getCell(4).value = analysis.lighthouseMetrics.speedIndex.score
+    setColor(row.getCell(3), analysis.lighthouseMetrics.speedIndex.complianceLevel)
+    setColor(row.getCell(4), analysis.lighthouseMetrics.speedIndex.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -558,11 +564,11 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
 
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Total Blocking Time (ms) (average)'
-    row.getCell(2).value = lighthouseMetrics.totalBlockingTime.displayValue
-    row.getCell(3).value = lighthouseMetrics.totalBlockingTime.complianceLevel
-    row.getCell(4).value = lighthouseMetrics.totalBlockingTime.score
-    setColor(row.getCell(3), lighthouseMetrics.totalBlockingTime.complianceLevel)
-    setColor(row.getCell(4), lighthouseMetrics.totalBlockingTime.complianceLevel)
+    row.getCell(2).value = analysis.lighthouseMetrics.totalBlockingTime.displayValue
+    row.getCell(3).value = analysis.lighthouseMetrics.totalBlockingTime.complianceLevel
+    row.getCell(4).value = analysis.lighthouseMetrics.totalBlockingTime.score
+    setColor(row.getCell(3), analysis.lighthouseMetrics.totalBlockingTime.complianceLevel)
+    setColor(row.getCell(4), analysis.lighthouseMetrics.totalBlockingTime.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' }
@@ -579,11 +585,11 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
 
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Time to interactive (s) (average)'
-    row.getCell(2).value = lighthouseMetrics.interactive.displayValue
-    row.getCell(3).value = lighthouseMetrics.interactive.complianceLevel
-    row.getCell(4).value = lighthouseMetrics.interactive.score
-    setColor(row.getCell(3), lighthouseMetrics.interactive.complianceLevel)
-    setColor(row.getCell(4), lighthouseMetrics.interactive.complianceLevel)
+    row.getCell(2).value = analysis.lighthouseMetrics.interactive.displayValue
+    row.getCell(3).value = analysis.lighthouseMetrics.interactive.complianceLevel
+    row.getCell(4).value = analysis.lighthouseMetrics.interactive.score
+    setColor(row.getCell(3), analysis.lighthouseMetrics.interactive.complianceLevel)
+    setColor(row.getCell(4), analysis.lighthouseMetrics.interactive.complianceLevel)
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' },
@@ -648,9 +654,9 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
   }
 
   row = sheet.getRow(rowIndex)
-  if (analysisW3c !== null) {
+  if (analysis.analysisW3c !== null) {
     row.getCell(1).value = 'Number of Infos'
-    row.getCell(2).value = analysisW3c.totalInfo
+    row.getCell(2).value = analysis.analysisW3c.totalInfo
     // formatting
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
@@ -664,7 +670,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     }
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of Warnings'
-    row.getCell(2).value = analysisW3c.totalWarning
+    row.getCell(2).value = analysis.analysisW3c.totalWarning
     // formatting
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
@@ -678,7 +684,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     }
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of Errors'
-    row.getCell(2).value = analysisW3c.totalError
+    row.getCell(2).value = analysis.analysisW3c.totalError
     // formatting
     row.getCell(1).alignment = { wrapText: true }
     row.getCell(2).alignment = { wrapText: true }
@@ -692,7 +698,7 @@ function formatExcelSheet (urlName, index, workbook, projectName, analysisGreeni
     }
     row = sheet.getRow(rowIndex)
     row.getCell(1).value = 'Number of Fatal Errors'
-    row.getCell(2).value = analysisW3c.totalFatalError
+    row.getCell(2).value = analysis.analysisW3c.totalFatalError
     // draw border of the cell
     row.getCell(1).border = {
       left: { style: 'thick' },
@@ -749,6 +755,10 @@ function setColor (cell, grade) {
     pattern: 'solid',
     fgColor: { argb: couleur }
   }
+}
+
+function checkAnalysisIsEmpty (analysis) {
+  return analysis.analysisGreenit === null && analysis.analysisW3c === null && analysis.lighthouseMetrics === null
 }
 
 const exportAuditService = new ExportAuditService()

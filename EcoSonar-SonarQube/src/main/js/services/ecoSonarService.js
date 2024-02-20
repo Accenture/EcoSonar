@@ -11,14 +11,9 @@ export function getAnalysisUrlConfiguration (projectName, urlName) {
       console.log('ECOSONAR SERVICE - POST : analysis retrieved')
       resolve(response.data)
     })
-      .catch((error) => {
-        if (error.response && error.response.status === 400) {
-          console.warn('ECOSONAR SERVICE - POST : {} has no analysis registered', urlName)
-          reject(new Error(formatError(errors.noAnalysisFoundForURL, projectName, urlName)))
-        } else {
-          console.error('ECOSONAR SERVICE  - POST : unknown error occured')
-          reject(new Error(formatError(errors.errorRetrievingAnalysisforURL, projectName, urlName)))
-        }
+      .catch(() => {
+        console.error('ECOSONAR SERVICE  - POST : unknown error occured')
+        reject(new Error(formatError(errors.errorRetrievingAnalysisforURL, projectName, urlName)))
       })
   })
 }
@@ -30,14 +25,9 @@ export function getAnalysisForProjectConfiguration (projectName) {
         console.log('GREENIT SERVICE - GET : analysis retrieved')
         resolve(response.data)
       })
-      .catch((error) => {
-        if (error.response && error.response.status === 400) {
-          console.warn('ECOSONAR SERVICE - GET : {} has no analysis registered', projectName)
-          resolve({})
-        } else {
-          console.error('ECOSONAR SERVICE  - GET : unknown error occured')
-          reject(new Error(formatError(errors.errorRetrievingAnalysis, projectName)))
-        }
+      .catch(() => {
+        console.error('ECOSONAR SERVICE  - GET : unknown error occured')
+        reject(new Error(formatError(errors.errorRetrievingAnalysis, projectName)))
       })
   })
 }

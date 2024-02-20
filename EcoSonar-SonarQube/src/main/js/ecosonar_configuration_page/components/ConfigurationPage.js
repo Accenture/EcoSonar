@@ -4,6 +4,8 @@ import AddUrlForm from './AddUrlForm'
 import CrawlerPage from './Crawler/CrawlerPage'
 import DeleteUrlForm from './DeleteUrlForm'
 import UrlList from './UrlList'
+import errors from '../../utils/errors.json'
+import formatError from '../../format/formatError'
 
 export default class ConfigurationPage extends React.PureComponent {
   constructor () {
@@ -26,7 +28,14 @@ export default class ConfigurationPage extends React.PureComponent {
     })
     getUrlsConfiguration(this.props.project.key)
       .then((urls) => {
-        this.setState({ urls, loading: false })
+        if (urls.length > 0) {
+          this.setState({ urls, loading: false })
+        } else {
+          this.setState({
+            loading: false,
+            error: formatError(errors.noUrlAssigned, this.props.project.key)
+          })
+        }
       })
       .catch((result) => {
         if (result instanceof Error) {

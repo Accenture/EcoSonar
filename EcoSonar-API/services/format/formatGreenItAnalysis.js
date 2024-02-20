@@ -4,7 +4,7 @@ const formatCompliance = require('./formatCompliance')
 class FormatGreenItAnalysis {}
 
 FormatGreenItAnalysis.prototype.greenItUrlAnalysisFormatted = function (analysis) {
-  let formattedAnalysis
+  let formattedAnalysis = null
   try {
     formattedAnalysis = {
       domSize: { displayValue: analysis.domSize, complianceLevel: ecoIndexCalculationService.setScoreLetter('domSize', analysis.domSize) },
@@ -14,14 +14,14 @@ FormatGreenItAnalysis.prototype.greenItUrlAnalysisFormatted = function (analysis
       grade: analysis.grade
     }
   } catch (err) {
-    console.log(err)
-    console.log('GREENIT - error during the formatting of project analysis')
+    console.error(err)
+    console.error('GREENIT - error during the formatting of project analysis')
   }
   return formattedAnalysis
 }
 
 FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (res) {
-  let analysis
+  let analysis = null
   let j = 0
   let count, domSize, nbRequest, responsesSize, responsesSizeUncompress, ecoIndex
 
@@ -53,58 +53,65 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
       ecoIndex: Math.round(ecoIndex / count),
       grade: formatCompliance.getEcodesignGrade(ecoIndex / count)
     }
-    return analysis
   } catch (err) {
-    console.log(err)
-    console.log('GREENIT - error during the formatting of project analysis')
+    console.error(err)
+    console.error('GREENIT - error during the formatting of project analysis')
   }
+  return analysis
 }
 
 FormatGreenItAnalysis.prototype.formatDeploymentsForGraphs = function (deployments) {
   const duplicatedDeployments = []
-  for (const i of deployments) {
-    // We filter deployments to find the values with the same date
-    const duplicatedValuesArray = deployments.filter((element) => compareFullDate(element.dateGreenAnalysis, i.dateGreenAnalysis))
-    const sumElement = {
-      dateAnalysis: duplicatedValuesArray[0].dateGreenAnalysis,
-      domSize: 0,
-      nbRequest: 0,
-      responsesSize: 0,
-      ecoIndex: 0,
-      numberOfValues: 0
+  let finalDeployment = []
+  try {
+    for (const i of deployments) {
+      // We filter deployments to find the values with the same date
+      const duplicatedValuesArray = deployments.filter((element) => compareFullDate(element.dateGreenAnalysis, i.dateGreenAnalysis))
+      const sumElement = {
+        dateAnalysis: duplicatedValuesArray[0].dateGreenAnalysis,
+        domSize: 0,
+        nbRequest: 0,
+        responsesSize: 0,
+        ecoIndex: 0,
+        numberOfValues: 0
+      }
+
+      // We add up every element with the same date (only DD/MM/YYYY) in one (sumElement)
+      duplicatedValuesArray.forEach((element) => {
+        sumElement.domSize += element.domSize
+        sumElement.nbRequest += element.nbRequest
+        sumElement.responsesSize += element.responsesSize
+        sumElement.ecoIndex += element.ecoIndex
+        sumElement.numberOfValues++
+      })
+      duplicatedDeployments.push(sumElement)
     }
 
-    // We add up every element with the same date (only DD/MM/YYYY) in one (sumElement)
-    duplicatedValuesArray.forEach((element) => {
-      sumElement.domSize += element.domSize
-      sumElement.nbRequest += element.nbRequest
-      sumElement.responsesSize += element.responsesSize
-      sumElement.ecoIndex += element.ecoIndex
-      sumElement.numberOfValues++
-    })
-    duplicatedDeployments.push(sumElement)
+    // Sanitizing duplicatedDeployments by removing twins
+    finalDeployment = getUniqueListByDate(duplicatedDeployments, 'dateAnalysis')
+
+    // Finally we calculate the average for each date
+    for (const i of finalDeployment) {
+      i.domSize = Math.round(i.domSize / i.numberOfValues)
+      i.nbRequest = Math.round(i.nbRequest / i.numberOfValues)
+      i.responsesSize = Math.round(i.responsesSize / i.numberOfValues)
+      i.ecoIndex = Math.round(i.ecoIndex / i.numberOfValues)
+      delete i.numberOfValues
+    }
+  } catch (error) {
+    console.error(error)
+    console.error('GREENIT - error during the formatting of project analysis')
   }
 
-  // Sanitizing duplicatedDeployments by removing twins
-  const finalDeployment = getUniqueListByDate(duplicatedDeployments, 'dateAnalysis')
-
-  function getUniqueListByDate (arr, key) {
-    return [...new Map(arr.map(item => [item[key], item])).values()]
-  }
-
-  // Finally we calculate the average for each date
-  for (const i of finalDeployment) {
-    i.domSize = Math.round(i.domSize / i.numberOfValues)
-    i.nbRequest = Math.round(i.nbRequest / i.numberOfValues)
-    i.responsesSize = Math.round(i.responsesSize / i.numberOfValues)
-    i.ecoIndex = Math.round(i.ecoIndex / i.numberOfValues)
-    delete i.numberOfValues
-  }
-
-  function compareFullDate (firstDate, secondDate) {
-    return (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear())
-  }
   return finalDeployment
+}
+
+function getUniqueListByDate (arr, key) {
+  return [...new Map(arr.map(item => [item[key], item])).values()]
+}
+
+function compareFullDate (firstDate, secondDate) {
+  return (firstDate.getDate() === secondDate.getDate() && firstDate.getMonth() === secondDate.getMonth() && firstDate.getFullYear() === secondDate.getFullYear())
 }
 
 const formatGreenItAnalysis = new FormatGreenItAnalysis()

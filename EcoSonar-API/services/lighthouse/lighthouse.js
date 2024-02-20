@@ -41,11 +41,12 @@ module.exports = {
       const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
       if (loginSucceeded) {
         for (const [index, url] of urlList.entries()) {
+          await browser.newPage() // prevent browser to close before ending all pages analysis
           try {
             console.log('Lighthouse Analysis launched for url ' + url)
             await userJourneyService.getUserFlow(projectName, url)
-              .then((userflow) => {
-                userJourney = userflow
+              .then((result) => {
+                userJourney = result
               }).catch((error) => {
                 console.log(error.message)
               })
@@ -57,10 +58,12 @@ module.exports = {
             console.log('Lighthouse Analysis ended for url ' + url)
             results[index] = { ...lighthouseResults.lhr, url }
           } catch (error) {
-            console.log('LIGHTHOUSE ANALYSIS - An error occured when auditing ' + url)
+            console.error('LIGHTHOUSE ANALYSIS - An error occured when auditing ' + url)
             console.error('\x1b[31m%s\x1b[0m', error)
           }
         }
+      } else {
+        console.warn('Could not log in, audit for lighthouse analysis is skipped')
       }
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error)

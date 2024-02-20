@@ -1,4 +1,4 @@
-**EcoSonar API**
+# EcoSonar API
 
 New Postman Collection available with all endpoints :
 
@@ -8,7 +8,46 @@ Swagger User Interface available at the link : `[ECOSONAR-API-URL]/swagger/`
 
 Locally, available at this address : `http://localhost:3002/swagger/`
 
+# Summary
+
+- URL Configuration
+  - [GET URLs FROM PROJECT](#get-urls)
+  - [INSERT URLs IN PROJECT](#insert-urls)
+  - [DELETE URL IN PROJECT](#delete-url)
+  - [DELETE PROJECT](#delete-project)
+  - [LAUNCH CRAWLER](#launch-crawler)
+  - [GET CRAWLER RESULT](#get-crawler) 
+- Login Configuration
+  - [SAVE LOGIN FOR PROJECT](#save-login)
+  - [GET LOGIN FOR PROJECT](#get-login)
+  - [DELETE LOGIN FOR PROJECT](#delete-login)
+- Proxy Configuration
+  - [SAVE PROXY FOR PROJECT](#save-proxy)
+  - [GET PROXY FOR PROJECT](#get-proxy)
+  - [DELETE PROXY FOR PROJECT](#delete-proxy)
+- User Flow Configuration
+  - [SAVE USER FLOW FOR URL](#save-user-flow)
+  - [GET USER FLOW FOR URL](#get-user-flow)
+  - [DELETE USER FLOW for URL](#delete-user-flow)
+- EcoSonar Analysis
+  - [EcoSonar LAUNCH ANALYSIS](#launch-analysis)
+  - [RETRIEVE ANALYSIS PER PROJECT](#get-analysis-project)
+  - [RETRIEVE ANALYSIS PER URL](#get-analysis-url)
+  - [GET PROJECT SCORES](#get-project-scores)
+  - [GET AVERAGE OF ALL SCORES FOR PROJECTS REGISTERED IN ECOSONAR AT A DEFINED DATE](#get-ecosonar-info)
+  - [GET ALL PROJECTS SCORES FROM DATE DEFINED](#get-projects-info)
+  - [RETRIEVE ECOSONAR AUDIT IN EXCEL FORMAT FOR PROJECT](#export-audit)
+  - [RETRIEVE BEST PRACTICES PER PROJECT](#get-best-practices-project)
+  - [RETRIEVE BEST PRACTICES PER URL](#get-best-practices-url)
+- Procedure Configuration
+  - [SAVE PROCEDURE FOR THE PROJECT](#save-procedure)
+  - [RETRIEVE PROCEDURE SAVED FOR THE PROJECT](#get-procedure)
+- EcoSonar Infos
+  - [GET VERSION](#get-version)
+  - [GET BEST PRACTICES DOCUMENTATION](#get-best-practices-docs)
+
 ---
+<a name="get-urls"></a>
 
 ## **EcoSonar URL Configuration - GET URLs FROM PROJECT**
 
@@ -44,18 +83,12 @@ Locally, available at this address : `http://localhost:3002/swagger/`
 
 - **Error Response:**
 
-When you don't have any URLs assigned to a project into EcoSonar
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-"error": "Your project has no url assigned into EcoSonar. You must at least add one url if you want to analyse ecodesign practices."
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+
+<a name="insert-urls"></a>
 
 ## **EcoSonar URL Configuration - INSERT URLs IN PROJECT**
 
@@ -100,9 +133,11 @@ When you have validation errors in the list of urls you want to insert (url inva
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="delete-url"></a>
 
 ## **EcoSonar URL Configuration - DELETE URL IN PROJECT**
 
@@ -146,9 +181,11 @@ When the url can't be found in your project
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="delete-project"></a>
 
 ## **EcoSonar URL Configuration - DELETE PROJECT**
 
@@ -181,9 +218,11 @@ None
 
 - **Error Response:**
 
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="launch-crawler"></a>
 
 ## **EcoSonar URL Configuration - LAUNCH CRAWLER**
 
@@ -204,7 +243,7 @@ None
 - **Data Params**
   PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
   homepage_url is the home page of your website from where the crawler will start finding all pages within your website
-  save is a boolean value : if true, results will be saved in datatabse and pages will be audited by EcoSonar. If false, they will be saved in a temp collection to be reviewed by a user before being applied in EcoSonar configuration.
+  save is a boolean value : if true, results will be saved in datatabse and pages will be audited by EcoSonar. If false, they will be saved in a temporary collection to be reviewed by a user before being applied in EcoSonar configuration.
 
 `{
     "projectName": "PROJECT_NAME",
@@ -215,6 +254,8 @@ None
 - **Success Response:**
 
   - **Code:** 202 <br />
+
+<a name="get-crawler"></a>
 
 ## **EcoSonar URL Configuration - GET CRAWLER RESULT**
 
@@ -249,14 +290,11 @@ None
 
 - **Error Response:**
 
-EcoSonar API failed to get crawler results:
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `No crawled urls were saved for this project`
-
-OR
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="save-login"></a>
 
 ## **EcoSonar Login Configuration - SAVE LOGIN FOR PROJECT**
 
@@ -292,9 +330,11 @@ OR
 
 - **Error Response:**
 
-EcoSonar API is not able to save into the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-login"></a>
 
 ## **EcoSonar Login Configuration - GET LOGIN FOR PROJECT**
 
@@ -330,18 +370,12 @@ EcoSonar API is not able to save into the MongoDB Database :
 
 - **Error Response:**
 
-When you don't have any login registered for your project into EcoSonar
 
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "Your project does not have login saved into database."
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="delete-login"></a>
 
 ## **EcoSonar Login Configuration - DELETE LOGIN FOR PROJECT**
 
@@ -373,7 +407,7 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 - **Error Response:**
 
-When you don't have any login registered for your project into EcoSonar and you want still to delete it
+When you don't have any login saved into database for your project into EcoSonar and you want still to delete it
 
 - **Code:** 400 BAD REQUEST <br />
   **Content:** `{
@@ -382,9 +416,11 @@ When you don't have any login registered for your project into EcoSonar and you 
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="save-proxy"></a>
 
 ## **EcoSonar Proxy Configuration - SAVE PROXY FOR PROJECT**
 
@@ -420,9 +456,11 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 - **Error Response:**
 
-EcoSonar API is not able to save into the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-proxy"></a>
 
 ## **EcoSonar Proxy Configuration - GET PROXY FOR PROJECT**
 
@@ -458,18 +496,11 @@ EcoSonar API is not able to save into the MongoDB Database :
 
 - **Error Response:**
 
-When you don't have any proxy registered for your project into EcoSonar
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "Your project does not have proxy configuration saved into database."
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="delete-proxy"></a>
 
 ## **EcoSonar Proxy Configuration - DELETE PROXY FOR PROJECT**
 
@@ -499,11 +530,24 @@ EcoSonar API is not able to request to the MongoDB Database :
 
   - **Code:** 200 <br />
 
-EcoSonar API is not able to request to the MongoDB Database :
+- **Error Response:**
+
+When you don't have any proxy saved in database for your project into EcoSonar and you want still to delete it
+
+- **Code:** 400 BAD REQUEST <br />
+  **Content:** `{
+    "error": "Project not found"
+}`
+
+OR
+
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
 
-## **EcoSonar USER FLOW Configuration - SAVE USER FLOW for URL**
+<a name="save-user-flow"></a>
+
+## **EcoSonar USER FLOW Configuration - SAVE USER FLOW FOR URL**
 
 ![SAVE USER FLOW for URL](./images/save-user-flow-for-url.webp)
 
@@ -548,11 +592,13 @@ You want to add user flow to unexisting url :
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
 
-## **EcoSonar USER FLOW Configuration - GET USER FLOW for URL**
+<a name="get-user-flow"></a>
+
+## **EcoSonar USER FLOW Configuration - GET USER FLOW FOR URL**
 
 ![GET USER FLOW for URL](./images/get-user-flow-for-url.webp)
 
@@ -587,18 +633,12 @@ None
 
 - **Error Response:**
 
-When you don't have any user flow registered for the url into EcoSonar
 
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "Your project does not have user flow saved into database."
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="delete-user-flow"></a>
 
 ## **EcoSonar USER FLOW Configuration - DELETE USER FLOW FOR URL**
 
@@ -628,7 +668,22 @@ None
 
 EcoSonar API is not able to request to the MongoDB Database :
 
+- **Error Response:**
+
+When you don't have a user flow saved in database for your url into EcoSonar and you want still to delete it
+
+- **Code:** 400 BAD REQUEST <br />
+  **Content:** `{
+    "error": "Url not found"
+}`
+
+OR
+
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
+
 - **Code:** 500 Internal Server Error <br />
+
+<a name="launch-analysis"></a>
 
 ## **EcoSonar LAUNCH ANALYSIS**
 
@@ -660,13 +715,15 @@ EcoSonar analysis is launched through this API call either directly with a curl 
 
   - **Code:** 202 <br />
 
+<a name="get-analysis-project"></a>
+
 ## **EcoSonar ANALYSIS - RETRIEVE ANALYSIS PER PROJECT**
 
 ![RETRIEVE ANALYSIS PER PROJECT](./images/retrieve-analysis-per-project.webp)
 
 - **URL**
 
-  `/api/project?projectName=<PROJECT_NAME>`
+  `/api/greenit/project?projectName=<PROJECT_NAME>`
 
 - **Method:**
 
@@ -792,25 +849,11 @@ EcoSonar analysis is launched through this API call either directly with a curl 
 
 - **Error Response:**
 
-When no analysis has been done yet on your project
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "No analysis found for PROJECT_NAME"
-}`
-
-OR
-
-When an error occured when generating the report
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "Error during generation of PROJECT_NAME analysis"
-}`
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-analysis-url"></a>
 
 ## **EcoSonar ANALYSIS - RETRIEVE ANALYSIS PER URL**
 
@@ -944,18 +987,11 @@ EcoSonar API is not able to request to the MongoDB Database :
 
 - **Error Response:**
 
-When no analysis has been done yet on your url
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "No lighthouse and greenit analysis found for url url_to_retrieve in project PROJECT_NAME"
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-project-scores"></a>
 
 ## **EcoSonar ANALYSIS - GET PROJECT SCORES**
 
@@ -996,18 +1032,11 @@ Retrieve current scores from EcoIndex, Lighthouse Performance and Accessibility 
 
 - **Error Response:**
 
-When no analysis found for the project
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "No Analysis found for project PROJECT_NAME"
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-ecosonar-info"></a>
 
 ## **EcoSonar ANALYSIS - GET AVERAGE OF ALL SCORES FOR PROJECTS REGISTERED IN ECOSONAR AT A DEFINED DATE**
 
@@ -1059,9 +1088,11 @@ If date format is wrong
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database or other internal error:
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-projects-info"></a>
 
 ## **EcoSonar ANALYSIS - GET ALL PROJECTS SCORES FROM DATE DEFINED**
 
@@ -1138,9 +1169,11 @@ If date format is wrong
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database or other internal error:
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="export-audit"></a>
 
 ## **EcoSonar ANALYSIS - RETRIEVE ECOSONAR AUDIT IN EXCEL FORMAT FOR PROJECT**
 
@@ -1182,113 +1215,11 @@ When an error occured during file generation
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
 
-## **EcoSonar ANALYSIS - SAVE PROCEDURE FOR THE PROJECT**
-
-![SAVE PROCEDURE FOR THE PROJECT](./images/save-procedure-for-the-project.webp)
-
-Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
-You have 3 different configurations available in EcoSonar:
-
-- `scoreImpact` : best practices will be sorted by descending order of implementation (best practices not implemented returned first)
-- `quickWins` : best practices will be sorted by ascending order of difficulty (best practices easy to implement returned first)
-- `highestImpact` : best practices will be sorted by order of impact to improve EcoSonar scores (best practices most efficient returned first)
-
-* **URL**
-
-`/api/procedure`
-
-- **Method:**
-
-  `POST`
-
-- **URL Params**
-
-  None
-
-- **Data Params**
-
-  PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
-  selected_procedure can take 3 values : `scoreImpact`, `quickWins`, `highestImpact`
-
-  `{
-  "projectName" : "PROJECT_NAME",
-  "selectedProcedure": "selected_procedure"
-}`
-
-- **Success Response:**
-
-  - **Code:** 200 <br />
-    **Content:** `{
-  "procedure": "quickWins"
-}`
-
-- **Error Response:**
-
-When no procedure have been registered for your project
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "Procedure is not defined in project PROJECT_NAME"
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
-
-- **Code:** 500 Internal Server Error <br />
-
-## **EcoSonar ANALYSIS - RETRIEVE PROCEDURE SAVED FOR THE PROJECT**
-
-![RETRIEVE PROCEDURE SAVED FOR THE PROJECT](./images/retrieve-procedure-saved-for-the-project.webp)
-
-Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
-This request will return you the procedure chosen for this project.
-
-- **URL**
-
-`/api/procedure?projectName=<PROJECT_NAME>`
-
-- **Method:**
-
-  `GET`
-
-- **URL Params**
-
-  PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
-
-  **Required:**
-
-  `PROJECT_NAME=[string]`
-
-- **Data Params**
-
-  None
-
-- **Success Response:**
-
-  - **Code:** 200 <br />
-    **Content:** `{
-  "procedure": "quickWins"
-}`
-
-- **Error Response:**
-
-When no procedure have been registered for your project
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "Procedure is not defined in project PROJECT_NAME"
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
-
-- **Code:** 500 Internal Server Error <br />
+<a name="get-best-practices-project"></a>
 
 ## **EcoSonar ANALYSIS - RETRIEVE BEST PRACTICES PER PROJECT**
 
@@ -1365,18 +1296,11 @@ Retrieve audits from GreenIt-Analysis and Google Lighthouse aggregated per proje
 
 - **Error Response:**
 
-When no analysis has been done yet on your project
-
-- **Code:** 400 BAD REQUEST <br />
-  **Content:** `{
-    "error": "No analysis found for PROJECT_NAME"
-}`
-
-OR
-
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-best-practices-url"></a>
 
 ## **EcoSonar ANALYSIS - RETRIEVE BEST PRACTICES PER URL**
 
@@ -1454,18 +1378,110 @@ Retrieve audits from GreenIt-Analysis and Google Lighthouse per url audited.
 
 - **Error Response:**
 
-When no analysis has been done yet on your project
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
+
+- **Code:** 500 Internal Server Error <br />
+
+<a name="save-procedure"></a>
+
+## **EcoSonar ANALYSIS - SAVE PROCEDURE FOR THE PROJECT**
+
+![SAVE PROCEDURE FOR THE PROJECT](./images/save-procedure-for-the-project.webp)
+
+Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
+You have 3 different configurations available in EcoSonar:
+
+- `scoreImpact` : best practices will be sorted by descending order of implementation (best practices not implemented returned first)
+- `quickWins` : best practices will be sorted by ascending order of difficulty (best practices easy to implement returned first)
+- `highestImpact` : best practices will be sorted by order of impact to improve EcoSonar scores (best practices most efficient returned first)
+
+* **URL**
+
+`/api/procedure`
+
+- **Method:**
+
+  `POST`
+
+- **URL Params**
+
+  None
+
+- **Data Params**
+
+  PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+  selected_procedure can take 3 values : `scoreImpact`, `quickWins`, `highestImpact`
+
+  `{
+  "projectName" : "PROJECT_NAME",
+  "selectedProcedure": "selected_procedure"
+}`
+
+- **Success Response:**
+
+  - **Code:** 200 <br />
+    **Content:** `{
+  "procedure": "quickWins"
+}`
+
+- **Error Response:**
+
+When adding a non-registered procedure : 
 
 - **Code:** 400 BAD REQUEST <br />
   **Content:** `{
-    "error": "No analysis found for url url_to_retrieve into project PROJECT_NAME"
+    "error": "projects validation failed: procedure: `string` is not a valid enum value for path `procedure`."
 }`
 
 OR
 
-EcoSonar API is not able to request to the MongoDB Database :
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
 
 - **Code:** 500 Internal Server Error <br />
+
+<a name="get-procedure"></a>
+
+## **EcoSonar ANALYSIS - RETRIEVE PROCEDURE SAVED FOR THE PROJECT**
+
+![RETRIEVE PROCEDURE SAVED FOR THE PROJECT](./images/retrieve-procedure-saved-for-the-project.webp)
+
+Procedure in Ecosonar are the configuration chosen by delivery teams to sort the EcoSonar recommandations related to ecodesign.
+This request will return you the procedure chosen for this project.
+
+- **URL**
+
+`/api/procedure?projectName=<PROJECT_NAME>`
+
+- **Method:**
+
+  `GET`
+
+- **URL Params**
+
+  PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+
+  **Required:**
+
+  `PROJECT_NAME=[string]`
+
+- **Data Params**
+
+  None
+
+- **Success Response:**
+
+  - **Code:** 200 <br />
+    **Content:** `{
+  "procedure": "quickWins"
+}`
+
+- **Error Response:**
+
+EcoSonar API is not able to request the MongoDB Database or an internal error occured
+
+- **Code:** 500 Internal Server Error <br />
+
+<a name="get-version"></a>
 
 ## **EcoSonar Infos - GET VERSION**
 
@@ -1497,6 +1513,8 @@ EcoSonar API is not able to request to the MongoDB Database :
 - **Error Response:**
 
 - **Code:** 400 BAD REQUEST <br />
+
+<a name="get-best-practices-docs"></a>
 
 ## **EcoSonar Infos - GET BEST PRACTICES DOCUMENTATION**
 

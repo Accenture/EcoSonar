@@ -3,6 +3,7 @@ const PuppeteerHar = require('puppeteer-har')
 const { clickOnElement, waitForSelectors, applyChange } = require('../utils/playSelectors')
 const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
 const viewPortParams = require('../utils/viewportParams')
+const SystemError = require('../utils/SystemError')
 
 class UserJourneyService { }
 
@@ -50,14 +51,14 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
           await applyChange(step.value, element)
           break
         case 'scroll' :
-          await userJourneyService.scrollUntilPercentage(page, step.distancePercentage)
+          await userJourneyService.scrollUntil(page, step.distancePercentage, step.selectors)
           break
         default:
           break
       }
     } catch (error) {
-      console.log('USER JOURNEY : An error occured when launching user flow for url ' + url + ' in step ' + step.type)
-      console.log(error.message)
+      console.error('USER JOURNEY : An error occured when launching user flow for url ' + url + ' in step ' + step.type)
+      console.error(error)
     }
   }
   await page.waitForNavigation()
@@ -92,7 +93,7 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
         await applyChange(step.value, element)
         break
       case 'scroll' :
-        await userJourneyService.scrollUntilPercentage(targetPage, step.distancePercentage)
+        await userJourneyService.scrollUntil(targetPage, step.distancePercentage, step.selectors)
         break
       default:
         break
@@ -105,57 +106,103 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
 }
 
 UserJourneyService.prototype.insertUserFlow = async function (projectName, url, userFlow) {
-  const urlsProject = await urlsProjectRepository.getUserFlow(projectName, url)
-  if (urlsProject === null) {
-    console.log('UPDATE USER FLOW - Url not found')
-    throw new Error('Url not found')
-  } else {
-    await urlsProjectRepository.insertUserFlow(urlsProject, userFlow)
-      .then(() => {
-        console.log('UPDATE USER FLOW - Success')
+  let urlProject = null
+  let systemError = false
+
+  await urlsProjectRepository.getUserFlow(projectName, url)
+    .then((result) => {
+      urlProject = result
+    })
+    .catch(() => {
+      systemError = true
+    })
+  if (!systemError && urlProject === null) {
+    return Promise.reject(new Error('Url not found'))
+  } else if (!systemError) {
+    await urlsProjectRepository.insertUserFlow(urlProject, userFlow)
+      .catch(() => {
+        systemError = true
       })
   }
-}
-
-UserJourneyService.prototype.getUserFlow = async function (projectName, url) {
-  const urlsProject = await urlsProjectRepository.getUserFlow(projectName, url)
   return new Promise((resolve, reject) => {
-    if (urlsProject === null || urlsProject.userFlow === undefined) {
-      console.log('GET USER FLOW - Url flow not found')
-      reject(new Error('The page to audit does not have any user flow saved into database.'))
+    if (systemError) {
+      reject(new SystemError())
     } else {
-      resolve(Object.fromEntries(urlsProject.userFlow))
+      resolve()
     }
   })
 }
 
-UserJourneyService.prototype.deleteUserFlow = async function (projectName, url) {
-  const urlsProject = await urlsProjectRepository.getUserFlow(projectName, url)
-  if (urlsProject === null) {
-    console.log('UPDATE USER FLOW - Url not found')
-    throw new Error('Url not found')
-  } else {
-    urlsProjectRepository.deleteUserFlow(projectName, url)
-  }
+UserJourneyService.prototype.getUserFlow = async function (projectName, url) {
+  return new Promise((resolve, reject) => {
+    urlsProjectRepository.getUserFlow(projectName, url)
+      .then((result) => {
+        if (result === null || result.userFlow === undefined) {
+          console.log('GET USER FLOW - Url flow not found')
+          reject(new Error('The page to audit does not have any user flow saved into database.'))
+        } else {
+          resolve(Object.fromEntries(result.userFlow))
+        }
+      })
+      .catch((error) => {
+        reject(error)
+      })
+  })
 }
 
-UserJourneyService.prototype.scrollUntilPercentage = async function (page, distancePercentage) {
-  console.log('AUTOSCROLL - autoscroll has started')
-  await page.evaluate(async (percentage) => {
-    await new Promise((resolve, _reject) => {
-      let totalHeight = 0
-      const distance = 100
-      const scrollHeight = document.body.scrollHeight * percentage / 100
-      const timer = setInterval(() => {
-        window.scrollBy(0, distance)
-        totalHeight += distance
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer)
-          resolve()
-        }
-      }, 100)
+UserJourneyService.prototype.deleteUserFlow = async function (projectName, url) {
+  let urlProject = null
+  let systemError = false
+
+  await urlsProjectRepository.getUserFlow(projectName, url)
+    .then((result) => {
+      urlProject = result
     })
-  }, distancePercentage)
+    .catch(() => {
+      systemError = true
+    })
+  if (!systemError && urlProject === null) {
+    return Promise.reject(new Error('Url not found'))
+  } else if (!systemError) {
+    urlsProjectRepository.deleteUserFlow(projectName, url)
+      .catch(() => {
+        systemError = true
+      })
+  }
+  return new Promise((resolve, reject) => {
+    if (systemError) {
+      reject(new SystemError())
+    } else {
+      resolve()
+    }
+  })
+}
+
+UserJourneyService.prototype.scrollUntil = async function (page, distancePercentage, selectors = null) {
+  console.log('AUTOSCROLL - autoscroll has started')
+  if (distancePercentage) {
+    await page.evaluate(async (percentage) => {
+      await new Promise((resolve, _reject) => {
+        let totalHeight = 0
+        const distance = 100
+        const scrollHeight = document.body.scrollHeight * percentage / 100
+        const timer = setInterval(() => {
+          window.scrollBy(0, distance)
+          totalHeight += distance
+          if (totalHeight >= scrollHeight) {
+            clearInterval(timer)
+            resolve()
+          }
+        }, 100)
+      })
+    }, distancePercentage)
+  } else if (selectors !== null) {
+    await page.evaluate((selector) => {
+      const element = document.querySelector(selector[0])
+      const y = element.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({ top: y - 100 })
+    }, selectors)
+  }
   console.log('AUTOSCROLL - Autoscroll has ended ')
 }
 

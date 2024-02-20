@@ -29,7 +29,9 @@
     "bootupTime":{"difficulty": 7},
     "fontDisplay":{"difficulty": 2},
     "thirdPartySummary":{"difficulty": 7},
+    "thirdPartyFacades":{"difficulty": 6},
     "lcpLazyLoaded":{"difficulty": 4},
+    "nonCompositedAnimations":{"difficulty": 6},
     "domSize":{"difficulty": 8},
     "usesLongCacheTtl":{"difficulty": 8},
     "usesResponsiveImages":{"difficulty": 2},
@@ -48,5 +50,6 @@
     "totalByteWeight":{"difficulty": 8},
     "noDocumentWrite":{"difficulty": 3},
     "redirects":{"difficulty": 6},
+    "layoutShiftElements":{"difficulty": 6},
     "usesPassiveEventListeners":{"difficulty": 4}
 }

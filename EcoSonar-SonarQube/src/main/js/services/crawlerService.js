@@ -25,13 +25,9 @@ export function getCrawl (projectNameReq) {
         resolve(response.data)
       })
       .catch((error) => {
-        if (error.response && error.response.status === 400) {
-          reject(new Error(formatError(errors.errorCrawlingEmpty, projectNameReq)))
-        } else {
-          console.error(error)
-          console.error('CRAWLER SERVICE - unknown error occured : ', error.message)
-          reject(new Error(formatError(errors.errorGetCrawling, projectNameReq)))
-        }
+        console.error(error)
+        console.error('CRAWLER SERVICE - unknown error occured : ', error.message)
+        reject(new Error(formatError(errors.errorGetCrawling, projectNameReq)))
       })
   })
 }

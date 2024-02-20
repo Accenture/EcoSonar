@@ -10,13 +10,8 @@ export function getBestPractices (projectName) {
         resolve(response.data)
       })
       .catch((error) => {
-        if (error.response && error.response.status === 400) {
-          reject(new Error(formatError(errors.noAnalysisLaunched, projectName)))
-        } else {
-          console.error(error)
-          console.error('BEST PRACTICES SERVICE - GET : unknown error occured : ', error.message)
-          reject(new Error(formatError(errors.errorRetrievingBestPractices, projectName)))
-        }
+        console.error('BEST PRACTICES SERVICE - GET : unknown error occured : ', error.message)
+        reject(new Error(formatError(errors.errorRetrievingBestPractices, projectName)))
       })
   })
 }
@@ -32,13 +27,8 @@ export function getBestPracticesForUrl (projectName, urlName) {
         resolve(response.data)
       })
       .catch((error) => {
-        if (error.response && error.response.status === 400) {
-          reject(new Error(formatError(errors.noAnalysisFoundForURL, projectName, urlName)))
-        } else {
-          console.error(error)
-          console.error('BEST PRACTICES SERVICE - GET : unknown error occured :  ', error.message)
-          reject(new Error(formatError(errors.errorRetrievingBestPractices, projectName)))
-        }
+        console.error('BEST PRACTICES SERVICE - GET : unknown error occured :  ', error.message)
+        reject(new Error(formatError(errors.errorRetrievingBestPractices, projectName)))
       })
   })
 }

@@ -75,8 +75,6 @@ app.use((_req, res, next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: No url found for the project.
  *       500:
  *         description: System error.
  */
@@ -89,11 +87,9 @@ app.get('/api/all', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).json(results)
     })
     .catch((error) => {
-      if (error instanceof SystemError) {
-        return res.status(500).send()
-      }
-      console.log('GET URLS PROJECT - No url retrieved for project ' + projectName)
-      return res.status(400).json({ error: error.message })
+      console.error(error)
+      console.error('GET URLS PROJECT - retrieve all urls encountered an error for project ' + projectName)
+      return res.status(500).send()
     })
 }))
 
@@ -142,9 +138,11 @@ app.post('/api/insert', asyncMiddleware(async (req, res, _next) => {
     })
     .catch((error) => {
       if (error instanceof SystemError) {
+        console.error(error)
+        console.error(`INSERT URLS PROJECT - insert urls into project ${projectName} encountered an error`)
         return res.status(500).send()
       }
-      console.log('INSERT URLS PROJECT - Validation failed')
+      console.error('INSERT URLS PROJECT - Validation failed')
       return res.status(400).json({ error })
     })
 }))
@@ -187,10 +185,11 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).send()
     })
     .catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
+        console.error('DELETE URLS PROJECT - delete url ' + urlName + ' from project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('DELETE URLS PROJECT - Url not found, could not be deleted')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -203,7 +202,7 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
  *     tags:
  *       - "Login Configuration"
  *     summary: "Save Login For Project"
- *     description: Insert login credentials for a project.
+ *     description: Insert how to login into the project in database
  *     parameters:
  *       - name: projectName
  *         in: query
@@ -242,10 +241,11 @@ app.post('/api/login/insert', asyncMiddleware(async (req, res, _next) => {
       return res.status(201).send()
     })
     .catch((error) => {
+      console.error(error)
+      console.error('INSERT LOGIN CREDENTIALS - insert credentials into project ' + projectName + ' encountered an error')
       if (error instanceof SystemError) {
         return res.status(500).send()
       }
-      console.log('INSERT LOGIN CREDENTIALS - insertion failed')
       return res.status(400).json({ error })
     })
 }))
@@ -295,10 +295,11 @@ app.post('/api/proxy/insert', asyncMiddleware(async (req, res, _next) => {
       return res.status(201).send()
     })
     .catch((error) => {
+      console.error(error)
+      console.error('INSERT PROXY - proxy credentials into project ' + projectName + ' encountered an error')
       if (error instanceof SystemError) {
         return res.status(500).send()
       }
-      console.log('INSERT PROXY CREDENTIALS - insertion failed')
       return res.status(400).json({ error })
     })
 }))
@@ -320,8 +321,6 @@ app.post('/api/proxy/insert', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: No login credentials retrieved.
  *       500:
  *         description: System error.
  */
@@ -335,10 +334,12 @@ app.get('/api/login/find', asyncMiddleware(async (req, res, _next) => {
     })
     .catch((error) => {
       if (error instanceof SystemError) {
+        console.error(error)
+        console.error('FIND LOGIN CREDENTIALS - credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('FIND LOGIN CREDENTIALS - failed')
-      return res.status(400).json({ error: error.message })
+      console.warn('FIND LOGIN CREDENTIALS - credentials into project ' + projectName + ' are not saved')
+      return res.status(200).json({})
     })
 }))
 
@@ -359,8 +360,6 @@ app.get('/api/login/find', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: No proxy configuration retrieved.
  *       500:
  *         description: System error.
  */
@@ -374,10 +373,12 @@ app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
     })
     .catch((error) => {
       if (error instanceof SystemError) {
+        console.error(error)
+        console.error('FIND PROXY CREDENTIALS - credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('FIND PROXY CONFIGURATION - failed')
-      return res.status(400).json({ error: error.message })
+      console.warn('FIND PROXY CREDENTIALS - credentials into project ' + projectName + ' are not saved')
+      return res.status(200).json({})
     })
 }))
 
@@ -388,7 +389,7 @@ app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
  *     tags:
  *       - "Login Configuration"
  *     summary: "Delete Login For Project"
- *     description: Delete login credentials for a project.
+ *     description: Delete login credentials saved in database for a project.
  *     parameters:
  *       - name: projectName
  *         in: query
@@ -399,7 +400,7 @@ app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
  *       200:
  *         description: Success.
  *       400:
- *         description: Delete login credentials failed.
+ *         description: Project not found.
  *       500:
  *         description: System error.
  */
@@ -412,10 +413,11 @@ app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).send()
     })
     .catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
+        console.error('DELETE LOGIN CREDENTIALS - delete credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('DELETE LOGIN CREDENTIALS - failed')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -427,7 +429,7 @@ app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
  *     tags:
  *       - "Proxy Configuration"
  *     summary: "Delete Proxy For Project"
- *     description: Delete proxy configuration for a project.
+ *     description: Delete proxy configuration saved in database for a project.
  *     parameters:
  *       - name: projectName
  *         in: query
@@ -438,7 +440,7 @@ app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
  *       200:
  *         description: Success.
  *       400:
- *         description: Delete proxy configuration failed.
+ *         description: Project not found.
  *       500:
  *         description: System error.
  */
@@ -451,10 +453,11 @@ app.delete('/api/proxy', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).send()
     })
     .catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
+        console.error('DELETE PROXY CONFIGURATION - delete credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('DELETE PROXY CONFIGURATION  - failed')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -506,10 +509,12 @@ app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).send()
     })
     .catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
+        console.error('INSERT USER FLOW - insert credentials for url ' + url + ' in project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('INSERT USER FLOW - insertion failed')
+      console.error('INSERT USER FLOW - insertion failed')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -536,15 +541,13 @@ app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: No user flow retrieved.
  *       500:
  *         description: System error.
  */
 app.post('/api/user-flow/find', asyncMiddleware(async (req, res, _next) => {
   const url = req.body.url
   const projectName = req.body.projectName
-  console.log('FIND USER FLOW - credentials into url ' + url + ' in project ' + projectName)
+  console.log('FIND USER FLOW - get flow for url ' + url + ' in project ' + projectName)
   userJourneyService.getUserFlow(projectName, url)
     .then((userFlow) => {
       console.log('FIND USER FLOW - retrieve succeeded')
@@ -552,10 +555,12 @@ app.post('/api/user-flow/find', asyncMiddleware(async (req, res, _next) => {
     })
     .catch((error) => {
       if (error instanceof SystemError) {
+        console.error(error)
+        console.log('FIND USER FLOW - get flow for url ' + url + ' in project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('FIND USER FLOW - failed')
-      return res.status(400).json({ error: error.message })
+      console.warn('FIND USER FLOW - flow for url ' + url + ' is not saved')
+      return res.status(200).json({})
     })
 }))
 
@@ -596,10 +601,11 @@ app.delete('/api/user-flow', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).send()
     })
     .catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
+        console.error('DELETE USER FLOW - delete user flow into url ' + url + ' in project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.log('USER FLOW  - failed')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -658,8 +664,6 @@ app.post('/api/greenit/insert', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: Analysis for url could not be retrieved.
  *       500:
  *         description: System error.
  */
@@ -673,11 +677,9 @@ app.post('/api/greenit/url', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).json(results)
     })
     .catch((error) => {
-      if (error instanceof SystemError) {
-        return res.status(500).send()
-      }
-      console.log('GET ANALYSIS URL - Analysis for url could not be retrieved')
-      return res.status(400).json({ error: error.message })
+      console.log(error)
+      console.log('GET ANALYSIS URL - retrieve analysis for url ' + urlName + ' in project ' + projectName + ' encountered an error')
+      return res.status(500).send()
     })
 }))
 
@@ -698,8 +700,6 @@ app.post('/api/greenit/url', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: Analysis for project could not be retrieved.
  *       500:
  *         description: System error.
  */
@@ -711,11 +711,9 @@ app.get('/api/greenit/project', asyncMiddleware(async (req, res, _next) => {
       console.log('GET ANALYSIS PROJECT - Analysis for project retrieved')
       return res.status(200).json(results)
     }).catch((error) => {
-      if (error instanceof SystemError) {
-        return res.status(500).send()
-      }
-      console.log('GET ANALYSIS PROJECT - Analysis for project could not be retrieved')
-      return res.status(400).json({ error: error.message })
+      console.error(error)
+      console.error('GET ANALYSIS PROJECT - retrieve analysis for project ' + projectName + ' encountered an erro')
+      return res.status(500).send()
     })
 }))
 
@@ -736,8 +734,6 @@ app.get('/api/greenit/project', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: Scores for project could not be retrieved.
  *       500:
  *         description: System error.
  */
@@ -749,11 +745,9 @@ app.get('/api/ecosonar/scores', asyncMiddleware(async (req, res, _next) => {
       console.log('GET ECOSONAR PROJECT SCORES - Scores for project retrieved')
       return res.status(200).json(result)
     }).catch((error) => {
-      if (error instanceof SystemError) {
-        return res.status(500).send()
-      }
-      console.log('GET ECOSONAR PROJECT SCORES - Scores for project could not be retrieved')
-      return res.status(400).json({ error: error.message })
+      console.error(error)
+      console.error('GET ECOSONAR PROJECT SCORES - retrieve scores for project ' + projectNameReq + ' encountered an error')
+      return res.status(500).send()
     })
 }))
 
@@ -768,7 +762,7 @@ app.get('/api/ecosonar/scores', asyncMiddleware(async (req, res, _next) => {
  *     parameters:
  *       - name: date
  *         in: query
- *         description: endpoint will return the last analysis before that date, today if none
+ *         description: endpoint will return the last analysis before that date, today if none, format YYYY-MM-DD
  *         required: false
  *         type: string
  *         format: date
@@ -777,7 +771,7 @@ app.get('/api/ecosonar/scores', asyncMiddleware(async (req, res, _next) => {
  *       200:
  *         description: Success.
  *       400:
- *         description: Scores for projects could not be retrieved.
+ *         description: Bad date format
  *       500:
  *         description: System error.
  */
@@ -786,13 +780,15 @@ app.get('/api/ecosonar/info', asyncMiddleware(async (req, res, _next) => {
   console.log('GET AVERAGE PROJECT SCORE - retrieve all informations for all projects for the date defined')
   projectService.getAllInformationsAverage(date)
     .then((result) => {
-      console.log('GET AVERAGE PROJECT SCORES - Average of scores from all projects for the date defined')
+      console.log('GET AVERAGE PROJECT SCORES - Retrieved average of scores from all projects for the date defined')
       return res.status(200).json(result)
     }).catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
+        console.error('GET AVERAGE PROJECT SCORE - retrieve all informations for all projects for the date defined encountered an error')
         return res.status(500).send()
       }
-      console.log('GET AVERAGE PROJECT SCORES - Average of scores from all projects for the date defined could not be retrieved')
+      console.error('GET AVERAGE PROJECT SCORES - Average of scores from all projects for the date defined could not be retrieved')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -808,7 +804,7 @@ app.get('/api/ecosonar/info', asyncMiddleware(async (req, res, _next) => {
  *     parameters:
  *       - name: date
  *         in: query
- *         description: endpoint will return the last analysis before that date, today if none
+ *         description: endpoint will return the last analysis before that date, today if none, format YYYY-MM-DD
  *         required: false
  *         type: string
  *         format: date
@@ -821,7 +817,7 @@ app.get('/api/ecosonar/info', asyncMiddleware(async (req, res, _next) => {
  *         example: "my-project"
  *       - name: filterAndSort
  *         in: body
- *         description: filter and sorting configuration for projects scores of all projects registered in EcoSonar API. CATEGORY in filterScore can take the following enum ecoIndex, perfScore, accessScore, w3cScore. score is a value from 0 to 100, it will be the threshold for the CATEGORY. select takes the value upper or lower according if you want only project whose scores have an average value higher than score or lower. CATEGORY in sortBy can take the following enum ecoIndex, perfScore, accessScore, w3cScore and name. order can take the value asc or desc if you want to sort your projects according to the type.
+ *         description: filter and sorting configuration to retrieve only specific projects registered in EcoSonar. For filtering (filterScore), it will retrieve only projects whose score is either above or below the threshold defined in the field score. cat can take the following values ecoIndex, perfScore, accessScore, w3cScore. Score is a value from 0 to 100 and select can take the values upper or lower.  For sorting (sortBy), it will sort the list of projects according to the category and order chosen.type can take the following values ecoIndex, perfScore, accessScore, w3cScore and name. order can take the value asc or desc.
  *         required: false
  *         schema:
  *          type: object
@@ -867,7 +863,7 @@ app.get('/api/ecosonar/info', asyncMiddleware(async (req, res, _next) => {
  *       200:
  *         description: Success.
  *       400:
- *         description: Scores for project could not be retrieved.
+ *         description: Bad date format
  *       500:
  *         description: System error.
  */
@@ -876,16 +872,18 @@ app.post('/api/project/all', asyncMiddleware(async (req, res, _next) => {
   const filterName = req.query.filterName ?? null
   const sortBy = req.body.sortBy ?? null
   const filterScore = req.body.filterScore ?? null
-  console.log('GET PROJECTS SCORES - Retrieve scores for each projects.')
+  console.log('GET PROJECTS SCORES - Retrieve scores for each project')
   projectService.getAllProjectInformations(date, sortBy, filterName, filterScore)
     .then((result) => {
-      console.log('GET PROJECTS SCORES - Average scores for each projects.')
+      console.log('GET PROJECTS SCORES - Average scores for each project retrieved')
       return res.status(200).json(result)
     }).catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
+        console.log('GET PROJECTS SCORES - Retrieve scores for each project encountered an error')
         return res.status(500).send()
       }
-      console.log('GET PROJECT SCORES - Average scores for each each projects could not be retrieved')
+      console.log('GET PROJECT SCORES - Average scores for each each project could not be retrieved')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -908,8 +906,6 @@ app.post('/api/project/all', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: Best practices analysis for project could not be retrieved.
  *       500:
  *         description: System error.
  */
@@ -922,12 +918,9 @@ app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) =>
       return res.status(200).json(results)
     })
     .catch((error) => {
-      if (error instanceof SystemError) {
-        return res.status(500).send()
-      }
-      console.log('GET BEST PRACTICES PROJECT - Best practices analysis for project could not be retrieved')
-      console.log(error.message)
-      return res.status(400).json({ error: error.message })
+      console.error(error)
+      console.error('GET BEST PRACTICES PROJECT - retrieve best practices analysis for project ' + projectName + ' encountered an error')
+      return res.status(500).send()
     })
 }))
 
@@ -955,8 +948,6 @@ app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) =>
  *      responses:
  *        200:
  *          description: Success.
- *        400:
- *          description: Best practices analysis for url could not be retrieved.
  *        500:
  *          description: System error.
  */
@@ -970,11 +961,9 @@ app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).json(results)
     })
     .catch((error) => {
-      if (error instanceof SystemError) {
-        return res.status(500).send()
-      }
-      console.log('GET BEST PRACTICES URL - Best practices analysis for url could not be retrieved')
-      return res.status(400).json({ error: error.message })
+      console.error(error)
+      console.log(`GET BEST PRACTICES URL - retrieve best practices analysis for url ${urlName} into project ${projectName} encountered an error`)
+      return res.status(500).send()
     })
 }))
 
@@ -1032,8 +1021,6 @@ app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: No urls crawled saved.
  *       500:
  *         description: System error.
  */
@@ -1046,12 +1033,9 @@ app.get('/api/crawl', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).json(results)
     })
     .catch((error) => {
-      if (error instanceof SystemError) {
-        console.log(`CRAWLER -  Urls for ${projectName} retrieving has encountered an error`)
-        return res.status(500).send()
-      }
-      console.log(`CRAWLER -  No Urls saved for ${projectName}`)
-      return res.status(400).json(error.message)
+      console.error(error)
+      console.error(`CRAWLER - Retrieve all urls crawled for ${projectName} encountered an error`)
+      return res.status(500).send()
     })
 }))
 
@@ -1087,17 +1071,19 @@ app.get('/api/crawl', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/procedure', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const selectedProcedure = req.body.selectedProcedure
+  console.log(`POST PROCEDURE - Save procedure ${selectedProcedure} for project ${projectName}`)
   procedureService.saveProcedure(projectName, selectedProcedure)
     .then(() => {
-      console.log(`POST PROCEDURE - Procedure ${selectedProcedure} for project ${projectName} saved`)
+      console.log(`POST PROCEDURE - Procedure for project ${projectName} saved`)
       return res.status(200).send()
     })
     .catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
-        console.log('POST PROCEDURE - Procedure saving has encountered an error')
+        console.error(`POST PROCEDURE - Save procedure ${selectedProcedure} for project ${projectName} encountered an error`)
         return res.status(500).send()
       }
-      console.log(`POST PROCEDURE PROJECT - Procedure ${selectedProcedure} for project ${projectName} could not be retrieved`)
+      console.error(`POST PROCEDURE PROJECT - Procedure for project ${projectName} could not be saved because procedure is incorrect`)
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -1119,25 +1105,21 @@ app.post('/api/procedure', asyncMiddleware(async (req, res, _next) => {
  *     responses:
  *       200:
  *         description: Success.
- *       400:
- *         description: Procedure could not be retrieved.
  *       500:
  *         description: System Error.
  */
 app.get('/api/procedure', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
+  console.log(`GET PROCEDURE - Get Procedure for project ${projectName}`)
   procedureService.getProcedure(projectName)
     .then((procedure) => {
-      console.log(`GET PROCEDURE - Project ${projectName} with ${procedure.procedure} retrieved`)
+      console.log(`GET PROCEDURE - Project ${projectName} retrieved`)
       return res.status(200).json(procedure)
     })
     .catch((error) => {
-      if (error instanceof SystemError) {
-        console.log(`GET PROCEDURE - Procedure for project ${projectName} retrieving has encountered an error`)
-        return res.status(500).send()
-      }
-      console.log(`GET PROCEDURE - Procedure for project ${projectName} could not be retrieved`)
-      return res.status(400).json({ error: error.message })
+      console.error(error)
+      console.error(`GET PROCEDURE - Get Procedure for project ${projectName} encountered an error`)
+      return res.status(500).send()
     })
 }))
 
@@ -1150,8 +1132,9 @@ app.post('/api/export', asyncMiddleware(async (req, res, _next) => {
       return res.status(200).send(auditExported)
     })
     .catch((error) => {
+      console.error(error)
       if (error instanceof SystemError) {
-        console.log('POST EXCEL - Excel export has encountered an error')
+        console.log(`POST EXCEL - audit for project ${projectName} to be retrieved encountered an error`)
         return res.status(500).send()
       }
       console.log(`POST EXCEL PROJECT - Excel export for project ${projectName} could not be resolved`)
@@ -1178,7 +1161,7 @@ app.get('/api/version', asyncMiddleware(async (_req, res, _next) => {
     console.log('GET VERSION - Version of Ecosonar retrieved')
     return res.status(200).json({ version: packageJson.version })
   } catch (error) {
-    console.log('GET VERSION - Version of Ecosonar could not be retrieved')
+    console.error('GET VERSION - Version of Ecosonar could not be retrieved')
     return res.status(400).json({ error: error.message })
   }
 }))
@@ -1200,15 +1183,14 @@ app.get('/api/version', asyncMiddleware(async (_req, res, _next) => {
 app.get('/api/best-practices-rules', asyncMiddleware(async (req, res, _next) => {
   console.log('GET BEST PRACTICES - Best practices rules to be retrieved')
 
-  bestPracticesServices.getAllBestPracticesRules()
-    .then((bestPracticesRules) => {
-      console.log('GET BEST PRACTICES - Best practices rules has been retrieved')
-      return res.status(200).send(bestPracticesRules)
-    })
-    .catch((error) => {
-      console.log('GET BEST PRACTICES - Best practices rules could not be retrieved')
-      return res.status(400).json({ error: error.message })
-    })
+  try {
+    const bestPracticesRules = bestPracticesServices.getAllBestPracticesRules()
+    console.log('GET BEST PRACTICES - Best practices rules has been retrieved')
+    return res.status(200).send(bestPracticesRules)
+  } catch (error) {
+    console.error('GET BEST PRACTICES - Best practices rules could not be retrieved')
+    return res.status(400).json({ error: error.message })
+  }
 }))
 
 /**
@@ -1239,8 +1221,9 @@ app.delete('/api/project', asyncMiddleware(async (req, res, _next) => {
       console.log(`DELETE PROJECT - Project ${projectName} deletion succeeded`)
       return res.status(200).send()
     })
-    .catch(() => {
-      console.log(`DELETE PROJECT - Project ${projectName} deletion failed`)
+    .catch((error) => {
+      console.error(error)
+      console.error(`DELETE PROJECT - Delete project ${projectName} encountered an error`)
       return res.status(500).send()
     })
 }))
