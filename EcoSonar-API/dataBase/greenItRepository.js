@@ -1,6 +1,6 @@
-const greenits = require('./models/greenits')
-const urlsprojects = require('./models/urlsprojects')
-const SystemError = require('../utils/SystemError')
+import greenits from './models/greenits.js'
+import urlsprojects from './models/urlsprojects.js'
+import SystemError from '../utils/SystemError.js'
 
 const GreenItRepository = function () {
   /**
@@ -162,4 +162,4 @@ async function checkValues (arrayToInsert) {
 }
 
 const greenItRepository = new GreenItRepository()
-module.exports = greenItRepository
+export default greenItRepository

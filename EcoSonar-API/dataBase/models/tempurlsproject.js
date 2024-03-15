@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const tempUrlsProjectSchema = new Schema({
@@ -16,4 +16,4 @@ const tempUrlsProjectSchema = new Schema({
 })
 
 const tempurlsProject = mongoose.model('tempurlsprojects', tempUrlsProjectSchema)
-module.exports = tempurlsProject
+export default tempurlsProject

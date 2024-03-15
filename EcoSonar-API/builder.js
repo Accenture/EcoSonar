@@ -1,6 +1,6 @@
-const concat = require('concat-files')
-const glob = require('glob')
-const fs = require('fs')
+import concat from 'concat-files'
+import { glob } from 'glob'
+import fs from 'fs'
 
 const DIR = './services/greenit-analysis/dist'
 

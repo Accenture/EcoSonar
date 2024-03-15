@@ -1,5 +1,5 @@
-const ecoIndexCalculationService = require('../ecoIndexCalculationService')
-const formatCompliance = require('./formatCompliance')
+import ecoIndexCalculationService from '../ecoIndexCalculationService.js'
+import formatCompliance from './formatCompliance.js'
 
 class FormatGreenItAnalysis {}
 
@@ -115,4 +115,4 @@ function compareFullDate (firstDate, secondDate) {
 }
 
 const formatGreenItAnalysis = new FormatGreenItAnalysis()
-module.exports = formatGreenItAnalysis
+export default formatGreenItAnalysis

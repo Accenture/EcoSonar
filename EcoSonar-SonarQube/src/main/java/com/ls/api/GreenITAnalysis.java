@@ -34,7 +34,11 @@ public class GreenITAnalysis implements ProjectSensor{
             String route = "/api/greenit/insert";
             String uri = baseUrlHosted + route;
             String projectKey = context.config().get("sonar.projectKey").orElse("");
-            String body = "{\"projectName\":\"" + projectKey + "\"}";
+            String username = context.config().get("sonar.analysis.username").orElse("");
+            String password = context.config().get("sonar.analysis.password").orElse("");
+            String body = "{\"projectName\":\"" + projectKey + "\""+ ", "
+            + "\"username\":\"" + username + "\""+ ", "
+            + "\"password\":\"" + password + "\"}";
             HttpClient client = HttpClient.newHttpClient();
 
             HttpRequest request = HttpRequest.newBuilder()

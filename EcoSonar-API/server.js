@@ -1,6 +1,6 @@
-const http = require('http')
-const app = require('./routes/app')
-const database = require('./configuration/database')
+import http from 'http'
+import app from './routes/app.js'
+import database from './configuration/database.js'
 
 // connection BDD
 database.connection()

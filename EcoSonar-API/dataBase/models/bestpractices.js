@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const bestPracticesSchema = new Schema({
@@ -221,12 +221,6 @@ const bestPracticesSchema = new Schema({
       auditedMetric: { type: Number }
     },
     nonCompositedAnimations: {
-      score: { type: Number },
-      scoreDisplayMode: { type: String },
-      description: { type: Array },
-      auditedMetric: { type: Number }
-    },
-    preloadLcpImage: {
       score: { type: Number },
       scoreDisplayMode: { type: String },
       description: { type: Array },
@@ -627,4 +621,4 @@ const bestPracticesSchema = new Schema({
 })
 
 const bestPractices = mongoose.model('bestpractices', bestPracticesSchema)
-module.exports = bestPractices
+export default bestPractices

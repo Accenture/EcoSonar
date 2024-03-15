@@ -1,5 +1,5 @@
+import formatCompliance from '../../services/format/formatCompliance.js'
 
-const formatCompliance = require('../../services/format/formatCompliance')
 class FormatBestPracticesForProject { }
 
 FormatBestPracticesForProject.prototype.addScores = function (totalScore, score, numberOfValues) {
@@ -95,4 +95,4 @@ FormatBestPracticesForProject.prototype.formatResponse = function (auditedMetric
 }
 
 const formatBestPracticesForProject = new FormatBestPracticesForProject()
-module.exports = formatBestPracticesForProject
+export default formatBestPracticesForProject

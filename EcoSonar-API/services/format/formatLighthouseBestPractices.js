@@ -1,6 +1,6 @@
-const enumAudits = require('../../utils/enumAudits')
-const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
-const metricsCalculate = require('../../utils/metricsCalculate')
+import enumAudits from '../../utils/enumAudits.js'
+import formatBestPracticesForProject from '../format/formatBestPracticesForProject.js'
+import metricsCalculate from '../../utils/metricsCalculate.js'
 
 class FormatLighthouseBestPractices { }
 
@@ -47,16 +47,21 @@ FormatLighthouseBestPractices.prototype.formatPerformance = function (report) {
   const performanceBestPractices = enumAudits.performanceNamesToSave()
   const formattedReports = {}
   for (const element in performanceBestPractices) {
-    const score = report.audits[performanceBestPractices[element]].score
-    const scoreDisplayMode = report.audits[performanceBestPractices[element]].scoreDisplayMode
-    const items = (report.audits[performanceBestPractices[element]].details !== undefined) ? report.audits[performanceBestPractices[element]].details.items : []
-    let displayValue = report.audits[performanceBestPractices[element]].displayValue
-    if (displayValue) {
-      displayValue = Number(displayValue.replace(',', '').match(reg)[0])
-    } else {
-      displayValue = 0
+    try {
+      const score = report.audits[performanceBestPractices[element]].score ?? 0
+      const scoreDisplayMode = report.audits[performanceBestPractices[element]].scoreDisplayMode ?? null
+      const items = (report.audits[performanceBestPractices[element]].details !== undefined) ? report.audits[performanceBestPractices[element]].details.items : []
+      let displayValue = report.audits[performanceBestPractices[element]].displayValue ?? null
+      if (displayValue) {
+        displayValue = Number(displayValue.replace(',', '').match(reg)[0])
+      } else {
+        displayValue = 0
+      }
+      formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
+    } catch (error) {
+      console.error('error for url ' + report.url + ' on element ' + element)
+      console.error(error)
     }
-    formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
   }
   return { ...formattedReports, url: report.url }
 }
@@ -222,4 +227,4 @@ FormatLighthouseBestPractices.prototype.returnFormattedAccessibility = function 
 }
 
 const formatLighthouseBestPractices = new FormatLighthouseBestPractices()
-module.exports = formatLighthouseBestPractices
+export default formatLighthouseBestPractices

@@ -1,4 +1,4 @@
-const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
+import formatBestPracticesForProject from '../format/formatBestPracticesForProject.js'
 
 class FormatGreenItBestPractices {}
 
@@ -567,4 +567,4 @@ FormatGreenItBestPractices.prototype.useStandardTypefaces = function (reports) {
 }
 
 const formatGreenItBestPractices = new FormatGreenItBestPractices()
-module.exports = formatGreenItBestPractices
+export default formatGreenItBestPractices

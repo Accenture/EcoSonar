@@ -1,4 +1,2 @@
-class SystemError {
+export default class SystemError {
 }
-
-module.exports = SystemError

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const w3cSchema = new Schema({
@@ -14,4 +14,4 @@ const w3cSchema = new Schema({
 })
 
 const w3cs = mongoose.model('w3cs', w3cSchema)
-module.exports = w3cs
+export default w3cs

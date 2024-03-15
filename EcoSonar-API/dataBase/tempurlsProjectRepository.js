@@ -1,6 +1,6 @@
-const uniqid = require('uniqid')
-const tempurlsproject = require('./models/tempurlsproject')
-const SystemError = require('../utils/SystemError')
+import uniqid from 'uniqid'
+import tempurlsproject from './models/tempurlsproject.js'
+import SystemError from '../utils/SystemError.js'
 
 const TempUrlsProjectRepository = function () {
   /**
@@ -30,7 +30,7 @@ const TempUrlsProjectRepository = function () {
    */
   this.updateUrls = async function (projectName, urls) {
     return new Promise((resolve, reject) => {
-      tempurlsproject.updateOne({ projectName }, { urlsList: urls })
+      tempurlsproject.updateOne({ projectName: { $eq: projectName } }, { urlsList: urls })
         .then(() => { resolve() })
         .catch((err) => {
           console.error('\x1b[31m%s\x1b[0m', err)
@@ -46,7 +46,7 @@ const TempUrlsProjectRepository = function () {
    */
   this.findUrls = async function (name) {
     return new Promise((resolve, reject) => {
-      tempurlsproject.findOne({ projectName: name })
+      tempurlsproject.findOne({ projectName: { $eq: name } })
         .then((result) => { resolve(result) })
         .catch((err) => {
           console.error('\x1b[31m%s\x1b[0m', err)
@@ -61,7 +61,7 @@ const TempUrlsProjectRepository = function () {
    */
   this.deleteProject = async function (projectName) {
     return new Promise((resolve, reject) => {
-      tempurlsproject.deleteOne({ projectName })
+      tempurlsproject.deleteOne({ projectName: { $eq: projectName } })
         .then((result) => {
           console.log(`DELETE URLS PROJECT - On tempurlsproject project ${projectName} removed`)
           resolve()
@@ -75,4 +75,4 @@ const TempUrlsProjectRepository = function () {
 }
 
 const tempurlsProjectRepository = new TempUrlsProjectRepository()
-module.exports = tempurlsProjectRepository
+export default tempurlsProjectRepository

@@ -1,7 +1,7 @@
-const { DefaultAzureCredential } = require('@azure/identity')
-const { SecretClient } = require('@azure/keyvault-secrets')
+import { DefaultAzureCredential } from '@azure/identity'
+import { SecretClient } from '@azure/keyvault-secrets'
 
-async function retrievePassword () {
+export default async function retrievePassword () {
   if (process.env.ECOSONAR_ENV_CLOUD_PROVIDER === 'AZURE') {
     return retrievePasswordFromAzure()
   } else if (process.env.ECOSONAR_ENV_CLOUD_PROVIDER === 'local') {
@@ -23,5 +23,3 @@ async function retrievePasswordFromAzure () {
   const retrievedSecret = await client.getSecret(secretName)
   return retrievedSecret.value
 }
-
-module.exports = { retrievePassword }

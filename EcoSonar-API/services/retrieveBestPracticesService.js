@@ -1,12 +1,12 @@
-const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
-const formatGreenItReports = require('./format/formatGreenItReports')
-const formatLighthouseBestPractices = require('./format/formatLighthouseBestPractices')
-const w3cRepository = require('../dataBase/w3cRepository')
-const formatW3cBestPractices = require('./format/formatW3cBestPractices')
-const bestPracticesSorting = require('./format/bestPracticesSorting')
-const projectsRepository = require('../dataBase/projectsRepository')
-const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
-const SystemError = require('../utils/SystemError')
+import bestPracticesRepository from '../dataBase/bestPracticesRepository.js'
+import formatGreenItReports from './format/formatGreenItReports.js'
+import formatLighthouseBestPractices from './format/formatLighthouseBestPractices.js'
+import w3cRepository from '../dataBase/w3cRepository.js'
+import formatW3cBestPractices from './format/formatW3cBestPractices.js'
+import bestPracticesSorting from './format/bestPracticesSorting.js'
+import projectsRepository from '../dataBase/projectsRepository.js'
+import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
+import SystemError from '../utils/SystemError.js'
 
 class RetrieveBestPracticesService { }
 
@@ -200,4 +200,4 @@ RetrieveBestPracticesService.prototype.getUrlBestPractices = async function (pro
 }
 
 const retrieveBestPracticesService = new RetrieveBestPracticesService()
-module.exports = retrieveBestPracticesService
+export default retrieveBestPracticesService

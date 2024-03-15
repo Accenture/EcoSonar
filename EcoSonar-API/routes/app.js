@@ -1,22 +1,26 @@
-const express = require('express')
-const cors = require('cors')
-const dotenv = require('dotenv')
-const urlConfigurationService = require('../services/urlConfigurationService')
-const analysisService = require('../services/analysisService')
-const retrieveAnalysisService = require('../services/retrieveAnalysisService')
-const retrieveBestPracticesService = require('../services/retrieveBestPracticesService')
-const crawlerService = require('../services/crawler/crawlerService')
-const procedureService = require('../services/procedureService')
-const loginProxyConfigurationService = require('../services/loginProxyConfigurationService')
-const userJourneyService = require('../services/userJourneyService')
-const exportAuditService = require('../services/exportAuditService')
-const SystemError = require('../utils/SystemError')
-const asyncMiddleware = require('../utils/AsyncMiddleware')
-const swaggerUi = require('swagger-ui-express')
-const swaggerSpec = require('../swagger')
-const projectService = require('../services/projectService')
+import express from 'express'
+import cors from 'cors'
+import dotenv from 'dotenv'
+import swaggerUi from 'swagger-ui-express'
+import helmet from 'helmet'
+import swaggerSpec from '../swagger.js'
+import RateLimit from 'express-rate-limit'
+import urlConfigurationService from '../services/urlConfigurationService.js'
+import analysisService from '../services/analysisService.js'
+import retrieveAnalysisService from '../services/retrieveAnalysisService.js'
+import retrieveBestPracticesService from '../services/retrieveBestPracticesService.js'
+import crawlerService from '../services/crawler/crawlerService.js'
+import procedureService from '../services/procedureService.js'
+import loginProxyConfigurationService from '../services/loginProxyConfigurationService.js'
+import userJourneyService from '../services/userJourneyService.js'
+import exportAuditService from '../services/exportAuditService.js'
+import SystemError from '../utils/SystemError.js'
+import asyncMiddleware from '../utils/AsyncMiddleware.js'
+import projectService from '../services/projectService.js'
+import bestPracticesServices from '../services/bestPracticesService.js'
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
 const packageJson = require('../package.json')
-const bestPracticesServices = require('../services/bestPracticesService')
 
 dotenv.config()
 
@@ -25,6 +29,7 @@ app.disable('x-powered-by')
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+app.use(helmet())
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 const PORT = process.env.SWAGGER_PORT || 3002
@@ -33,11 +38,9 @@ app.listen(PORT, () => console.log(`Swagger in progress on port ${PORT}`))
 const sonarqubeServerUrl = process.env.ECOSONAR_ENV_SONARQUBE_SERVER_URL || ''
 const whitelist = [sonarqubeServerUrl]
 
-if (process.env.ECOSONAR_ENV_CLOUD_PROVIDER === 'local') {
-  const localServers = process.env.ECOSONAR_ENV_LOCAL_DEV_SERVER_URL?.split(';') || []
-  for (const localServer of localServers) {
-    whitelist.push(localServer)
-  }
+const localServers = process.env.ECOSONAR_ENV_LOCAL_DEV_SERVER_URL?.split(';') || []
+for (const localServer of localServers) {
+  whitelist.push(localServer)
 }
 
 const corsOptions = {
@@ -50,6 +53,13 @@ const corsOptions = {
   }
 }
 app.use(cors(corsOptions))
+
+const limiter = RateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300 // max 300 requests per windowMs
+})
+
+app.use(limiter)
 
 app.use((_req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization')
@@ -629,6 +639,10 @@ app.delete('/api/user-flow', asyncMiddleware(async (req, res, _next) => {
  *          properties:
  *            projectName:
  *              type: string
+ *            username:
+ *              type: string
+ *            password:
+ *              type: string
  *     responses:
  *       202:
  *         description: Analysis launched
@@ -636,8 +650,10 @@ app.delete('/api/user-flow', asyncMiddleware(async (req, res, _next) => {
  */
 app.post('/api/greenit/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
+  const username = req.body.username
+  const password = req.body.password
   console.log('INSERT ANALYSIS - Launch analysis for project ' + projectName)
-  analysisService.insert(projectName)
+  analysisService.insert(projectName, username, password)
   res.status(202).send()
 }))
 
@@ -990,6 +1006,10 @@ app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
  *              type: string
  *            saveUrls:
  *              type: boolean
+ *            username:
+ *              type: string
+ *            password:
+ *              type: string
  *     responses:
  *       202:
  *         description: Crawler started.
@@ -998,9 +1018,10 @@ app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const mainUrl = req.body.mainUrl
   const saveUrls = req.body.saveUrls
+  const username = req.body.username
+  const password = req.body.password
   console.log(`CRAWLER - Running crawler from ${mainUrl}`)
-  crawlerService.launchCrawl(projectName, mainUrl, saveUrls)
-  console.log('CRAWLER - Crawler started')
+  crawlerService.launchCrawl(projectName, mainUrl, saveUrls, username, password)
   return res.status(202).send()
 }))
 
@@ -1228,4 +1249,4 @@ app.delete('/api/project', asyncMiddleware(async (req, res, _next) => {
     })
 }))
 
-module.exports = app
+export default app

@@ -1,5 +1,5 @@
-const projects = require('./models/projects')
-const SystemError = require('../utils/SystemError')
+import projects from './models/projects.js'
+import SystemError from '../utils/SystemError.js'
 
 const ProjectsRepository = function () {
   /**
@@ -9,7 +9,7 @@ const ProjectsRepository = function () {
    */
   this.createProcedure = function (projectName, procedure) {
     return new Promise((resolve, reject) => {
-      projects.create({ projectName, procedure })
+      projects.create({ projectName: { $eq: projectName }, procedure })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -28,7 +28,7 @@ const ProjectsRepository = function () {
    */
   this.updateProjectProcedure = async function (projectName, selectedProcedure) {
     return new Promise((resolve, reject) => {
-      projects.updateOne({ projectName }, { procedure: selectedProcedure })
+      projects.updateOne({ projectName: { $eq: projectName } }, selectedProcedure)
         .then(() => {
           resolve()
         })
@@ -50,7 +50,7 @@ const ProjectsRepository = function () {
   this.createLoginConfiguration = async function (projectName, loginCredentials) {
     const loginMap = (loginCredentials !== undefined && loginCredentials !== null) ? new Map(Object.entries(loginCredentials)) : {}
     return new Promise((resolve, reject) => {
-      projects.create({ projectName, login: loginMap })
+      projects.create({ projectName: { $eq: projectName }, login: loginMap })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -66,7 +66,7 @@ const ProjectsRepository = function () {
  */
   this.createProxyConfiguration = async function (projectName, proxy) {
     return new Promise((resolve, reject) => {
-      projects.create({ projectName, proxy })
+      projects.create({ projectName: { $eq: projectName }, proxy })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -83,7 +83,7 @@ const ProjectsRepository = function () {
   this.updateLoginConfiguration = async function (projectName, loginCredentials) {
     const loginMap = new Map(Object.entries(loginCredentials))
     return new Promise((resolve, reject) => {
-      projects.updateOne({ projectName }, { login: loginMap })
+      projects.updateOne({ projectName: { $eq: projectName } }, { login: loginMap })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -99,7 +99,7 @@ const ProjectsRepository = function () {
  */
   this.updateProxyConfiguration = async function (projectName, proxy) {
     return new Promise((resolve, reject) => {
-      projects.updateOne({ projectName }, { proxy })
+      projects.updateOne({ projectName: { $eq: projectName } }, { proxy })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -115,7 +115,7 @@ const ProjectsRepository = function () {
    */
   this.getProjectSettings = async function (projectName) {
     return new Promise((resolve, reject) => {
-      projects.findOne({ projectName }, { login: 1, procedure: 1, proxy: 1 })
+      projects.findOne({ projectName: { $eq: projectName } }, { login: 1, procedure: 1, proxy: 1 })
         .then((result) => {
           resolve(result)
         })
@@ -136,9 +136,9 @@ const ProjectsRepository = function () {
     let systemError = false
     try {
       if (procedureRegistered !== undefined || proxyRegistered.ipAddress !== undefined || proxyRegistered.port !== undefined) {
-        await projects.updateOne({ projectName: projectNameReq }, { $unset: { login: '' } })
+        await projects.updateOne({ projectName: { $eq: projectNameReq } }, { $unset: { login: '' } })
       } else {
-        await projects.deleteOne({ projectName: projectNameReq })
+        await projects.deleteOne({ projectName: { $eq: projectNameReq } })
       }
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error)
@@ -163,9 +163,9 @@ const ProjectsRepository = function () {
     let systemError = false
     try {
       if (procedureRegistered !== undefined || loginRegistered !== undefined) {
-        await projects.updateOne({ projectName: projectNameReq }, { $unset: { proxy: '', ipAddress: '', port: '' } })
+        await projects.updateOne({ projectName: { $eq: projectNameReq } }, { $unset: { proxy: '', ipAddress: '', port: '' } })
       } else {
-        await projects.deleteOne({ projectName: projectNameReq })
+        await projects.deleteOne({ projectName: { $eq: projectNameReq } })
       }
     } catch (error) {
       console.error('\x1b[31m%s\x1b[0m', error)
@@ -186,7 +186,7 @@ const ProjectsRepository = function () {
    */
   this.deleteProjectPerProjectName = async function (projectNameReq) {
     return new Promise((resolve, reject) => {
-      projects.deleteOne({ projectName: projectNameReq })
+      projects.deleteOne({ projectName: { $eq: projectNameReq } })
         .then(() => {
           console.log(`DELETE URLS PROJECT - project ${projectNameReq} deleted`)
           resolve()
@@ -199,4 +199,4 @@ const ProjectsRepository = function () {
 }
 
 const projectsRepository = new ProjectsRepository()
-module.exports = projectsRepository
+export default projectsRepository

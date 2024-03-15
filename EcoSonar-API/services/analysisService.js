@@ -1,16 +1,16 @@
-const uniqid = require('uniqid')
-const greenItRepository = require('../dataBase/greenItRepository')
-const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
-const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
-const lighthouseRepository = require('../dataBase/lighthouseRepository')
-const lighthouseAnalysis = require('./lighthouse/lighthouse')
-const formatLighthouseMetrics = require('./format/formatLighthouseMetrics')
-const greenItAnalysis = require('./greenit-analysis/analyseService')
-const formatLighthouseBestPractices = require('./format/formatLighthouseBestPractices')
-const w3cAnalysis = require('../services/W3C/w3cAnalysis')
-const w3cRepository = require('../dataBase/w3cRepository')
-const formatW3cBestPractices = require('./format/formatW3cBestPractices')
-const formatW3cAnalysis = require('./format/formatW3cAnalysis')
+import uniqid from 'uniqid'
+import greenItRepository from '../dataBase/greenItRepository.js'
+import bestPracticesRepository from '../dataBase/bestPracticesRepository.js'
+import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
+import lighthouseRepository from '../dataBase/lighthouseRepository.js'
+import lighthouseAnalysis from './lighthouse/lighthouse.js'
+import formatLighthouseMetrics from './format/formatLighthouseMetrics.js'
+import analyse from './greenit-analysis/analyseService.js'
+import formatLighthouseBestPractices from './format/formatLighthouseBestPractices.js'
+import w3cAnalysis from '../services/W3C/w3cAnalysis.js'
+import w3cRepository from '../dataBase/w3cRepository.js'
+import formatW3cBestPractices from './format/formatW3cBestPractices.js'
+import formatW3cAnalysis from './format/formatW3cAnalysis.js'
 
 class AnalysisService {}
 
@@ -19,7 +19,7 @@ class AnalysisService {}
  * @param {string} projectName
  * @param {boolean} autoscroll is used to enable autoscrolling for each tab opened during analysis
  */
-AnalysisService.prototype.insert = async function (projectName, autoscroll) {
+AnalysisService.prototype.insert = async function (projectName, username, password, autoscroll) {
   const allowExternalAPI = process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API || 'false'
   let urlProjectList = []
   let reports = []
@@ -34,7 +34,7 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
   if (systemError || urlProjectList.length === 0) {
     console.warn('GREENIT INSERT - project has no url to do the audit. Audit stopped')
   } else {
-    reports = await launchAuditsToUrlList(urlProjectList, autoscroll, projectName, allowExternalAPI)
+    reports = await launchAuditsToUrlList(urlProjectList, projectName, allowExternalAPI, username, password, autoscroll)
     const reportsFormatted = formatAuditsToBeSaved(reports, urlProjectList)
 
     greenItRepository
@@ -76,19 +76,19 @@ AnalysisService.prototype.insert = async function (projectName, autoscroll) {
   }
 }
 
-async function launchAuditsToUrlList (urlProjectList, autoscroll, projectName, allowExternalAPI) {
+async function launchAuditsToUrlList (urlProjectList, projectName, allowExternalAPI, username, password, autoscroll) {
   let reportsGreenit = []
   let reportsLighthouse = []
   let reportsW3c = []
 
   const urlList = urlProjectList.map((url) => url.urlName)
   try {
-    reportsGreenit = await greenItAnalysis.analyse(urlList, autoscroll, projectName)
+    reportsGreenit = await analyse(urlList, projectName, username, password, autoscroll)
   } catch (error) {
     console.error(error)
   }
   try {
-    reportsLighthouse = await lighthouseAnalysis.lighthouseAnalysis(urlList, projectName)
+    reportsLighthouse = await lighthouseAnalysis(urlList, projectName, username, password)
   } catch (error) {
     console.error(error)
   }
@@ -208,4 +208,4 @@ function formatAuditsToBeSaved (reports, urlProjectList) {
 }
 
 const analysisService = new AnalysisService()
-module.exports = analysisService
+export default analysisService

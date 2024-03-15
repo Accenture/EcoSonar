@@ -1,9 +1,9 @@
-const puppeteer = require('puppeteer')
-const createGreenITReports = require('./greenit-analysis.js').createGreenITReports
-const authenticationService = require('../authenticationService')
-const viewPortParams = require('../../utils/viewportParams')
+import puppeteer from 'puppeteer'
+import createGreenITReports from './greenit-analysis.js'
+import authenticationService from '../authenticationService.js'
+import viewPortParams from '../../utils/viewportParams.js'
 
-async function analyse (urlList, autoscroll, projectName) {
+export default async function analyse (urlList, projectName, username, password, autoscroll) {
   let reports = []
   const browserArgs = [
     '--no-sandbox', // can't run inside docker without
@@ -21,29 +21,29 @@ async function analyse (urlList, autoscroll, projectName) {
   const userJourneyEnabled = process.env.ECOSONAR_ENV_USER_JOURNEY_ENABLED || 'false'
   if (userJourneyEnabled === 'true') {
     console.log('Your EcoSonar project is using user journey to audit your website, GreenIT analysis will be made into different Chromium browser for right cookies configuration')
-    reports = await launchAllAnalysisOnDifferentBrowser(browserArgs, urlList, projectName, autoscroll)
+    reports = await launchAllAnalysisOnDifferentBrowser(browserArgs, urlList, projectName, username, password, autoscroll)
   } else {
-    reports = await launchAllAnalysisOnSameBrowser(browserArgs, urlList, projectName, autoscroll)
+    reports = await launchAllAnalysisOnSameBrowser(browserArgs, urlList, projectName, username, password, autoscroll)
   }
   return reports
 }
 
-async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projectName, autoscroll) {
+async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projectName, username, password, autoscroll) {
   let reports = []
   let report
   for (const url of urlList) {
     // start browser
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: 'new',
       args: browserArgs,
       ignoreHTTPSErrors: true,
       // Keep gpu horsepower in headless
       ignoreDefaultArgs: ['--disable-gpu'],
-      defaultViewport: viewPortParams.viewPortParams
+      defaultViewport: viewPortParams
     })
 
     try {
-      const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
+      const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName, username, password)
       if (loginSucceeded) {
         report = await createGreenITReports(browser, projectName, [url], autoscroll)
         reports = reports.concat(report)
@@ -60,20 +60,20 @@ async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projec
   return reports
 }
 
-async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName, autoscroll) {
+async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName, username, password, autoscroll) {
   // start browser
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: 'new',
     args: browserArgs,
     ignoreHTTPSErrors: true,
     // Keep gpu horsepower in headless
     ignoreDefaultArgs: ['--disable-gpu'],
-    defaultViewport: viewPortParams.viewPortParams
+    defaultViewport: viewPortParams
   })
 
   let reports = []
   try {
-    const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName)
+    const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName, username, password)
     if (loginSucceeded) {
       // analyse each page
       reports = await createGreenITReports(browser, projectName, urlList, autoscroll)
@@ -98,8 +98,4 @@ async function closeBrowser (browser) {
     }
   })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error))
   await browser.close()
-}
-
-module.exports = {
-  analyse
 }

@@ -1,5 +1,5 @@
-const projectsRepository = require('../dataBase/projectsRepository')
-const SystemError = require('../utils/SystemError')
+import projectsRepository from '../dataBase/projectsRepository.js'
+import SystemError from '../utils/SystemError.js'
 
 class ProcedureService { }
 
@@ -41,4 +41,4 @@ ProcedureService.prototype.getProcedure = async function (projectName) {
 }
 
 const procedureService = new ProcedureService()
-module.exports = procedureService
+export default procedureService

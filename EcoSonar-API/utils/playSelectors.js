@@ -75,4 +75,4 @@ async function applyChange (valueToChange, element) {
   }
 }
 
-module.exports = { clickOnElement, waitForSelectors, applyChange }
+export { clickOnElement, waitForSelectors, applyChange }

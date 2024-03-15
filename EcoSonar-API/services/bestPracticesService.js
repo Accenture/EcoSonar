@@ -1,3 +1,5 @@
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
 const greenItData = require('../utils/bestPractices/greenItData.json')
 const lighthouseAccessibilityData = require('../utils/bestPractices/lighthouseAccessibilityData.json')
 const lighthousePerformanceData = require('../utils/bestPractices/lighthousePerformanceData.json')
@@ -13,4 +15,4 @@ BestPracticesServices.prototype.getAllBestPracticesRules = function () {
 }
 
 const bestPracticesServices = new BestPracticesServices()
-module.exports = bestPracticesServices
+export default bestPracticesServices

@@ -1,10 +1,10 @@
-const swaggerJSDoc = require('swagger-jsdoc')
+import swaggerJSDoc from 'swagger-jsdoc'
 
 const swagger = {
   swaggerDefinition: {
     info: {
       title: 'API EcoSonar',
-      version: '3.2',
+      version: '3.5',
       description: 'Swagger UI of EcoSonar API'
     }
   },
@@ -12,5 +12,4 @@ const swagger = {
 }
 
 const swaggerSpec = swaggerJSDoc(swagger)
-
-module.exports = swaggerSpec
+export default swaggerSpec

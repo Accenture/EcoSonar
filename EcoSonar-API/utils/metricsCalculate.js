@@ -97,4 +97,4 @@ MetricsCalculate.prototype.isPresentForAccessibilityMetrics = function () {
 }
 
 const metricsCalculate = new MetricsCalculate()
-module.exports = metricsCalculate
+export default metricsCalculate

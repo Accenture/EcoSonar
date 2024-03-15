@@ -36,7 +36,6 @@ EnumAudits.prototype.performanceNamesToSave = function () {
     lcpLazyLoaded: 'lcp-lazy-loaded',
     longTasks: 'long-tasks',
     nonCompositedAnimations: 'non-composited-animations',
-    preloadLcpImage: 'preload-lcp-image',
     domSize: 'dom-size',
     usesLongCacheTtl: 'uses-long-cache-ttl',
     usesResponsiveImages: 'uses-responsive-images',
@@ -143,4 +142,4 @@ EnumAudits.prototype.accessibilityNames = function () {
 }
 
 const enumAudits = new EnumAudits()
-module.exports = enumAudits
+export default enumAudits

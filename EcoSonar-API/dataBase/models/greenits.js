@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const greenItSchema = new Schema({
@@ -42,4 +42,4 @@ const greenItSchema = new Schema({
 })
 
 const greenIt = mongoose.model('greenits', greenItSchema)
-module.exports = greenIt
+export default greenIt

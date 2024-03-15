@@ -1,6 +1,6 @@
-const projectsRepository = require('../dataBase/projectsRepository')
-const SystemError = require('../utils/SystemError')
-const retrieveLoginProxyYamlConfigurationService = require('./yamlConfiguration/retrieveLoginProxyYamlConfiguration')
+import projectsRepository from '../dataBase/projectsRepository.js'
+import SystemError from '../utils/SystemError.js'
+import retrieveLoginProxyYamlConfigurationService from './yamlConfiguration/retrieveLoginProxyYamlConfiguration.js'
 
 class LoginProxyConfigurationService {}
 
@@ -64,45 +64,30 @@ LoginProxyConfigurationService.prototype.insertProxyConfiguration = async functi
   })
 }
 
-LoginProxyConfigurationService.prototype.getLoginCredentials = async function (projectName) {
-  const configSettings = process.env.ECOSONAR_ENV_AUTHENTICATION_CONFIGURATION || 'database'
-  const authenticationUrl = process.env.ECOSONAR_ENV_AUTHENTICATION_URL || ''
-  const username = process.env.ECOSONAR_ENV_AUTHENTICATION_USERNAME || ''
-  const password = process.env.ECOSONAR_ENV_AUTHENTICATION_PASSWORD || ''
+LoginProxyConfigurationService.prototype.getLoginCredentials = async function (projectName, username, password) {
   let loginInformations = {}
   let error = false
 
-  if (configSettings === 'env' && authenticationUrl !== '' && username !== '' && password !== '') {
-    loginInformations = {
-      authentication_url: authenticationUrl,
-      username,
-      password
-    }
-  } else if (configSettings === 'yaml') {
-    const login = await retrieveLoginProxyYamlConfigurationService.getLoginInformations()
-    if (login !== false && (login.projectName === undefined || login.projectName.includes(projectName)) && login.authentication_url !== undefined && login.username !== undefined && login.password !== undefined) {
-      loginInformations = {
-        authentication_url: login.authentication_url,
-        username: login.username,
-        password: login.password
-      }
-    }
-  } else {
-    await projectsRepository.getProjectSettings(projectName)
-      .then((result) => {
-        if (!(result === null || result.login === undefined)) {
-          loginInformations = {
-            authentication_url: result.login.get('authentication_url'),
-            username: result.login.get('username'),
-            password: result.login.get('password'),
-            steps: result.login.get('steps')
-          }
+  await projectsRepository.getProjectSettings(projectName)
+    .then((result) => {
+      if (!(result === null || result.login === undefined)) {
+        const usernameSaved = username !== undefined ? username : result.login.get('username')
+        const passwordSaved = password !== undefined ? password : result.login.get('password')
+        loginInformations = {
+          authentication_url: result.login.get('authentication_url'),
+          loginButtonSelector: result.login.get('loginButtonSelector'),
+          usernameSelector: result.login.get('usernameSelector'),
+          passwordSelector: result.login.get('passwordSelector'),
+          steps: result.login.get('steps'),
+          username: usernameSaved,
+          password: passwordSaved
         }
-      })
-      .catch(() => {
-        error = true
-      })
-  }
+      }
+    })
+    .catch(() => {
+      error = true
+    })
+
   return new Promise((resolve, reject) => {
     if (error) {
       reject(new SystemError())
@@ -213,4 +198,4 @@ LoginProxyConfigurationService.prototype.deleteProxyConfiguration = async functi
 }
 
 const loginproxyConfigurationService = new LoginProxyConfigurationService()
-module.exports = loginproxyConfigurationService
+export default loginproxyConfigurationService

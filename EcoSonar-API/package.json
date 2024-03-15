@@ -1,12 +1,13 @@
 {
   "name": "ecosonar-api",
-  "version": "3.4",
+  "version": "3.5",
   "description": "Ecodesign and accessibility tool to help developpers minimize carbon footprint of their web-application",
   "repository": {
     "type": "git",
     "url": "https://github.com/Accenture/EcoSonar"
   },
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "postinstall": "node builder.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -17,34 +18,37 @@
   "author": "",
   "license": "GNU",
   "dependencies": {
-    "@azure/identity": "^3.3.0",
-    "@azure/keyvault-secrets": "^4.6.0",
+    "@azure/identity": "4.0.1",
+    "@azure/keyvault-secrets": "^4.8.0",
     "cheerio": "^1.0.0-rc.12",
+    "chrome-har": "^0.13.2",
     "concat-files": "^0.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "exceljs": "^4.3.0",
+    "dotenv": "^16.3.2",
+    "exceljs": "^4.4.0",
     "express": "^4.18.2",
-    "glob": "^8.1.0",
+    "express-rate-limit": "^7.2.0",
+    "glob": "^10.3.10",
+    "helmet": "^7.1.0",
     "html-validator": "^6.0.1",
     "js-yaml": "^4.1.0",
-    "lighthouse": "^9.6.8",
-    "mongodb": "^5.0.1",
-    "mongoose": " ^7.6.2",
-    "puppeteer": "^18.2.1",
-    "puppeteer-har": "^1.1.2",
+    "lighthouse": "^11.6.0",
+    "lodash": "^4.17.21",
+    "mongodb": "^6.3.0",
+    "mongoose": " ^8.2.0",
+    "puppeteer": "^22.4.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "uniqid": "^5.4.0"
   },
   "devDependencies": {
-    "@ecocode/eslint-plugin": "^0.2.0",
-    "eslint": "^8.39.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.6.1",
+    "@ecocode/eslint-plugin": "^1.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.0"
   }
 }

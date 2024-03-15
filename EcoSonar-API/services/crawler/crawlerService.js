@@ -1,8 +1,8 @@
-const cheerio = require('cheerio')
-const puppeteer = require('puppeteer')
-const authenticationService = require('../authenticationService')
-const urlConfigurationService = require('../urlConfigurationService')
-const tempUrlsProjectRepository = require('../../dataBase/tempurlsProjectRepository')
+import cheerio from 'cheerio'
+import puppeteer from 'puppeteer'
+import authenticationService from '../authenticationService.js'
+import urlConfigurationService from '../urlConfigurationService.js'
+import tempUrlsProjectRepository from '../../dataBase/tempurlsProjectRepository.js'
 
 class CrawlerService { }
 
@@ -13,59 +13,73 @@ class CrawlerService { }
  * @param {*} savedAsPermanent boolean value that mentions if urls crawled should be saved permanently or temporary
  * launch crawling of the website and save the urls crawled according to context
  */
-CrawlerService.prototype.launchCrawl = async function (projectName, mainUrl, savedAsPermanent) {
+CrawlerService.prototype.launchCrawl = async function (projectName, mainUrl, savedAsPermanent, username, password) {
   let crawledUrls = []
   let projectUrls = []
   const seenUrls = []
 
-  const browserArgs = [
-    '--no-sandbox', // can't run inside docker without
-    '--disable-setuid-sandbox', // but security issues
-    '--ignore-certificate-errors',
-    '--window-size=1920,1080'
-  ]
+  const isUrlValid = verifyUrl(mainUrl)
+  if (!isUrlValid) {
+    console.error('URL set is not valid and can not be crawled')
+  } else {
+    const browserArgs = [
+      '--no-sandbox', // can't run inside docker without
+      '--disable-setuid-sandbox', // but security issues
+      '--ignore-certificate-errors',
+      '--window-size=1920,1080'
+    ]
 
-  const proxyConfiguration = await authenticationService.useProxyIfNeeded(projectName)
-  if (proxyConfiguration) {
-    browserArgs.push(proxyConfiguration)
-  }
+    const proxyConfiguration = await authenticationService.useProxyIfNeeded(projectName)
+    if (proxyConfiguration) {
+      browserArgs.push(proxyConfiguration)
+    }
 
-  // start browser and authenticate
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: browserArgs,
-    ignoreHTTPSErrors: true,
-    ignoreDefaultArgs: ['--disable-gpu']
-  })
-
-  try {
-    const websiteDetails = getWebsiteProtocolAndPrefix(mainUrl)
-    await authenticationService.loginIfNeeded(browser)
-    await recursiveCrawl(mainUrl, browser, crawledUrls, seenUrls, websiteDetails)
-  } catch (error) {
-    console.error(error)
-  } finally { browser.close() }
-
-  // Get all the URL already registered in the project to avoid crawling them again
-  await urlConfigurationService.getAll(projectName)
-    .then((result) => {
-      projectUrls = result
-    }).catch(() => {
-      console.log('An error occured when retrieving urls saved to be audited for the project or no urls were saved')
+    // start browser and authenticate
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: browserArgs,
+      ignoreHTTPSErrors: true,
+      ignoreDefaultArgs: ['--disable-gpu']
     })
-  // Removing mainUrl and aliases from return list if already exist in the project
-  if (projectUrls.includes(mainUrl) || projectUrls.includes(mainUrl + '/') || projectUrls.includes(mainUrl.slice(0, -1)) || crawledUrls.includes(mainUrl + '/')) {
-    crawledUrls = crawledUrls.filter((url) => (url !== mainUrl))
+
+    try {
+      const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName, username, password)
+      if (loginSucceeded) {
+        const websiteDetails = getWebsiteProtocolAndPrefix(mainUrl)
+        await recursiveCrawl(mainUrl, browser, crawledUrls, seenUrls, websiteDetails)
+      } else {
+        console.warn('Could not log in, crawled is skipped')
+      }
+    } catch (error) {
+      console.error(error)
+    } finally { browser.close() }
+
+    // Get all the URL already registered in the project to avoid crawling them again
+    await urlConfigurationService.getAll(projectName)
+      .then((result) => {
+        projectUrls = result
+      }).catch(() => {
+        console.log('An error occured when retrieving urls saved to be audited for the project or no urls were saved')
+      })
+    // Removing mainUrl and aliases from return list if already exist in the project
+    if (projectUrls.includes(mainUrl) || projectUrls.includes(mainUrl + '/') || projectUrls.includes(mainUrl.slice(0, -1)) || crawledUrls.includes(mainUrl + '/')) {
+      crawledUrls = crawledUrls.filter((url) => (url !== mainUrl))
+    }
+
+    // Remove URLS that are being crawler twice due to ending slash in it (www.myurl.com/ vs www.myurl.com)
+    for (const crawledUrl of crawledUrls) {
+      crawledUrls = crawledUrls.filter((url) => (url !== crawledUrl.slice(0, -1)))
+    }
+
+    crawledUrls = crawledUrls.filter((url) => (!projectUrls.includes(url) && !projectUrls.includes(url + '/') && !projectUrls.includes(url.slice(0, -1))))
+
+    saveUrlsCrawled(projectName, crawledUrls, savedAsPermanent)
   }
+}
 
-  // Remove URLS that are being crawler twice due to ending slash in it (www.myurl.com/ vs www.myurl.com)
-  for (const crawledUrl of crawledUrls) {
-    crawledUrls = crawledUrls.filter((url) => (url !== crawledUrl.slice(0, -1)))
-  }
-
-  crawledUrls = crawledUrls.filter((url) => (!projectUrls.includes(url) && !projectUrls.includes(url + '/') && !projectUrls.includes(url.slice(0, -1))))
-
-  saveUrlsCrawled(projectName, crawledUrls, savedAsPermanent)
+function verifyUrl (homepageUrl) {
+  const urlPattern = /^(https?|):\/\/[^\s/$.?#].[^\s]*$/i
+  return urlPattern.test(homepageUrl)
 }
 
 /**
@@ -258,4 +272,4 @@ CrawlerService.prototype.retrieveCrawledUrl = async function (projectName) {
 }
 
 const crawlerService = new CrawlerService()
-module.exports = crawlerService
+export default crawlerService

@@ -1,11 +1,11 @@
-const greenItRepository = require('../dataBase/greenItRepository')
-const lighthouseRepository = require('../dataBase/lighthouseRepository')
-const w3cRepository = require('../dataBase/w3cRepository')
-const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
-const formatLighthouseAnalysis = require('./format/formatLighthouseAnalysis')
-const SystemError = require('../utils/SystemError')
-const formatGreenItAnalysis = require('./format/formatGreenItAnalysis')
-const formatW3cAnalysis = require('./format/formatW3cAnalysis')
+import greenItRepository from '../dataBase/greenItRepository.js'
+import lighthouseRepository from '../dataBase/lighthouseRepository.js'
+import w3cRepository from '../dataBase/w3cRepository.js'
+import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
+import formatLighthouseAnalysis from './format/formatLighthouseAnalysis.js'
+import SystemError from '../utils/SystemError.js'
+import formatGreenItAnalysis from './format/formatGreenItAnalysis.js'
+import formatW3cAnalysis from './format/formatW3cAnalysis.js'
 
 class RetrieveAnalysisService { }
 
@@ -391,4 +391,4 @@ RetrieveAnalysisService.prototype.getProjectScores = async function (projectName
 }
 
 const retrieveAnalysisService = new RetrieveAnalysisService()
-module.exports = retrieveAnalysisService
+export default retrieveAnalysisService

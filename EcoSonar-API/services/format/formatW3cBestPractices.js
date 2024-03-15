@@ -1,4 +1,4 @@
-const formatCompliance = require('./formatCompliance')
+import formatCompliance from './formatCompliance.js'
 
 class FormatW3cBestPractices {}
 
@@ -89,4 +89,4 @@ FormatW3cBestPractices.prototype.returnFormattedW3c = function (latestW3cAnalysi
 }
 
 const formatW3cBestPractices = new FormatW3cBestPractices()
-module.exports = formatW3cBestPractices
+export default formatW3cBestPractices

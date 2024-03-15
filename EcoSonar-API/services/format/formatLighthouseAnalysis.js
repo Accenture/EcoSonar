@@ -1,4 +1,4 @@
-const formatCompliance = require('./formatCompliance')
+import formatCompliance from './formatCompliance.js'
 
 class FormatLighthouseAnalysis {}
 
@@ -251,4 +251,4 @@ function compareFullDate (firstDate, secondDate) {
 }
 
 const formatLighthouseAnalysis = new FormatLighthouseAnalysis()
-module.exports = formatLighthouseAnalysis
+export default formatLighthouseAnalysis

@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const { retrievePassword } = require('./retrieveDatabasePasswordFromCloudProvider')
+import mongoose from 'mongoose'
+import retrievePassword from './retrieveDatabasePasswordFromCloudProvider.js'
 
 mongoose.set('strictQuery', false)
 
@@ -18,9 +18,8 @@ Database.prototype.connection = async function () {
     const port = process.env.ECOSONAR_ENV_DB_PORT || 27017
     dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
     connectionString = `mongodb://${cluster}:${port}/${dbName}`
-    mongoose.connect(connectionString,
-      { useNewUrlParser: true, useUnifiedTopology: true }
-    ).then(() => console.log('Connection to MongoDB successful'))
+    mongoose.connect(connectionString)
+      .then(() => console.log('Connection to MongoDB successful'))
       .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
   } else if (mongoDBType === 'MongoDB_Atlas') {
     // connection to dataBase MongoDB Atlas for MongoDB API
@@ -29,9 +28,8 @@ Database.prototype.connection = async function () {
     cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
     dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
     connectionString = `mongodb+srv://${user}:${password}@${cluster}/${dbName}?retryWrites=true&w=majority`
-    mongoose.connect(connectionString,
-      { useNewUrlParser: true, useUnifiedTopology: true }
-    ).then(() => console.log('Connection to MongoDB Atlas successful'))
+    mongoose.connect(connectionString)
+      .then(() => console.log('Connection to MongoDB Atlas successful'))
       .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
   } else if (mongoDBType === 'CosmosDB') {
     // connection to dataBase Azure CosmosDB for MongoDB API
@@ -46,8 +44,6 @@ Database.prototype.connection = async function () {
         username: user,
         password
       },
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       retryWrites: false
     })
       .then(() => console.log('Connection to CosmosDB successful'))
@@ -58,4 +54,4 @@ Database.prototype.connection = async function () {
 }
 
 const database = new Database()
-module.exports = database
+export default database

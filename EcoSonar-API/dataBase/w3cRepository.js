@@ -1,6 +1,5 @@
-
-const SystemError = require('../utils/SystemError')
-const w3cs = require('./models/w3cs')
+import SystemError from '../utils/SystemError.js'
+import w3cs from './models/w3cs.js'
 
 const W3cRepository = function () {
   /**
@@ -140,4 +139,4 @@ const W3cRepository = function () {
 }
 
 const w3cRepository = new W3cRepository()
-module.exports = w3cRepository
+export default w3cRepository

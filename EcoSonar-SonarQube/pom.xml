@@ -6,7 +6,7 @@
 
     <groupId>com.ls</groupId>
     <artifactId>ecosonar</artifactId>
-    <version>3.4</version>
+    <version>3.5</version>
 
     <packaging>sonar-plugin</packaging>
 

@@ -1,12 +1,12 @@
-const { waitForSelectors, applyChange } = require('../utils/playSelectors')
-const loginProxyConfigurationService = require('./loginProxyConfigurationService')
-const viewPortParams = require('../utils/viewportParams')
+import { waitForSelectors, applyChange } from '../utils/playSelectors.js'
+import loginProxyConfigurationService from './loginProxyConfigurationService.js'
+import viewPortParams from '../utils/viewportParams.js'
 
 class AuthenticationService { }
 
-AuthenticationService.prototype.loginIfNeeded = async function (browser, projectName) {
+AuthenticationService.prototype.loginIfNeeded = async function (browser, projectName, username, password) {
   let loginInformations
-  await loginProxyConfigurationService.getLoginCredentials(projectName)
+  await loginProxyConfigurationService.getLoginCredentials(projectName, username, password)
     .then((login) => {
       loginInformations = login
     })
@@ -17,12 +17,12 @@ AuthenticationService.prototype.loginIfNeeded = async function (browser, project
     // Go to login url
     const [page] = await browser.pages()
 
-    await page.setViewport(viewPortParams.viewPortParams)
+    await page.setViewport(viewPortParams)
 
     await page.goto(loginInformations.authentication_url, { timeout: 0, waitUntil: 'networkidle2' })
     // Fill login fields
     if (loginInformations.steps) {
-      return loginOnMultiPages(page, loginInformations.steps)
+      return loginOnMultiPages(page, loginInformations)
     } else {
       return loginOnOnePage(page, loginInformations)
     }
@@ -59,18 +59,24 @@ async function loginOnOnePage (page, loginInformations) {
   }
 }
 
-async function loginOnMultiPages (page, steps) {
+async function loginOnMultiPages (page, loginInformations) {
   const timeout = 10000
   let step; let element
   try {
-    for (step of steps) {
+    for (step of loginInformations.steps) {
       element = await waitForSelectors(step.selectors, page, { timeout, visible: true })
       switch (step.type) {
         case 'click':
           await element.click()
           break
         case 'change':
-          await applyChange(step.value, element)
+          if (step.value === '%USERNAME%') {
+            await applyChange(loginInformations.username, element)
+          } else if (step.value === '%PASSWORD%') {
+            await applyChange(loginInformations.password, element)
+          } else {
+            await applyChange(step.value, element)
+          }
           break
         default:
           break
@@ -101,4 +107,4 @@ AuthenticationService.prototype.useProxyIfNeeded = async function (projectName) 
 }
 
 const authenticationService = new AuthenticationService()
-module.exports = authenticationService
+export default authenticationService

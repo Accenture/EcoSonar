@@ -1,6 +1,6 @@
-const validator = require('html-validator')
-const puppeteer = require('puppeteer')
-const authenticationService = require('../authenticationService')
+import validator from 'html-validator'
+import puppeteer from 'puppeteer'
+import authenticationService from '../authenticationService.js'
 
 class W3cAnalysis {}
 
@@ -39,7 +39,7 @@ W3cAnalysis.prototype.w3cAnalysisWithAPI = async function (urlsList) {
  * @param {Array} urlsList is a list of urls that needs to be analysed by W3C HTML Validator
  * @returns a list of HTML issues
  */
-W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) {
+W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName, username, password) {
   // Initializing variables
   const resultForUrlsList = []
   const htmlResults = []
@@ -60,7 +60,7 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) 
 
   // Starting the browser
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: 'new',
     args: browserArgs,
     ignoreHTTPSErrors: true,
     // Keep gpu horsepower in headless
@@ -71,7 +71,7 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) 
 
   try {
     // Extracting the HTML content of each url with pupeteer
-    const loginSucceeded = await authenticationService.loginIfNeeded(browser)
+    const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName, username, password)
     if (loginSucceeded) {
       // analyse each page
 
@@ -122,4 +122,4 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName) 
   }
 }
 const w3cAnalysis = new W3cAnalysis()
-module.exports = w3cAnalysis
+export default w3cAnalysis

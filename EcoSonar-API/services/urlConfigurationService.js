@@ -1,10 +1,10 @@
-const tempUrlsProjectRepository = require('../dataBase/tempurlsProjectRepository')
-const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
-const greenItRepository = require('../dataBase/greenItRepository')
-const lighthouseRepository = require('../dataBase/lighthouseRepository')
-const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
-const w3cRepository = require('../dataBase/w3cRepository')
-const SystemError = require('../utils/SystemError')
+import tempUrlsProjectRepository from '../dataBase/tempurlsProjectRepository.js'
+import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
+import greenItRepository from '../dataBase/greenItRepository.js'
+import lighthouseRepository from '../dataBase/lighthouseRepository.js'
+import bestPracticesRepository from '../dataBase/bestPracticesRepository.js'
+import w3cRepository from '../dataBase/w3cRepository.js'
+import SystemError from '../utils/SystemError.js'
 
 class UrlConfigurationService {
 }
@@ -161,4 +161,4 @@ UrlConfigurationService.prototype.delete = async function (projectName, urlName)
 }
 
 const urlConfigurationService = new UrlConfigurationService()
-module.exports = urlConfigurationService
+export default urlConfigurationService

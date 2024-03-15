@@ -1,15 +1,15 @@
-const lighthouseUserFlow = require('lighthouse/lighthouse-core/fraggle-rock/api.js')
-const PuppeteerHar = require('puppeteer-har')
-const { clickOnElement, waitForSelectors, applyChange } = require('../utils/playSelectors')
-const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
-const viewPortParams = require('../utils/viewportParams')
-const SystemError = require('../utils/SystemError')
+import { startFlow } from 'lighthouse'
+import PuppeteerHar from '../utils/PuppeteerHar.js'
+import { clickOnElement, waitForSelectors, applyChange } from '../utils/playSelectors.js'
+import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
+import viewPortParams from '../utils/viewportParams.js'
+import SystemError from '../utils/SystemError.js'
 
 class UserJourneyService { }
 
 UserJourneyService.prototype.playUserJourney = async function (url, browser, userJourney) {
   const page = await browser.newPage()
-  await page.setViewport(viewPortParams.viewPortParams)
+  await page.setViewport(viewPortParams)
   // disabling cache
   await page.setCacheEnabled(false)
 
@@ -61,7 +61,7 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
       console.error(error)
     }
   }
-  await page.waitForNavigation()
+  // await page.waitForNavigation()
   const harObj = await pptrHar.stop()
   return {
     page,
@@ -72,8 +72,8 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
 UserJourneyService.prototype.playUserFlowLighthouse = async function (url, browser, userJourney) {
   const timeout = 10000
   const targetPage = await browser.newPage()
-  await targetPage.setViewport(viewPortParams.viewPortParams)
-  const flow = await lighthouseUserFlow.startFlow(targetPage, { name: url })
+  await targetPage.setViewport(viewPortParams)
+  const flow = await startFlow(targetPage, { name: url })
   const steps = userJourney.steps
   let step; let element
   for (step of steps) {
@@ -82,7 +82,7 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
         await flow.navigate(step.url, {
           stepName: step.url
         })
-        await targetPage.setViewport(viewPortParams.viewPortParams)
+        await targetPage.setViewport(viewPortParams)
         break
       case 'click':
         element = await waitForSelectors(step.selectors, targetPage, { timeout, visible: true })
@@ -99,7 +99,7 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
         break
     }
   }
-  await targetPage.waitForNavigation()
+  // await targetPage.waitForNavigation()
   targetPage.close()
   const lighthouseResults = await flow.createFlowResult()
   return lighthouseResults.steps[0]
@@ -207,4 +207,4 @@ UserJourneyService.prototype.scrollUntil = async function (page, distancePercent
 }
 
 const userJourneyService = new UserJourneyService()
-module.exports = userJourneyService
+export default userJourneyService

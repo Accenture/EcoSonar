@@ -55,4 +55,4 @@ EcoIndexCalculationService.prototype.setScoreLetter = function (metric, value) {
   } else return 'G'
 }
 const ecoIndexCalculationService = new EcoIndexCalculationService()
-module.exports = ecoIndexCalculationService
+export default ecoIndexCalculationService

@@ -1,12 +1,12 @@
-const SystemError = require('../utils/SystemError')
-const retrieveAnalysisService = require('../services/retrieveAnalysisService')
-const projectsRepository = require('../dataBase/projectsRepository')
-const w3cRepository = require('../dataBase/w3cRepository')
-const lighthouseRepository = require('../dataBase/lighthouseRepository')
-const greenItRepository = require('../dataBase/greenItRepository')
-const bestPracticesRepository = require('../dataBase/bestPracticesRepository')
-const urlsProjectRepository = require('../dataBase/urlsProjectRepository')
-const tempurlsProjectRepository = require('../dataBase/tempurlsProjectRepository')
+import SystemError from '../utils/SystemError.js'
+import retrieveAnalysisService from '../services/retrieveAnalysisService.js'
+import projectsRepository from '../dataBase/projectsRepository.js'
+import w3cRepository from '../dataBase/w3cRepository.js'
+import lighthouseRepository from '../dataBase/lighthouseRepository.js'
+import greenItRepository from '../dataBase/greenItRepository.js'
+import bestPracticesRepository from '../dataBase/bestPracticesRepository.js'
+import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
+import tempurlsProjectRepository from '../dataBase/tempurlsProjectRepository.js'
 
 class ProjectService { }
 
@@ -299,4 +299,4 @@ ProjectService.prototype.deleteProject = async function (projectName) {
 }
 
 const projectService = new ProjectService()
-module.exports = projectService
+export default projectService

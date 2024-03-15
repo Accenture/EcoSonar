@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
 const lighthouseSchema = new Schema({
@@ -122,4 +122,4 @@ const lighthouseSchema = new Schema({
 })
 
 const lighthouse = mongoose.model('lighthouses', lighthouseSchema)
-module.exports = lighthouse
+export default lighthouse

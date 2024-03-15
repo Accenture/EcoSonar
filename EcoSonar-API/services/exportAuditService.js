@@ -1,7 +1,7 @@
-const exceljs = require('exceljs')
-const retrieveAnalysisService = require('./retrieveAnalysisService')
-const urlConfigurationService = require('./urlConfigurationService')
-const SystemError = require('../utils/SystemError')
+import exceljs from 'exceljs'
+import retrieveAnalysisService from './retrieveAnalysisService.js'
+import urlConfigurationService from './urlConfigurationService.js'
+import SystemError from '../utils/SystemError.js'
 
 class ExportAuditService { }
 
@@ -762,4 +762,4 @@ function checkAnalysisIsEmpty (analysis) {
 }
 
 const exportAuditService = new ExportAuditService()
-module.exports = exportAuditService
+export default exportAuditService

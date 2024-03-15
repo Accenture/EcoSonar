@@ -1,3 +1,5 @@
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
 const ecodesignMetric = require('../../utils/feature_importance_model.json')
 const quickWinsConfig = require('../../utils/quick_wins_configuration.json')
 
@@ -198,4 +200,4 @@ function addBestPracticesMissingFromHighestImpactModel (list, newList, complianc
 }
 
 const bestPracticesSorting = new BestPracticesSorting()
-module.exports = bestPracticesSorting
+export default bestPracticesSorting

@@ -1,4 +1,6 @@
-const formatCompliance = require('./formatCompliance')
+import formatCompliance from './formatCompliance.js'
+import { createRequire } from 'node:module'
+const require = createRequire(import.meta.url)
 const metricsW3c = require('../../utils/metricsW3c.json')
 
 class FormatW3cAnalysis {}
@@ -187,4 +189,4 @@ function formatW3c (errorsList) {
   }
 }
 const formatW3cAnalysis = new FormatW3cAnalysis()
-module.exports = formatW3cAnalysis
+export default formatW3cAnalysis

@@ -52,4 +52,4 @@ FormatCompliance.prototype.complianceLevelW3c = function (type) {
 }
 
 const formatCompliance = new FormatCompliance()
-module.exports = formatCompliance
+export default formatCompliance

@@ -1,5 +1,5 @@
-const lighthouses = require('./models/lighthouses')
-const SystemError = require('../utils/SystemError')
+import lighthouses from './models/lighthouses.js'
+import SystemError from '../utils/SystemError.js'
 
 const LighthouseRepository = function () {
   /**
@@ -176,4 +176,4 @@ const LighthouseRepository = function () {
 }
 
 const lighthouseRepository = new LighthouseRepository()
-module.exports = lighthouseRepository
+export default lighthouseRepository

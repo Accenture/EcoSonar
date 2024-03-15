@@ -1,5 +1,5 @@
-const bestpractices = require('./models/bestpractices')
-const SystemError = require('../utils/SystemError')
+import bestpractices from './models/bestpractices.js'
+import SystemError from '../utils/SystemError.js'
 
 const BestPracticesRepository = function () {
   /**
@@ -151,4 +151,4 @@ function replaceDotWithUnderscoreInKeys (obj) {
 }
 
 const bestPracticesRepository = new BestPracticesRepository()
-module.exports = bestPracticesRepository
+export default bestPracticesRepository

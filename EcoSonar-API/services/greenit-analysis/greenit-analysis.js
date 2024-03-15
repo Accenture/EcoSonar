@@ -1,87 +1,85 @@
 /* eslint-disable no-undef */
-const PuppeteerHar = require('puppeteer-har')
-const path = require('path')
-const userJourneyService = require('../userJourneyService')
-const viewPortParams = require('../../utils/viewportParams')
+import path from 'path'
+import PuppeteerHar from '../../utils/PuppeteerHar.js'
+import userJourneyService from '../userJourneyService.js'
+import viewPortParams from '../../utils/viewportParams.js'
 
-module.exports = {
-  async createGreenITReports (browser, projectName, urlList, autoscroll) {
-    // Concurent tab
-    const MAX_TAB = 40
-    // Nb of retry before dropping analysis
-    const RETRY = 2
+export default async function createGreenITReports (browser, projectName, urlList, autoscroll) {
+  // Concurent tab
+  const MAX_TAB = 40
+  // Nb of retry before dropping analysis
+  const RETRY = 2
 
-    const asyncFunctions = []
-    let results
-    let index = 0
-    const reports = []
+  const asyncFunctions = []
+  let results
+  let index = 0
+  const reports = []
 
-    const convert = []
+  const convert = []
 
-    for (let i = 0; i < MAX_TAB; i++) {
-      convert[i] = i
-    }
+  for (let i = 0; i < MAX_TAB; i++) {
+    convert[i] = i
+  }
 
-    // Asynchronous analysis with MAX_TAB open simultaneously to json
-    for (let i = 0; i < MAX_TAB && index < urlList.length; i++) {
-      asyncFunctions.push(
+  // Asynchronous analysis with MAX_TAB open simultaneously to json
+  for (let i = 0; i < MAX_TAB && index < urlList.length; i++) {
+    asyncFunctions.push(
+      analyseURL(
+        browser,
+        projectName,
+        urlList[index],
+        {
+          tabId: i
+        },
+        autoscroll
+      )
+    )
+    index++
+  }
+
+  while (asyncFunctions.length !== 0) {
+    results = await Promise.race(asyncFunctions)
+    if (!results.success && results.tryNb <= RETRY) {
+      asyncFunctions.splice(
+        convert[results.tabId],
+        1,
         analyseURL(
           browser,
           projectName,
-          urlList[index],
+          results.url,
           {
-            tabId: i
+            tabId: results.tabId,
+            tryNb: results.tryNb + 1
           },
           autoscroll
         )
-      )
-      index++
-    }
-
-    while (asyncFunctions.length !== 0) {
-      results = await Promise.race(asyncFunctions)
-      if (!results.success && results.tryNb <= RETRY) {
+      ) // convert is NEEDED, variable size array
+    } else {
+      reports.push(results)
+      if (index === urlList.length) {
+        asyncFunctions.splice(convert[results.tabId], 1) // convert is NEEDED, variable size array
+        for (let i = results.tabId + 1; i < convert.length; i++) {
+          convert[i] = convert[i] - 1
+        }
+      } else {
         asyncFunctions.splice(
-          convert[results.tabId],
+          results.tabId,
           1,
           analyseURL(
             browser,
             projectName,
-            results.url,
+            urlList[index],
             {
-              tabId: results.tabId,
-              tryNb: results.tryNb + 1
+              tabId: results.tabId
             },
             autoscroll
           )
-        ) // convert is NEEDED, variable size array
-      } else {
-        reports.push(results)
-        if (index === urlList.length) {
-          asyncFunctions.splice(convert[results.tabId], 1) // convert is NEEDED, variable size array
-          for (let i = results.tabId + 1; i < convert.length; i++) {
-            convert[i] = convert[i] - 1
-          }
-        } else {
-          asyncFunctions.splice(
-            results.tabId,
-            1,
-            analyseURL(
-              browser,
-              projectName,
-              urlList[index],
-              {
-                tabId: results.tabId
-              },
-              autoscroll
-            )
-          ) // No need for convert, fixed size array
-          index++
-        }
+        ) // No need for convert, fixed size array
+        index++
       }
     }
-    return reports
   }
+  return reports
 }
 
 // Analyse a webpage
@@ -141,7 +139,8 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
           })
       )
       // add script, get run, then remove it to not interfere with the analysis
-      const script = await page.addScriptTag({ path: path.join(__dirname, './dist/bundle.js') })
+      const __dirname = path.resolve(path.dirname(''))
+      const script = await page.addScriptTag({ path: path.join(__dirname, './services/greenit-analysis/dist/bundle.js') })
 
       await script.evaluate((x) => x.remove())
       // pass node object to browser
@@ -172,7 +171,7 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
 async function launchPageWithoutUserJourney (browser, url, autoscroll) {
   const page = await browser.newPage()
 
-  await page.setViewport(viewPortParams.viewPortParams)
+  await page.setViewport(viewPortParams)
 
   // disabling cache
   await page.setCacheEnabled(false)

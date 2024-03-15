@@ -1,6 +1,7 @@
-const uniqid = require('uniqid')
-const urlsprojects = require('./models/urlsprojects')
-const SystemError = require('../utils/SystemError')
+import uniqid from 'uniqid'
+import escapeRegExp from 'lodash/escapeRegExp.js'
+import urlsprojects from './models/urlsprojects.js'
+import SystemError from '../utils/SystemError.js'
 
 const UrlsProjectRepository = function () {
   /**
@@ -84,7 +85,7 @@ const UrlsProjectRepository = function () {
    */
   this.findAll = async function (projectNameReq) {
     return new Promise((resolve, reject) => {
-      urlsprojects.find({ projectName: projectNameReq })
+      urlsprojects.find({ projectName: { $eq: projectNameReq } })
         .then((result) => {
           resolve(result)
         })
@@ -120,7 +121,7 @@ const UrlsProjectRepository = function () {
    */
   this.getUserFlow = async function (projectName, urlName) {
     return new Promise((resolve, reject) => {
-      urlsprojects.findOne({ projectName, urlName }, { idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
+      urlsprojects.findOne({ projectName: { $eq: projectName }, urlName: { $eq: urlName } }, { idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
         .then((result) => {
           resolve(result)
         })
@@ -138,7 +139,7 @@ const UrlsProjectRepository = function () {
    */
   this.deleteUserFlow = async function (projectName, urlName) {
     return new Promise((resolve, reject) => {
-      urlsprojects.updateOne({ projectName, urlName }, { $unset: { userFlow: '' } })
+      urlsprojects.updateOne({ projectName: { $eq: projectName }, urlName: { $eq: urlName } }, { $unset: { userFlow: '' } })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -149,7 +150,7 @@ const UrlsProjectRepository = function () {
 
   this.findUrl = async function (projectName, urlName) {
     return new Promise((resolve, reject) => {
-      urlsprojects.find({ projectName, urlName }, { idKey: 1 })
+      urlsprojects.find({ projectName: { $eq: projectName }, urlName: { $eq: urlName } }, { idKey: 1 })
         .then((result) => { resolve(result) })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -165,7 +166,7 @@ const UrlsProjectRepository = function () {
   this.findAllProjectsNames = async function (filterName) {
     let query = {}
     if (filterName !== null) {
-      query = { projectName: { $regex: new RegExp(filterName, 'i') } }
+      query = { projectName: { $regex: new RegExp(escapeRegExp(filterName), 'i') } }
     }
     return new Promise((resolve, reject) => {
       urlsprojects.find(query)
@@ -181,4 +182,4 @@ const UrlsProjectRepository = function () {
 }
 
 const urlsProjectRepository = new UrlsProjectRepository()
-module.exports = urlsProjectRepository
+export default urlsProjectRepository

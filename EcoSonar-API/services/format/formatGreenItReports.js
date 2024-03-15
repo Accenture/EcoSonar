@@ -1,6 +1,5 @@
-
-const formatGreenItBestPractices = require('./formatGreenItBestPractices')
-const formatBestPracticesForProject = require('../format/formatBestPracticesForProject')
+import formatGreenItBestPractices from './formatGreenItBestPractices.js'
+import formatBestPracticesForProject from '../format/formatBestPracticesForProject.js'
 
 class FormatGreenItReports {}
 
@@ -39,4 +38,4 @@ FormatGreenItReports.prototype.returnFormattedGreenIt = function (reports) {
   return formatBestPracticesForProject.sortByScore(greenItBestPractices)
 }
 const formatGreenItReports = new FormatGreenItReports()
-module.exports = formatGreenItReports
+export default formatGreenItReports
