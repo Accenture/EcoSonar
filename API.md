@@ -244,11 +244,15 @@ None
   PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
   homepage_url is the home page of your website from where the crawler will start finding all pages within your website
   save is a boolean value : if true, results will be saved in datatabse and pages will be audited by EcoSonar. If false, they will be saved in a temporary collection to be reviewed by a user before being applied in EcoSonar configuration.
+  username is the username of the technical account to login into your project. You should before launch crawler set the login configuration for the project.
+  password is the password of the technical account.
 
 `{
     "projectName": "PROJECT_NAME",
-    "mainUrl": "homepage_url"
-    "saveUrls": "save"
+    "mainUrl": "homepage_url",
+    "saveUrls": "save",
+    "username": "username",
+    "password": "password"
 }`
 
 - **Success Response:**
@@ -706,9 +710,13 @@ EcoSonar analysis is launched through this API call either directly with a curl 
 - **Data Params**
 
   PROJECT_NAME should match to the Project Key defined in your Sonarqube Project.
+  username is the username of the technical account to login into your project. You should before launch an analysis set the login configuration for the project.
+  password is the password of the technical account.
 
   `{
-    "projectName" : "PROJECT_NAME"
+    "projectName" : "PROJECT_NAME",
+    "username": "username",
+    "password": "password"
 }`
 
 - **Success Response:**
