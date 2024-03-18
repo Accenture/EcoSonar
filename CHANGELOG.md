@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Version 3.5 , 18/03/2024
+
+### Added
+
+- Include in the API to launch an EcoSonar analysis and the crawling the username and password used for the project (avoid to have login details saved in clear in database)
+- Integrate Ecocode plugins with latest release
+- Include Helmet configuration
+
+
+### Removed
+
+- yaml configuration for authentication and user flow
+
+### Changed
+
+- Update save login configuration for multi pages to not save in clear username and password (use instead %USERNAME% AND %PASSWORD%)
+- Update EcoSonar-API components to their latest versions
+- Move all API Endpoints to return 200 with empty list or object instead of 400 error code with a message error
+- Review all logging messages
+- Fix security vulnerabilities on code (CodeQL)
+
+---
+
 ## Version 3.4 , 11/01/2024
 
 ### Added

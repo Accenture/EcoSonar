@@ -232,7 +232,7 @@ ECOSONAR_ENV_USER_JOURNEY_ENABLED = `true`or `false`
 
 ### Prerequisites
 
-- Node.js https://nodejs.org/fr/ (at least v16)
+- Node.js https://nodejs.org/fr/ (at least v18)
 
 <a name="installation-node"></a>
 

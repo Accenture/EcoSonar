@@ -58,49 +58,18 @@ Thanks to a configuration popup, you can enter manually the pages to audit. This
 In order to audit pages that can be accessed only through an authentication service (intranet pages for example),
 you need to add authentication credentials into EcoSonar API to allow auditing dedicated pages.
 
-### When you have a simple login flow : username, password and click on a button
-
-#### EcoSonar V2.3 and below
-
-To implement that, you can create a YAML file login.yaml at the root of the folder `EcoSonar-API` and use the following format
-if the CSS selector of you input field is `input[name=username]` or `input[type=email]`, password field `input[name=password]`, `input[type=password]`, `input[id=password]` and button `button[type=submit]` :
-
-```
-authentication_url: authenticationPage
-username: yourUsername
-password: yourPassword
-```
-
-or if one of the CSS Selector does not match the default CSS Selectors :
-
-```
-authentication_url:authenticationPage
-username: yourUsername
-password: yourPassword
-loginButtonSelector: CSS_Selector_Button
-usernameSelector: CSS_Selector_Login
-passwordSelector: CSS_Selector_Password
-```
-
-##### CSS Selectors
-
-CSS Selectors are patterns in HTML code to apply some style (doc ). For exemple, to find the css selector of  loginButtonSelector:
-Go to the login page of your website
-Right click on the login button
-Select inspect
-Choose css selectors you want (class, type, name, id, ....)
-
-More Information :
-
-documentation: https://github.com/cnumr/GreenIT-Analysis-cli/blob/072987f7d501790d1a6ccc4af6ec06937b52eb13/README.md#commande
-code: https://github.com/cnumr/GreenIT-Analysis-cli/blob/072987f7d501790d1a6ccc4af6ec06937b52eb13/cli-core/analysis.js#L198
-
-#### EcoSonar V3.0 and above
-
 You can directly configure your login credentials at a project level in the API.
-Be careful your login credentials will then be saved into the database, please check with your security team if you are allowed to do so.
+You can use the Endpoint "Save Login For Project".
 
-You can use the Endpoint "Save Login and Proxy" and enter the following body:
+You can have the 3 following options to configure the authentication.
+For each option, according to your security requirements, you can choose to either set the flow to login with the password and username in clear in the database. Or you can set the username and password only when analysing a project or crawling the website.
+
+![EcoSonar Authentication config](./images/ecosonar-configure-auth.webp)
+
+### When you have a simple login flow : username, password and click on a button with the CSS Selectors identified
+
+
+if the CSS selector of you input field is `input[name=username]` or `input[type=email]`, password field `input[name=password]`, `input[type=password]`, `input[id=password]` and button `button[type=submit]` :
 
 ```
 {
@@ -112,7 +81,9 @@ You can use the Endpoint "Save Login and Proxy" and enter the following body:
 }
 ```
 
-or
+`username`and `password` are optional and can be set only if it is allowed to save them in clear in database.
+
+### When you have a simple login flow : username, password and click on a button with not identified CSS Selectors
 
 ```
 {
@@ -127,20 +98,22 @@ or
 }
 ```
 
+`username`and `password` are optional and can be set only if it is allowed to save them in clear in database.
+
 ### More complicated Login flows
 
-When the Username and password are not in the same page, or you need other user inputs to complete authentication
+When the Username and password are not in the same page, or you need other user inputs to complete authentication.
 
-#### EcoSonar V2.3 and below
+```
+{
+    "login": {
+        "authentication_url":  "authenticationPage",
+        "steps" : [ ....]
+    }
+}
+```
 
-If the authentication of the website required steps or a page change, you must follow these requirements:
-
-1. Create a YAML file login.yaml at the root of the repo
-2. Add authentication_url key and value is required
-3. Add steps key is required
-4. Fill steps part as follow
-
-To choose you authentification_url, you can either set it to the page in which you need to perform the authentification steps or pick the page that can only be accessed after being authenticated.
+To choose your authentification_url, you can either set it to the page in which you need to perform the authentification steps or pick the page that can only be accessed after being authenticated.
 
 (To help you to create steps, you can use on Google Chrome Tool "Recorder". (inspector -> recorder -> start a new recording) and save json file, then you can extract steps type, target, selectors)
 
@@ -155,44 +128,73 @@ Each step is a description of an action made by a regular user:
   value: value of the password or username (required)
   /!\ CSS Selectors with "aria" label are not read by EcoSonar.
 
-Example of login.yaml file. to access into an account
-
-```
-authentication_url: authenticationPage
-steps:
-  -   type: "click"
-      selectors:
-          - "#input-email"
-  -   type: "change"
-      value: "my email"
-      selectors:
-          - "#input-email"
-  -   type: "click"
-      selectors:
-        - "#lookup-btn"
-  -   type: "change"
-      value: "my password"
-      selectors:
-          - "#input-password"
-  -   type: "click"
-      selectors:
-        - "#signin-button"
-```
-
-#### EcoSonar V3.0 and above
-
-You can use directly to configure your login credentials at a project level in the API.
-
-You can use the Endpoint "Save Login and Proxy" and enter the following body:
+Example of a user flow to authenticate !
 
 ```
 {
-    "login": {
-        "authentication_url":  "authenticationPage",
-        "steps" : [ ....]
-    }
+  "login": {
+    "authentication_url": "authenticationPage",
+    "steps": [
+         {​​​​​​​​​​​​​​​​​​​​​​
+          "type": "click",
+          "selectors": [
+            [
+              "#input-email"
+            ]
+          ],
+        }​​​​​​​​​​​​​​​​​​​​​​,
+        {​​​​​​​​​​​​​​​​​​​
+          "type": "change",
+          "value": "%USERNAME%",
+          "selectors": [
+            [
+              "#input-email"
+            ]
+          ],
+        }​​​​​​​​​​​​​​​​​​​,
+        {​​​​​​​​​​​​​​​​​​​​​​
+          "type": "click",
+          "selectors": [
+            [
+              "#lookup-btn"
+            ]
+          ],
+        }​​​​​​​​​​​​​​​​​​​​​​,
+        {​​​​​​​​​​​​​​​​​​​
+          "type": "change",
+          "value": "%PASSWORD%",
+          "selectors": [
+            [
+              "#input-email"
+            ]
+          ],
+        }​​​​​​​​​​​​​​​​​​​,
+        {​​​​​​​​​​​​​​​​​​​​​​
+          "type": "click",
+          "selectors": [
+            [
+              "#signin-button"
+            ]
+          ],
+        }
+    ]
+  }
 }
 ```
+
+#### CSS Selectors
+
+CSS Selectors are patterns in HTML code to apply some style (doc ). For exemple, to find the css selector of  loginButtonSelector:
+Go to the login page of your website
+Right click on the login button
+Select inspect
+Choose css selectors you want (class, type, name, id, ....)
+
+More Information :
+
+documentation: https://github.com/cnumr/GreenIT-Analysis-cli/blob/072987f7d501790d1a6ccc4af6ec06937b52eb13/README.md#commande
+code: https://github.com/cnumr/GreenIT-Analysis-cli/blob/072987f7d501790d1a6ccc4af6ec06937b52eb13/cli-core/analysis.js#L198
+
 
 <a name="proxy"></a>
 
@@ -336,19 +338,7 @@ We are handling into EcoSonar 4 kind of browser interactions :
 
 ### User Flow Integration
 
-#### EcoSonar v2.3 and below
-
-Once you have been able to define the JSON file matching to your user flow, you can followed instructions:
-
-1. Create a folder "userJourney" if it does not exists yet at the root of the folder `EcoSonar-API`.
-2. Paste JSON file created in the folder "userJourney" and rename it with the URL you wish to audit. Please remove the following special character `:` `?` `:` `/` from the URL in order to save the JSON. To retrieve the user flow we are matching it with the URL registered through EcoSonar URL Configuration. This step is not to forget otherwise EcoSonar won't be auditing the right page.
-3. Deploy EcoSonar-API with all relevant user flows.
-4. Launch a new EcoSonar audit to verify there are no technical errors in the logs application. Correct them if needed.
-
-#### EcoSonar v3.0 and above
-
-With version 3.0, you can directly configure the user flow in the API provided (no longer need to reboot the instance)
-You can use the Endpoint "Save User Flow" and enter the following body:
+Once you have been able to define the JSON file matching to your user flow, you can use the Endpoint "Save User Flow" and enter the following body:
 
 ```
 {
