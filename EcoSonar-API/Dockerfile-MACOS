@@ -1,0 +1,53 @@
+# Use the official Node.js image for macOS
+FROM node:21.6.2-alpine
+
+# Uncomment if you need to configure proxy.
+#ENV HTTP_PROXY=$http_proxy
+#ENV HTTPS_PROXY=$https_proxy
+#ENV NO_PROXY=$no_proxy
+
+# Install necessary packages
+RUN apk update \
+    && apk add --no-cache \
+        chromium \
+        nss \
+        freetype \
+        freetype-dev \
+        harfbuzz \
+        ca-certificates \
+        ttf-freefont \
+        nodejs \
+        npm
+
+# Create app directory
+WORKDIR /app
+
+# Bundle app source
+COPY . .
+
+# Uncomment if you need to configure proxy.
+#RUN npm config set proxy $HTTP_PROXY
+
+# If you are building your code for production
+# RUN npm ci --only=production
+# otherwise run npm install
+RUN npm install
+
+# Set up user and directories
+RUN addgroup -S pptruser && \
+    adduser -S -G pptruser pptruser && \
+    addgroup pptruser audio && \
+    addgroup pptruser video && \
+    mkdir -p /home/pptruser/Downloads && \
+    chown -R pptruser:pptruser /home/pptruser && \
+    chown -R pptruser:pptruser /app/
+
+USER pptruser
+
+# To avoid "Error: ENOENT: no such file or directory, open '/app/dist/bundle.js'"
+RUN npm i
+
+ENV PORT=3000
+EXPOSE 3000
+
+CMD ["npm", "start"]
