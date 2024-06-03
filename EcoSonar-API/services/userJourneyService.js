@@ -1,4 +1,6 @@
 import { startFlow } from 'lighthouse'
+import lighthouse from 'lighthouse'
+import { setTimeout } from "timers/promises";
 import PuppeteerHar from '../utils/PuppeteerHar.js'
 import { clickOnElement, waitForSelectors, applyChange } from '../utils/playSelectors.js'
 import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
@@ -72,6 +74,8 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
 UserJourneyService.prototype.playUserFlowLighthouse = async function (url, browser, userJourney) {
   const timeout = 10000
   const targetPage = await browser.newPage()
+  // go to url
+  await targetPage.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
   await targetPage.setViewport(viewPortParams)
   const flow = await startFlow(targetPage, { name: url })
   const steps = userJourney.steps
@@ -99,10 +103,10 @@ UserJourneyService.prototype.playUserFlowLighthouse = async function (url, brows
         break
     }
   }
-  // await targetPage.waitForNavigation()
-  targetPage.close()
-  const lighthouseResults = await flow.createFlowResult()
-  return lighthouseResults.steps[0]
+  //Wait browser to render completely
+  await setTimeout(5000);
+
+  return targetPage;
 }
 
 UserJourneyService.prototype.insertUserFlow = async function (projectName, url, userFlow) {

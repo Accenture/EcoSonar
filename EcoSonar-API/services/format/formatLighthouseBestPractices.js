@@ -22,16 +22,18 @@ FormatLighthouseBestPractices.prototype.formatAccessibility = function (report) 
   const formattedReports = {}
 
   for (const element in accessibilityBestPractices) {
-    const score = report.audits[accessibilityBestPractices[element]].score
-    const scoreDisplayMode = report.audits[accessibilityBestPractices[element]].scoreDisplayMode
-    let displayValue = report.audits[accessibilityBestPractices[element]].displayValue
-    const items = (report.audits[accessibilityBestPractices[element]].details !== undefined) ? report.audits[accessibilityBestPractices[element]].details.items : []
-    if (scoreDisplayMode === 'binary' && (displayValue === 0 || displayValue === undefined)) {
-      displayValue = items.length
-    } else if (displayValue === undefined) {
-      displayValue = 0
+    if (report.audits[accessibilityBestPractices[element]] !== undefined) {
+        const score = report.audits[accessibilityBestPractices[element]].score
+        const scoreDisplayMode = report.audits[accessibilityBestPractices[element]].scoreDisplayMode
+        let displayValue = report.audits[accessibilityBestPractices[element]].displayValue
+        const items = (report.audits[accessibilityBestPractices[element]].details !== undefined) ? report.audits[accessibilityBestPractices[element]].details.items : []
+        if (scoreDisplayMode === 'binary' && (displayValue === 0 || displayValue === undefined)) {
+          displayValue = items.length
+        } else if (displayValue === undefined) {
+          displayValue = 0
+        }
+        formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue, url: report.finalUrl }
     }
-    formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue, url: report.finalUrl }
   }
   return { ...formattedReports, url: report.url }
 }
@@ -48,16 +50,18 @@ FormatLighthouseBestPractices.prototype.formatPerformance = function (report) {
   const formattedReports = {}
   for (const element in performanceBestPractices) {
     try {
-      const score = report.audits[performanceBestPractices[element]].score ?? 0
-      const scoreDisplayMode = report.audits[performanceBestPractices[element]].scoreDisplayMode ?? null
-      const items = (report.audits[performanceBestPractices[element]].details !== undefined) ? report.audits[performanceBestPractices[element]].details.items : []
-      let displayValue = report.audits[performanceBestPractices[element]].displayValue ?? null
-      if (displayValue) {
-        displayValue = Number(displayValue.replace(',', '').match(reg)[0])
-      } else {
-        displayValue = 0
-      }
-      formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
+        if (report.audits[performanceBestPractices[element]] !== undefined) {
+            const score = report.audits[performanceBestPractices[element]].score ?? 0
+            const scoreDisplayMode = report.audits[performanceBestPractices[element]].scoreDisplayMode ?? null
+            const items = (report.audits[performanceBestPractices[element]].details !== undefined) ? report.audits[performanceBestPractices[element]].details.items : []
+            let displayValue = report.audits[performanceBestPractices[element]].displayValue ?? null
+            if (displayValue) {
+                displayValue = Number(displayValue.replace(',', '').match(reg)[0])
+            } else {
+                displayValue = 0
+            }
+            formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
+        }
     } catch (error) {
       console.error('error for url ' + report.url + ' on element ' + element)
       console.error(error)

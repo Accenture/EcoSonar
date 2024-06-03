@@ -14,15 +14,18 @@ export default async function analyse (urlList, projectName, username, password,
   ]
 
   const proxyConfiguration = await authenticationService.useProxyIfNeeded(projectName)
+  console.log('Get proxy successful');
   if (proxyConfiguration) {
     browserArgs.push(proxyConfiguration)
   }
 
   const userJourneyEnabled = process.env.ECOSONAR_ENV_USER_JOURNEY_ENABLED || 'false'
+  console.log('Finished retrieving variable ECOSONAR_ENV_USER_JOURNEY_ENABLED');
   if (userJourneyEnabled === 'true') {
     console.log('Your EcoSonar project is using user journey to audit your website, GreenIT analysis will be made into different Chromium browser for right cookies configuration')
     reports = await launchAllAnalysisOnDifferentBrowser(browserArgs, urlList, projectName, username, password, autoscroll)
   } else {
+  console.log('launchAllAnalysisOnSameBrowser');
     reports = await launchAllAnalysisOnSameBrowser(browserArgs, urlList, projectName, username, password, autoscroll)
   }
   return reports
@@ -83,6 +86,7 @@ async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName
   } catch (error) {
     console.error('\x1b[31m%s\x1b[0m', error)
   } finally {
+    console.log('Closing browser for launchAllAnalysisOnSameBrowser');
     await closeBrowser(browser)
   }
   return reports

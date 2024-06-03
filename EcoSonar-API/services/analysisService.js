@@ -141,9 +141,14 @@ function formatAuditsToBeSaved (reports, urlProjectList) {
     if (lighthouseReport?.runtimeError === undefined) {
       const formattedLighthouseMetrics = formatLighthouseMetrics.formatLighthouseMetrics(lighthouseReport)
       const urlProjectAudited = urlProjectList.filter((urlProject) => urlProject.urlName === lighthouseReport.url)
+      let urlProjectAuditedKey = 0;
+      if (urlProjectAudited.length !== 0) {
+       urlProjectAuditedKey = urlProjectAudited[0].idKey;
+      }
+
       const lighthouseAudit = {
         idLighthouseAnalysis: uniqid(),
-        idUrlLighthouse: urlProjectAudited[0].idKey,
+        idUrlLighthouse: urlProjectAuditedKey,
         dateLighthouseAnalysis: date,
         performance: formattedLighthouseMetrics.performance,
         accessibility: formattedLighthouseMetrics.accessibility,
