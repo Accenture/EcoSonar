@@ -129,6 +129,7 @@ Each step is a description of an action made by a regular user:
   /!\ CSS Selectors with "aria" label are not read by EcoSonar.
 
 Example of a user flow to authenticate using option 3 !
+
 In the example below, the page to be analysed is : https://www.example.com/test.html
 **authentication_url** : login page 
 ```
