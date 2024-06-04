@@ -231,10 +231,10 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
  *              properties:
  *                authentication_url:
  *                  type: string
- *                steps:
- *                  type: array
- *                  items:
- *                    type: object
+ *                username:
+ *                  type: string
+ *                password:
+ *                  type: string
  *     responses:
  *       201:
  *         description: Success.

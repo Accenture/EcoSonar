@@ -11,7 +11,8 @@ export default async function lighthouseAnalysis (urlList, projectName, username
     '--disable-setuid-sandbox', // but security issues
     '--ignore-certificate-errors',
     '--window-size=1920,1080',
-    '--start-maximized'
+    '--start-maximized',
+    '--remote-debugging-port=36951'
   ]
 
   const proxyConfiguration = await authenticationService.useProxyIfNeeded(projectName)
@@ -19,10 +20,10 @@ export default async function lighthouseAnalysis (urlList, projectName, username
     browserArgs.push(proxyConfiguration)
   }
 
-  // start browser
-  const browser = await puppeteer.launch({
+  const browserLight = await puppeteer.launch({
     headless: 'new',
     args: browserArgs,
+    timeout: 0,
     ignoreHTTPSErrors: true,
     // Keep gpu horsepower in headless
     ignoreDefaultArgs: [
@@ -34,13 +35,22 @@ export default async function lighthouseAnalysis (urlList, projectName, username
 
   const results = []
 
+  const generateReportForHome = async (url, index) => {
+    //Launch lighthouse analysis
+    const homePageReport = await lighthouse(url, config);
+    const homePageReportLhr = homePageReport.lhr;
+    results[index] = { ...homePageReportLhr, url }
+    console.log(`home page performance report generated successfully`);
+  };
+
   try {
     let lighthouseResults
+    let authenticatedPage
     let userJourney
-    const loginSucceeded = await authenticationService.loginIfNeeded(browser, projectName, username, password)
+    const loginSucceeded = await authenticationService.loginIfNeeded(browserLight, projectName, username, password)
     if (loginSucceeded) {
       for (const [index, url] of urlList.entries()) {
-        const page = await browser.newPage() // prevent browser to close before ending all pages analysis
+        const page = await browserLight.newPage() // prevent browser to close before ending all pages analysis
         try {
           console.log('Lighthouse Analysis launched for url ' + url)
           await userJourneyService.getUserFlow(projectName, url)
@@ -50,18 +60,25 @@ export default async function lighthouseAnalysis (urlList, projectName, username
               console.log(error.message)
             })
           if (userJourney) {
-            lighthouseResults = await userJourneyService.playUserFlowLighthouse(url, browser, userJourney)
+            authenticatedPage = await userJourneyService.playUserFlowLighthouse(url, browserLight, userJourney)
           } else {
             // Wait for Lighthouse to open url, then inject our stylesheet.
-            browser.on('targetchanged', async target => {
+            browserLight.on('targetchanged', async target => {
               if (page && page.url() === url) {
                 await page.addStyleTag({ content: '* {color: red}' })
               }
             })
-            lighthouseResults = await lighthouse(url, { disableStorageReset: true }, config, page)
           }
-          console.log('Lighthouse Analysis ended for url ' + url)
-          results[index] = { ...lighthouseResults.lhr, url }
+          //If the url requires an authentication
+          if (authenticatedPage) {
+            console.log('Light house analysis with authentication in progress for the url '+ authenticatedPage.url());
+            await generateReportForHome(authenticatedPage.url(), index);
+          } else {
+            lighthouseResults = await lighthouse(url, { disableStorageReset: true }, config, page)
+            console.log('Light house analysis without authentication in progress for the url '+ url);
+            results[index] = { ...lighthouseResults.lhr, url }
+          }
+
         } catch (error) {
           console.error('LIGHTHOUSE ANALYSIS - An error occured when auditing ' + url)
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -73,7 +90,8 @@ export default async function lighthouseAnalysis (urlList, projectName, username
   } catch (error) {
     console.error('\x1b[31m%s\x1b[0m', error)
   } finally {
-    await browser.close()
+    console.log('Closing browser for Lighthouse');
+    await browserLight.close();
   }
-  return results
+  return results;
 }

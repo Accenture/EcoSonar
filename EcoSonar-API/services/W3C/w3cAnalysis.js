@@ -118,6 +118,7 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName, 
   } catch (error) {
     console.error('\x1b[31m%s\x1b[0m', error)
   } finally {
+  console.log('Closing browser for w3cAnalysis');
     await browser.close()
   }
 }

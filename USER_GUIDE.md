@@ -128,57 +128,41 @@ Each step is a description of an action made by a regular user:
   value: value of the password or username (required)
   /!\ CSS Selectors with "aria" label are not read by EcoSonar.
 
-Example of a user flow to authenticate !
+Example of a user flow to authenticate using option 3 !
 
+In the example below, the page to be analysed is : https://www.example.com/test.html
+**authentication_url** : login page 
 ```
 {
-  "login": {
-    "authentication_url": "authenticationPage",
-    "steps": [
-         {​​​​​​​​​​​​​​​​​​​​​​
-          "type": "click",
-          "selectors": [
-            [
-              "#input-email"
-            ]
-          ],
-        }​​​​​​​​​​​​​​​​​​​​​​,
-        {​​​​​​​​​​​​​​​​​​​
-          "type": "change",
-          "value": "%USERNAME%",
-          "selectors": [
-            [
-              "#input-email"
-            ]
-          ],
-        }​​​​​​​​​​​​​​​​​​​,
-        {​​​​​​​​​​​​​​​​​​​​​​
-          "type": "click",
-          "selectors": [
-            [
-              "#lookup-btn"
-            ]
-          ],
-        }​​​​​​​​​​​​​​​​​​​​​​,
-        {​​​​​​​​​​​​​​​​​​​
-          "type": "change",
-          "value": "%PASSWORD%",
-          "selectors": [
-            [
-              "#input-email"
-            ]
-          ],
-        }​​​​​​​​​​​​​​​​​​​,
-        {​​​​​​​​​​​​​​​​​​​​​​
-          "type": "click",
-          "selectors": [
-            [
-              "#signin-button"
-            ]
-          ],
-        }
-    ]
-  }
+    "projectName": "Demo",
+    "url": "https://www.example.com/test.html",
+    "userFlow": {
+        "authentication_url": "https://www.login.com/",
+        "steps": [
+            {
+                "type": "change",
+                "value": "standard_user",
+                "selectors": [
+                    "#user-name"
+                ]
+            },
+            {
+                "type": "change",
+                "value": "secret_sauce",
+                "selectors": [
+                    "#password"
+                ]
+            },
+            {
+                "type": "click",
+                "selectors": [
+                    [
+                        "#login-button"
+                    ]
+                ]
+            }
+        ]
+    }
 }
 ```
 

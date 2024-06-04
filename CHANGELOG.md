@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## Version 3.6 , 04/06/2024
+
+### Changed
+
+- User flow : Bug fix, ability to add a user flow with CSS selectors for authentication
+- Proxy : Bug fix in string to object cast
+- Swagger.js : Documentation updated
+- USER GUIDE updated for authentication
+
+---
+
 ## Version 3.5 , 18/03/2024
 
 ### Added

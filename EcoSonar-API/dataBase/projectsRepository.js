@@ -9,7 +9,7 @@ const ProjectsRepository = function () {
    */
   this.createProcedure = function (projectName, procedure) {
     return new Promise((resolve, reject) => {
-      projects.create({ projectName: { $eq: projectName }, procedure })
+      projects.create({ projectName, procedure })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -50,7 +50,7 @@ const ProjectsRepository = function () {
   this.createLoginConfiguration = async function (projectName, loginCredentials) {
     const loginMap = (loginCredentials !== undefined && loginCredentials !== null) ? new Map(Object.entries(loginCredentials)) : {}
     return new Promise((resolve, reject) => {
-      projects.create({ projectName: { $eq: projectName }, login: loginMap })
+      projects.create({ projectName }, { login: loginMap })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
@@ -66,7 +66,7 @@ const ProjectsRepository = function () {
  */
   this.createProxyConfiguration = async function (projectName, proxy) {
     return new Promise((resolve, reject) => {
-      projects.create({ projectName: { $eq: projectName }, proxy })
+      projects.create({ projectName, proxy })
         .then(() => { resolve() })
         .catch((error) => {
           console.error('\x1b[31m%s\x1b[0m', error)
