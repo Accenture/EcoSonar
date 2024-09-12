@@ -7,6 +7,7 @@ import bestPracticesSorting from './format/bestPracticesSorting.js'
 import projectsRepository from '../dataBase/projectsRepository.js'
 import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
 
 class RetrieveBestPracticesService { }
 
@@ -31,11 +32,11 @@ RetrieveBestPracticesService.prototype.getProjectAnalysis = async function (proj
     await projectsRepository.getProjectSettings(projectName)
       .then((result) => {
         if (result === null) {
-          console.log('Best Practices is returned with default procedure score impact')
+          loggerService.info('Best Practices is returned with default procedure score impact')
         }
         procedure = result.procedure
       }).catch(() => {
-        console.log('Best Practices is returned with default procedure score impact')
+        loggerService.info('Best Practices is returned with default procedure score impact')
       })
 
     await w3cRepository
@@ -128,11 +129,11 @@ RetrieveBestPracticesService.prototype.getUrlBestPractices = async function (pro
   await projectsRepository.getProjectSettings(projectName)
     .then((result) => {
       if (result === null) {
-        console.log('Best Practices is returned with default procedure score impact')
+        loggerService.info('Best Practices is returned with default procedure score impact')
       }
       procedure = result.procedure
     }).catch(() => {
-      console.log('Best Practices is returned with default procedure score impact')
+      loggerService.info('Best Practices is returned with default procedure score impact')
     })
 
   await w3cRepository

@@ -4,7 +4,7 @@ const swagger = {
   swaggerDefinition: {
     info: {
       title: 'API EcoSonar',
-      version: '3.6',
+      version: '3.7',
       description: 'Swagger UI of EcoSonar API'
     }
   },

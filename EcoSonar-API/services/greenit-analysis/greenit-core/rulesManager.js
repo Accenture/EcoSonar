@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
 /*
  *  Copyright (C) 2019  didierfred@gmail.com
  *
@@ -16,64 +14,65 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-rulesManager = new RulesManager()
 
-function RulesManager () {
-  const rulesId = []
-  const rulesChecker = new Map()
-  const eventListeners = new Map()
-  const notCompatibleRules = []
-  eventListeners.set('harReceived', [])
-  eventListeners.set('frameMeasuresReceived', [])
-  eventListeners.set('resourceContentReceived', [])
+rulesManager = new RulesManager();
 
-  this.registerRule = function (ruleChecker, eventListener) {
-    rulesId.push(ruleChecker.id)
-    rulesChecker.set(ruleChecker.id, ruleChecker)
-    const event = eventListeners.get(eventListener)
-    if (event) event.push(ruleChecker.id)
-  }
+function RulesManager() {
+    let rulesId = [];
+    let rulesChecker = new Map();
+    let eventListeners = new Map();
+    let notCompatibleRules = [];
+    eventListeners.set('harReceived', []);
+    eventListeners.set('frameMeasuresReceived', []);
+    eventListeners.set('resourceContentReceived', []);
 
-  this.getRulesId = function () {
-    return rulesId
-  }
+    this.registerRule = function (ruleChecker, eventListener) {
+        rulesId.push(ruleChecker.id);
+        rulesChecker.set(ruleChecker.id, ruleChecker);
+        let event = eventListeners.get(eventListener);
+        if (event) event.push(ruleChecker.id);
+    };
 
-  this.getRulesNotCompatibleWithCurrentBrowser = function () {
-    return notCompatibleRules
-  }
+    this.getRulesId = function () {
+        return rulesId;
+    };
 
-  this.getNewRulesChecker = function () {
-    return new RulesChecker()
-  }
+    this.getRulesNotCompatibleWithCurrentBrowser = function () {
+        return notCompatibleRules;
+    };
 
-  function RulesChecker () {
-    const rules = new Map()
-    rulesChecker.forEach((ruleChecker, ruleId) => {
-      const ruleCheckerInstance = Object.create(ruleChecker)
-      // for certains rules need an initalization , method not implemented in all rules
-      if (ruleCheckerInstance.initialize) ruleCheckerInstance.initialize()
-      rules.set(ruleId, ruleCheckerInstance)
-    })
+    this.getNewRulesChecker = function () {
+        return new RulesChecker();
+    };
 
-    this.sendEvent = function (event, measures, resource) {
-      const eventListener = eventListeners.get(event)
-      if (eventListener) {
-        eventListener.forEach(ruleID => {
-          this.checkRule(ruleID, measures, resource)
-        })
-      }
+    function RulesChecker() {
+        let rules = new Map();
+        rulesChecker.forEach((ruleChecker, ruleId) => {
+            let ruleCheckerInstance = Object.create(ruleChecker);
+            // for certains rules need an initalization , method not implemented in all rules
+            if (ruleCheckerInstance.initialize) ruleCheckerInstance.initialize();
+            rules.set(ruleId, ruleCheckerInstance);
+        });
+
+        this.sendEvent = function (event, measures, resource) {
+            eventListener = eventListeners.get(event);
+            if (eventListener) {
+                eventListener.forEach((ruleID) => {
+                    this.checkRule(ruleID, measures, resource);
+                });
+            }
+        };
+
+        this.checkRule = function (rule, measures, resource) {
+            rules.get(rule).check(measures, resource);
+        };
+
+        this.getRule = function (rule) {
+            return rules.get(rule);
+        };
+
+        this.getAllRules = function () {
+            return rules;
+        };
     }
-
-    this.checkRule = function (rule, measures, resource) {
-      rules.get(rule).check(measures, resource)
-    }
-
-    this.getRule = function (rule) {
-      return rules.get(rule)
-    }
-
-    this.getAllRules = function () {
-      return rules
-    }
-  }
 }

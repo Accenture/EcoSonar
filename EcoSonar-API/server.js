@@ -1,5 +1,6 @@
 import http from 'http'
 import app from './routes/app.js'
+import loggerService from './loggers/traces.js'
 import database from './configuration/database.js'
 
 // connection BDD
@@ -45,7 +46,7 @@ server.on('error', errorHandler)
 server.on('listening', () => {
   const address = server.address()
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port
-  console.log('Listening on ' + bind)
+  loggerService.info('Listening on ' + bind)
 })
 
 server.listen(port)

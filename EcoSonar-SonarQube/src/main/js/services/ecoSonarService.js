@@ -31,3 +31,18 @@ export function getAnalysisForProjectConfiguration (projectName) {
       })
   })
 }
+
+export function postLauchAnalysis (projectNameReq) {
+  return new Promise((resolve, reject) => {
+    axiosInstance.post('/api/greenit/insert',  {
+      projectName: projectNameReq,
+    })
+      .then((response) => {
+        console.log('LAUNCH SERVICE - POST : lauch analysis')
+        resolve(response.data)
+      })
+      .catch(() => {
+        console.error('LAUNCH SERVICE  - GET : unknown error occured')
+      })
+  })
+}

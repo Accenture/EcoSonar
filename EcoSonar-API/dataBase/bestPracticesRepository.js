@@ -1,5 +1,6 @@
 import bestpractices from './models/bestpractices.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
 
 const BestPracticesRepository = function () {
   /**
@@ -20,11 +21,11 @@ const BestPracticesRepository = function () {
             resolve()
           })
           .catch((error) => {
-            console.error('\x1b[31m%s\x1b[0m', error)
+            loggerService.error('\x1b[31m%s\x1b[0m', error)
             reject(new SystemError())
           })
       } else {
-        console.log('None of the urls analyzed could be inserted')
+        loggerService.info('None of the urls analyzed could be inserted')
         reject(new Error('None of the urls analyzed could be inserted'))
       }
     })
@@ -38,11 +39,11 @@ const BestPracticesRepository = function () {
     return new Promise((resolve, reject) => {
       bestpractices.deleteMany({ idUrl: url[0].idKey })
         .then((result) => {
-          console.log(`DELETE URL - On best practices ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URL - On best practices ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -60,7 +61,7 @@ const BestPracticesRepository = function () {
         .sort({ dateAnalysisBestPractices: 1 })
         .then((result) => resolve(result))
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -79,7 +80,7 @@ const BestPracticesRepository = function () {
         .limit(1)
         .then((result) => resolve(result))
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -93,11 +94,11 @@ const BestPracticesRepository = function () {
     return new Promise((resolve, reject) => {
       bestpractices.deleteMany({ idUrl: { $in: urlIdKeyList } })
         .then((result) => {
-          console.log(`DELETE URLS PROJECT - On best practices ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URLS PROJECT - On best practices ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -118,7 +119,7 @@ function checkValues (arrayToInsert) {
     if (analysis.bestPractices) {
       arrayToInsertSanitized.push(analysis)
     } else {
-      console.warn(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
+      loggerService.warn(`BEST PRACTICES INSERT - Best practices for url  ${analysis.url} cannot be inserted due to presence of NaN or undefined values`)
     }
   }
   return arrayToInsertSanitized

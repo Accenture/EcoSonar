@@ -1,4 +1,4 @@
-import cheerio from 'cheerio'
+import * as cheerio from 'cheerio'
 import puppeteer from 'puppeteer'
 import authenticationService from '../authenticationService.js'
 import urlConfigurationService from '../urlConfigurationService.js'

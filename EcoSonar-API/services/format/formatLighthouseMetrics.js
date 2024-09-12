@@ -1,5 +1,6 @@
 import enumAudits from '../../utils/enumAudits.js'
 import formatCompliance from './formatCompliance.js'
+import loggerService from '../../loggers/traces.js'
 
 class FormatLighthouseMetrics {}
 
@@ -22,7 +23,7 @@ FormatLighthouseMetrics.prototype.formatLighthouseMetrics = function (reports) {
             formattedReports[element] = { score, displayValue, complianceLevel }
           }
     } catch (error) {
-      console.error(error)
+      loggerService.error(error)
     }
   }
   return formattedReports

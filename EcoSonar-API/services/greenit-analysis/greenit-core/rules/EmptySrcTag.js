@@ -1,16 +1,13 @@
-/* eslint-disable no-undef */
 rulesManager.registerRule({
-  id: 'EmptySrcTag',
-  emptySrcTagNumber: 0,
-  score: 100,
+    complianceLevel: 'A',
+    id: "EmptySrcTag",
+    comment: "",
+    detailComment: "",
 
-  check: function (measures) {
-    this.emptySrcTagNumber = measures.emptySrcTagNumber
-
-    if (this.emptySrcTagNumber === 0) {
-      this.score = 100
-    } else {
-      this.score = 0
+    check: function (measures) {
+        if (measures.emptySrcTagNumber > 0) {
+            this.complianceLevel = 'C';
+            this.comment = chrome.i18n.getMessage("rule_EmptySrcTag_Comment", String(measures.emptySrcTagNumber));
+        }
     }
-  }
-}, 'frameMeasuresReceived')
+}, "frameMeasuresReceived");

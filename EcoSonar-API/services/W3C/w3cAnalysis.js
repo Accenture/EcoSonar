@@ -1,6 +1,7 @@
 import validator from 'html-validator'
 import puppeteer from 'puppeteer'
 import authenticationService from '../authenticationService.js'
+import loggerService from '../../loggers/traces.js'
 
 class W3cAnalysis {}
 
@@ -17,17 +18,17 @@ W3cAnalysis.prototype.w3cAnalysisWithAPI = async function (urlsList) {
       const options = {
         url
       }
-      console.log(`W3C ANALYSIS : launching analyse for ${url} `)
+      loggerService.info(`W3C ANALYSIS : launching analyse for ${url} `)
       const resultForUrl = await validator(options)
       if (resultForUrl.messages[0].type === 'non-document-error') {
-        console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : URL ${url} cannot be found`)
-        console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
+        loggerService.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : URL ${url} cannot be found`)
+        loggerService.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
       } else {
         reports.push(resultForUrl)
-        console.log(`W3C ANALYSIS : Analyse ended for ${url} `)
+        loggerService.info(`W3C ANALYSIS : Analyse ended for ${url} `)
       }
     } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
+      loggerService.error('\x1b[31m%s\x1b[0m', error)
     }
   }
   return reports
@@ -87,8 +88,8 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName, 
 
           htmlResults.push({ url, html })
         } catch {
-          console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : An error happened on URL ${url}`)
-          console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
+          loggerService.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : An error happened on URL ${url}`)
+          loggerService.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : ${url} has been removed from result `)
         }
         await page.close()
       }
@@ -101,24 +102,24 @@ W3cAnalysis.prototype.w3cAnalysisLocal = async function (urlsList, projectName, 
             data: htmlResult.html,
             isFragment: false
           }
-          console.log(`W3C ANALYSIS : launching analyse for ${htmlResult.url} `)
+          loggerService.info(`W3C ANALYSIS : launching analyse for ${htmlResult.url} `)
           const resultForHtml = await validator(options)
           resultForUrlsList.push(htmlResult.url, resultForHtml)
-          console.log(`W3C ANALYSIS : Analyse ended for ${htmlResult.url} `)
+          loggerService.info(`W3C ANALYSIS : Analyse ended for ${htmlResult.url} `)
         } catch (error) {
-          console.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : An error happened on URL ${htmlResult.url}`)
-          console.error(error)
+          loggerService.error('\x1b[31m%s\x1b[0m', `W3C ANALYSIS : An error happened on URL ${htmlResult.url}`)
+          loggerService.error(error)
         }
       }
 
       return resultForUrlsList
     } else {
-      console.warn('Could not log in, audit for w3c analysis is skipped')
+      loggerService.warn('Could not log in, audit for w3c analysis is skipped')
     }
   } catch (error) {
-    console.error('\x1b[31m%s\x1b[0m', error)
+    loggerService.error('\x1b[31m%s\x1b[0m', error)
   } finally {
-  console.log('Closing browser for w3cAnalysis');
+  loggerService.info('Closing browser for w3cAnalysis');
     await browser.close()
   }
 }

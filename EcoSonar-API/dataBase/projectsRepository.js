@@ -1,5 +1,6 @@
 import projects from './models/projects.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
 
 const ProjectsRepository = function () {
   /**
@@ -12,7 +13,7 @@ const ProjectsRepository = function () {
       projects.create({ projectName, procedure })
         .then(() => { resolve() })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           if (error._message === 'projects validation failed') {
             reject(new Error(error.message))
           }
@@ -33,7 +34,7 @@ const ProjectsRepository = function () {
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           if (error._message === 'projects validation failed') {
             reject(new Error(error.message))
           }
@@ -53,7 +54,7 @@ const ProjectsRepository = function () {
       projects.create({ projectName }, { login: loginMap })
         .then(() => { resolve() })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -69,7 +70,7 @@ const ProjectsRepository = function () {
       projects.create({ projectName, proxy })
         .then(() => { resolve() })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -86,7 +87,7 @@ const ProjectsRepository = function () {
       projects.updateOne({ projectName: { $eq: projectName } }, { login: loginMap })
         .then(() => { resolve() })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -102,7 +103,7 @@ const ProjectsRepository = function () {
       projects.updateOne({ projectName: { $eq: projectName } }, { proxy })
         .then(() => { resolve() })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -120,7 +121,7 @@ const ProjectsRepository = function () {
           resolve(result)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -141,7 +142,7 @@ const ProjectsRepository = function () {
         await projects.deleteOne({ projectName: { $eq: projectNameReq } })
       }
     } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
+      loggerService.error('\x1b[31m%s\x1b[0m', error)
       systemError = true
     }
     return new Promise((resolve, reject) => {
@@ -168,7 +169,7 @@ const ProjectsRepository = function () {
         await projects.deleteOne({ projectName: { $eq: projectNameReq } })
       }
     } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
+      loggerService.error('\x1b[31m%s\x1b[0m', error)
       systemError = true
     }
     return new Promise((resolve, reject) => {
@@ -191,7 +192,7 @@ const ProjectsRepository = function () {
           console.log(`DELETE URLS PROJECT - project ${projectNameReq} deleted`)
           resolve()
         }).catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })

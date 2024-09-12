@@ -1,6 +1,7 @@
 import { waitForSelectors, applyChange } from '../utils/playSelectors.js'
 import loginProxyConfigurationService from './loginProxyConfigurationService.js'
 import viewPortParams from '../utils/viewportParams.js'
+import loggerService from '../loggers/traces.js'
 
 class AuthenticationService { }
 
@@ -11,7 +12,7 @@ AuthenticationService.prototype.loginIfNeeded = async function (browser, project
       loginInformations = login
     })
     .catch(() => {
-      console.log('LOGIN CREDENTIALS - no login saved for this project')
+      loggerService.info('LOGIN CREDENTIALS - no login saved for this project')
     })
   if (loginInformations) {
     // Go to login url
@@ -50,11 +51,11 @@ async function loginOnOnePage (page, loginInformations) {
     await page.waitForNavigation()
     return true
   } catch (error) {
-    console.error(error.message)
+    loggerService.error(error.message)
     if (error.message === 'Navigation timeout of 30000 ms exceeded') {
       return true
     }
-    console.error('Could not log in')
+    loggerService.error('Could not log in')
     return false
   }
 }
@@ -85,11 +86,11 @@ async function loginOnMultiPages (page, loginInformations) {
     await page.waitForNavigation()
     return true
   } catch (error) {
-    console.error(error.message)
+    loggerService.error(error.message)
     if (error.message === 'Navigation timeout of 10000 ms exceeded' || error.message === 'Navigation timeout of 30000 ms exceeded') {
       return true
     }
-    console.error('Could not log in')
+    loggerService.error('Could not log in')
     return false
   }
 }
@@ -101,7 +102,7 @@ AuthenticationService.prototype.useProxyIfNeeded = async function (projectName) 
       proxyConfiguration = '--proxy-server=' + res.ipAddress + ':' + res.port
     })
     .catch(() => {
-      console.log('PROXY CREDENTIALS - no proxy saved for this project')
+      loggerService.info('PROXY CREDENTIALS - no proxy saved for this project')
     })
   return proxyConfiguration
 }

@@ -1,5 +1,6 @@
 import SystemError from '../utils/SystemError.js'
 import w3cs from './models/w3cs.js'
+import loggerService from '../loggers/traces.js'
 
 const W3cRepository = function () {
   /**
@@ -15,11 +16,11 @@ const W3cRepository = function () {
             resolve()
           })
           .catch((err) => {
-            console.error('\x1b[31m%s\x1b[0m', err)
+            loggerService.error('\x1b[31m%s\x1b[0m', err)
             reject(new SystemError())
           })
       } else {
-        console.log('W3C - None of the urls analysed could be inserted')
+        loggerService.info('W3C - None of the urls analysed could be inserted')
         reject(
           new Error('W3C - None of the urls analysed could be inserted')
         )
@@ -42,7 +43,7 @@ const W3cRepository = function () {
           resolve(res)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -94,7 +95,7 @@ const W3cRepository = function () {
         .sort({ dateW3cAnalysis: 1 })
         .then((result) => { resolve(result) })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     }
@@ -109,11 +110,11 @@ const W3cRepository = function () {
     return new Promise((resolve, reject) => {
       w3cs.deleteMany({ idUrlW3c: url[0].idKey })
         .then((result) => {
-          console.log(`DELETE URL - On W3C ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URL - On W3C ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -127,11 +128,11 @@ const W3cRepository = function () {
     return new Promise((resolve, reject) => {
       w3cs.deleteMany({ idUrlW3c: { $in: urlIdKeyList } })
         .then((result) => {
-          console.log(`DELETE URLS PROJECT - On W3C ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URLS PROJECT - On W3C ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })

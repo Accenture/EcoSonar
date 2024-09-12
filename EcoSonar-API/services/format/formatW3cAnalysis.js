@@ -2,6 +2,7 @@ import formatCompliance from './formatCompliance.js'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 const metricsW3c = require('../../utils/metricsW3c.json')
+import loggerService from '../../loggers/traces.js'
 
 class FormatW3cAnalysis {}
 
@@ -29,8 +30,8 @@ FormatW3cAnalysis.prototype.w3cAnalysisFormattedDeployments = function (deployme
     })
     formattedDeployments = this.formatDeploymentsForGraphs(formattedDeployments)
   } catch (error) {
-    console.error(error)
-    console.error('W3C - error during the formatting of project analysis')
+    loggerService.error(error)
+    loggerService.error('W3C - error during the formatting of project analysis')
   }
   return formattedDeployments
 }
@@ -64,8 +65,8 @@ FormatW3cAnalysis.prototype.formatDeploymentsForGraphs = function (formattedDepl
     // Sanitizing duplicatedDeployments
     finalDeployment = getUniqueListByDate(duplicatedDeployments, 'dateAnalysis')
   } catch (error) {
-    console.error(error)
-    console.error('W3C - error during the formatting of project analysis')
+    loggerService.error(error)
+    loggerService.error('W3C - error during the formatting of project analysis')
   }
 
   return finalDeployment
@@ -118,8 +119,8 @@ FormatW3cAnalysis.prototype.w3cLastAnalysisFormatted = function (latestW3cAnalys
       dateAnalysis: latestW3cAnalysis[0].dateW3cAnalysis
     }
   } catch (error) {
-    console.error(error)
-    console.error('W3C - error during the formatting of project analysis')
+    loggerService.error(error)
+    loggerService.error('W3C - error during the formatting of project analysis')
   }
   return w3c
 }
@@ -184,8 +185,8 @@ function formatW3c (errorsList) {
     }
     return errorsListWithoutDuplicat
   } catch (err) {
-    console.error(err)
-    console.error('W3C - Error during the deletion of duplicate errors for w3c analysis')
+    loggerService.error(err)
+    loggerService.error('W3C - Error during the deletion of duplicate errors for w3c analysis')
   }
 }
 const formatW3cAnalysis = new FormatW3cAnalysis()

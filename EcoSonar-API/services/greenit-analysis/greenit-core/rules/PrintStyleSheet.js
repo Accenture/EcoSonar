@@ -1,16 +1,13 @@
-// eslint-disable-next-line no-undef
 rulesManager.registerRule({
-  id: 'PrintStyleSheet',
-  printStyleSheetsNumber: 0,
-  score: 100,
-
-  check: function (measures) {
-    this.printStyleSheetsNumber = measures.printStyleSheetsNumber
-
-    if (this.printStyleSheetsNumber >= 1) {
-      this.score = 100
-    } else {
-      this.score = 0
+    complianceLevel: 'C',
+    id: "PrintStyleSheet",
+    comment: "",
+    detailComment: "",
+  
+    check: function (measures) {
+      if (measures.printStyleSheetsNumber > 0) {
+        this.complianceLevel = 'A';
+        this.comment = chrome.i18n.getMessage("rule_PrintStyleSheet_Comment", String(measures.printStyleSheetsNumber));
+      }
     }
-  }
-}, 'frameMeasuresReceived')
+  }, "frameMeasuresReceived");

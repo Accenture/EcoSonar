@@ -1,6 +1,7 @@
 import enumAudits from '../../utils/enumAudits.js'
 import formatBestPracticesForProject from '../format/formatBestPracticesForProject.js'
 import metricsCalculate from '../../utils/metricsCalculate.js'
+import loggerService from '../../loggers/traces.js'
 
 class FormatLighthouseBestPractices { }
 
@@ -63,8 +64,8 @@ FormatLighthouseBestPractices.prototype.formatPerformance = function (report) {
             formattedReports[element] = { score: score * 100, scoreDisplayMode, description: items, auditedMetric: displayValue }
         }
     } catch (error) {
-      console.error('error for url ' + report.url + ' on element ' + element)
-      console.error(error)
+      loggerService.error('error for url ' + report.url + ' on element ' + element)
+      loggerService.error(error)
     }
   }
   return { ...formattedReports, url: report.url }

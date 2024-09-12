@@ -11,6 +11,8 @@ import w3cAnalysis from '../services/W3C/w3cAnalysis.js'
 import w3cRepository from '../dataBase/w3cRepository.js'
 import formatW3cBestPractices from './format/formatW3cBestPractices.js'
 import formatW3cAnalysis from './format/formatW3cAnalysis.js'
+import loggerService from '../loggers/traces.js'
+import configurationRepository from '../dataBase/configurationRepository.js'
 
 class AnalysisService {}
 
@@ -20,10 +22,29 @@ class AnalysisService {}
  * @param {boolean} autoscroll is used to enable autoscrolling for each tab opened during analysis
  */
 AnalysisService.prototype.insert = async function (projectName, username, password, autoscroll) {
-  const allowExternalAPI = process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API || 'false'
+  let allowW3c = false;
   let urlProjectList = []
   let reports = []
   let systemError = false
+  let idKey = null;
+
+  await urlsProjectRepository.getUrlProject(projectName)
+  .then((result) => {
+    idKey = result.idKey })
+  .catch(() => { systemError = true })
+
+  configurationRepository.findConfiguration(idKey)
+      .then((existingConfig) => {
+        if (existingConfig === null) {
+          resolve({ Configuration: '' })
+        }
+        allowW3c = existingConfig.W3C;
+        resolve({ Configuration: existingConfig.W3C })
+      }).catch((err) => {
+        loggerService.error(err)
+      })
+  
+  
 
   await urlsProjectRepository.findAll(projectName)
     .then((urls) => { urlProjectList = urls })
@@ -32,74 +53,72 @@ AnalysisService.prototype.insert = async function (projectName, username, passwo
     })
 
   if (systemError || urlProjectList.length === 0) {
-    console.warn('GREENIT INSERT - project has no url to do the audit. Audit stopped')
+    loggerService.warn('GREENIT INSERT - project has no url to do the audit. Audit stopped')
   } else {
-    reports = await launchAuditsToUrlList(urlProjectList, projectName, allowExternalAPI, username, password, autoscroll)
+    reports = await launchAuditsToUrlList(urlProjectList, projectName, allowW3c, username, password, autoscroll)
     const reportsFormatted = formatAuditsToBeSaved(reports, urlProjectList)
-
     greenItRepository
       .insertAll(reportsFormatted.greenitAnalysisFormatted)
       .then(() => {
-        console.log('GREENIT INSERT - analysis has been inserted')
+        loggerService.info('GREENIT INSERT - analysis has been inserted')
       })
       .catch(() => {
-        console.error('GREENIT INSERT - greenit insertion failed')
+        loggerService.info('GREENIT INSERT - greenit insertion failed')
       })
 
     lighthouseRepository
       .insertAll(reportsFormatted.analysisLighthouseFormatted)
       .then(() => {
-        console.log('LIGHTHOUSE INSERT - analysis has been inserted')
+        loggerService.info('LIGHTHOUSE INSERT - analysis has been inserted')
       })
       .catch(() => {
-        console.error('LIGHTHOUSE INSERT - lighthouse insertion failed')
+        loggerService.error('LIGHTHOUSE INSERT - lighthouse insertion failed')
       })
 
-    if (allowExternalAPI === 'true') {
+    if (allowW3c === 'true') {
       w3cRepository.insertAll(reportsFormatted.w3cAnalysisFormatted)
         .then(() => {
-          console.log('W3C INSERT - analysis has been inserted')
+          loggerService.info('W3C INSERT - analysis has been inserted')
         })
         .catch(() => {
-          console.error('W3C INSERT - w3c insertion failed')
+          loggerService.error('W3C INSERT - w3c insertion failed')
         })
     }
 
     bestPracticesRepository
       .insertBestPractices(reportsFormatted.bestPracticesFormatted)
       .then(() => {
-        console.log('BEST PRACTICES INSERT - best practices have been inserted')
+        loggerService.info('BEST PRACTICES INSERT - best practices have been inserted')
       })
       .catch(() => {
-        console.error('BEST PRACTICES INSERT : best practices insertion failed')
+        loggerService.error('BEST PRACTICES INSERT : best practices insertion failed')
       })
   }
 }
 
-async function launchAuditsToUrlList (urlProjectList, projectName, allowExternalAPI, username, password, autoscroll) {
+async function launchAuditsToUrlList (urlProjectList, projectName, allowW3c, username, password, autoscroll) {
   let reportsGreenit = []
   let reportsLighthouse = []
   let reportsW3c = []
-
   const urlList = urlProjectList.map((url) => url.urlName)
   try {
     reportsGreenit = await analyse(urlList, projectName, username, password, autoscroll)
   } catch (error) {
-    console.error(error)
+    loggerService.error(error)
   }
   try {
     reportsLighthouse = await lighthouseAnalysis(urlList, projectName, username, password)
   } catch (error) {
-    console.error(error)
+    loggerService.error(error)
   }
-  if (allowExternalAPI === 'true') {
+  if (allowW3c === 'true') {
     try {
       reportsW3c = await w3cAnalysis.w3cAnalysisWithAPI(urlList)
     } catch (error) {
-      console.error(error)
+      loggerService.error(error)
     }
   } else {
-    console.warn('INSERT ANALYSIS - Usage of external API is not allowed, W3C analysis skipped')
+    loggerService.warn('INSERT ANALYSIS - Usage of external API is not allowed, W3C analysis skipped')
   }
   return {
     reportsGreenit,

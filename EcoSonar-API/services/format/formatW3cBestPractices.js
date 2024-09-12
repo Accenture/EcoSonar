@@ -1,4 +1,5 @@
 import formatCompliance from './formatCompliance.js'
+import loggerService from '../../loggers/traces.js'
 
 class FormatW3cBestPractices {}
 
@@ -33,7 +34,7 @@ FormatW3cBestPractices.prototype.formatW3c = function (w3cAnalysis) {
         }
       }
     } catch (err) {
-      console.log('W3C - Error during the formatting of w3c analysis for url ' + w3cAnalysis.url)
+      loggerService.info('W3C - Error during the formatting of w3c analysis for url ' + w3cAnalysis.url)
     }
   }
   return w3cAnalysis
@@ -82,8 +83,8 @@ FormatW3cBestPractices.prototype.returnFormattedW3c = function (latestW3cAnalysi
       }
     }
   } catch (error) {
-    console.log(error.message)
-    console.log('W3C - Error during the formatting of w3c analysis')
+    loggerService.info(error.message)
+    loggerService.info('W3C - Error during the formatting of w3c analysis')
   }
   return formattedW3cAnalysis
 }

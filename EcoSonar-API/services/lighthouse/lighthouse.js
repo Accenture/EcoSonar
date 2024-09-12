@@ -4,6 +4,7 @@ import config from './config.js'
 import authenticationService from '../authenticationService.js'
 import userJourneyService from '../userJourneyService.js'
 import viewPortParams from '../../utils/viewportParams.js'
+import loggerService from '../../loggers/traces.js'
 
 export default async function lighthouseAnalysis (urlList, projectName, username, password) {
   const browserArgs = [
@@ -40,7 +41,7 @@ export default async function lighthouseAnalysis (urlList, projectName, username
     const homePageReport = await lighthouse(url, config);
     const homePageReportLhr = homePageReport.lhr;
     results[index] = { ...homePageReportLhr, url }
-    console.log(`home page performance report generated successfully`);
+    loggerService.info(`home page performance report generated successfully`);
   };
 
   try {
@@ -52,12 +53,12 @@ export default async function lighthouseAnalysis (urlList, projectName, username
       for (const [index, url] of urlList.entries()) {
         const page = await browserLight.newPage() // prevent browser to close before ending all pages analysis
         try {
-          console.log('Lighthouse Analysis launched for url ' + url)
+          loggerService.info('Lighthouse Analysis launched for url ' + url)
           await userJourneyService.getUserFlow(projectName, url)
             .then((result) => {
               userJourney = result
             }).catch((error) => {
-              console.log(error.message)
+              loggerService.info(error.message)
             })
           if (userJourney) {
             authenticatedPage = await userJourneyService.playUserFlowLighthouse(url, browserLight, userJourney)
@@ -71,26 +72,26 @@ export default async function lighthouseAnalysis (urlList, projectName, username
           }
           //If the url requires an authentication
           if (authenticatedPage) {
-            console.log('Light house analysis with authentication in progress for the url '+ authenticatedPage.url());
+            loggerService.info('Light house analysis with authentication in progress for the url '+ authenticatedPage.url());
             await generateReportForHome(authenticatedPage.url(), index);
           } else {
             lighthouseResults = await lighthouse(url, { disableStorageReset: true }, config, page)
-            console.log('Light house analysis without authentication in progress for the url '+ url);
+            loggerService.info('Light house analysis without authentication in progress for the url '+ url);
             results[index] = { ...lighthouseResults.lhr, url }
           }
 
         } catch (error) {
-          console.error('LIGHTHOUSE ANALYSIS - An error occured when auditing ' + url)
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('LIGHTHOUSE ANALYSIS - An error occured when auditing ' + url)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
         }
       }
     } else {
-      console.warn('Could not log in, audit for lighthouse analysis is skipped')
+      loggerService.warn('Could not log in, audit for lighthouse analysis is skipped')
     }
   } catch (error) {
-    console.error('\x1b[31m%s\x1b[0m', error)
+    loggerService.error('\x1b[31m%s\x1b[0m', error)
   } finally {
-    console.log('Closing browser for Lighthouse');
+    loggerService.info('Closing browser for Lighthouse');
     await browserLight.close();
   }
   return results;

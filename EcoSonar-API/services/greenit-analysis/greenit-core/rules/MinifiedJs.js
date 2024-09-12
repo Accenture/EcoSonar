@@ -1,31 +1,21 @@
-/* eslint-disable no-undef */
 rulesManager.registerRule({
-  id: 'MinifiedJs',
-  totalJsSize: 0,
-  minifiedJsSize: 0,
-  percentMinifiedJs: 0,
-  contents: '',
-  score: 100,
+    complianceLevel: 'A',
+    id: "MinifiedJs",
+    comment: "",
+    detailComment: "",
+    totalJsSize: 0,
+    minifiedJsSize: 0,
 
-  check: function (_measures, resourceContent) {
-    if (resourceContent.type.toUpperCase() === 'SCRIPT') {
-      this.totalJsSize += resourceContent.content.length
-      if (isMinified(resourceContent.content)) {
-        this.minifiedJsSize += resourceContent.content.length
-      } else {
-        this.contents += `${resourceContent.url}|`
-      }
-      this.percentMinifiedJs = this.minifiedJsSize / this.totalJsSize * 100
-
-      if (this.percentMinifiedJs === 100) {
-        this.score = 100
-      } else if (this.percentMinifiedJs >= 99.28) {
-        this.score = 35
-      } else if (this.percentMinifiedJs >= 98.56) {
-        this.score = 20
-      } else {
-        this.score = 0
-      }
+    check: function (measures, resourceContent) {
+        if (resourceContent.type === "script") {
+            this.totalJsSize += resourceContent.content.length;
+            if (!isMinified(resourceContent.content)) this.detailComment += chrome.i18n.getMessage("rule_MinifiedJs_DetailComment",resourceContent.url) + '<br>';
+            else this.minifiedJsSize += resourceContent.content.length;
+            const percentMinifiedJs = this.minifiedJsSize / this.totalJsSize * 100;
+            this.complianceLevel = 'A';
+            if (percentMinifiedJs < 90) this.complianceLevel = 'C';
+            else if (percentMinifiedJs < 95) this.complianceLevel = 'B';
+            this.comment = chrome.i18n.getMessage("rule_MinifiedJs_Comment", String(Math.round(percentMinifiedJs * 10) / 10));
+        }
     }
-  }
-}, 'resourceContentReceived')
+}, "resourceContentReceived");

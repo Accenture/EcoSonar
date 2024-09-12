@@ -5,6 +5,8 @@ import lighthouseRepository from '../dataBase/lighthouseRepository.js'
 import bestPracticesRepository from '../dataBase/bestPracticesRepository.js'
 import w3cRepository from '../dataBase/w3cRepository.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
+import configurationService from './configurationService.js'
 
 class UrlConfigurationService {
 }
@@ -65,6 +67,7 @@ UrlConfigurationService.prototype.insert = async function (projectName, urlToBeA
           errorRegexp = error
         }
       })
+    configurationService.saveConfiguration(projectName, 'false', 'false');
   }
 
   if (!systemError && notInsertedArray.length === 0 && errorRegexp.length === 0) {
@@ -73,13 +76,13 @@ UrlConfigurationService.prototype.insert = async function (projectName, urlToBeA
 
   return new Promise((resolve, reject) => {
     if (notInsertedArray.length > 0) {
-      console.error('URL CONFIGURATION SERVICE - Some urls are duplicated')
+      loggerService.error('URL CONFIGURATION SERVICE - Some urls are duplicated')
       reject(errorArray)
     } else if (errorRegexp.length > 0) {
-      console.error('URL CONFIGURATION SERVICE - Some urls are invalid')
+      loggerService.error('URL CONFIGURATION SERVICE - Some urls are invalid')
       reject(errorRegexp)
     } else if (systemError) {
-      console.error('URL CONFIGURATION SERVICE - An error occured when reaching the database')
+      loggerService.error('URL CONFIGURATION SERVICE - An error occured when reaching the database')
       reject(new SystemError())
     } else {
       resolve()

@@ -1,34 +1,32 @@
-/* eslint-disable no-undef */
 rulesManager.registerRule({
-  id: 'ImageDownloadedNotDisplayed',
-  imgAnalysed: '',
-  imageDownloadedNotDisplayedNumber: 0,
-  score: 100,
+    complianceLevel: 'A',
+    id: "ImageDownloadedNotDisplayed",
+    comment: "",
+    detailComment: "",
+    imageDownloadedNotDisplayedNumber: 0,
+    imgAnalysed: new Map(),
 
-  isRevelant: function (entry) {
-    // Very small images could be download even if not display as it may be icons
-    if (entry.naturalWidth * entry.naturalHeight < 10000) return false
-    return (entry.clientWidth === 0 && entry.clientHeight === 0)
-  },
+    // need to get a new map , otherwise it's share between instance
+    initialize: function () {
+        this.imgAnalysed = new Map();
+    },
 
-  check: function (measures) {
-    const imgAnalysedToAdd = new Map()
-    measures.imagesResizedInBrowser.forEach(entry => {
-      if (!imgAnalysedToAdd.has(entry.src) && this.isRevelant(entry)) {
-        imgAnalysedToAdd.set(entry.src) // Do not count two times the same picture
-        this.imageDownloadedNotDisplayedNumber += 1
-        this.imgAnalysed += entry.src + '|'
-      }
-    })
+    isRevelant: function (entry) {
+        // Very small images could be download even if not display  as it may be icons 
+        if (entry.naturalWidth * entry.naturalHeight < 10000) return false;
+        if (entry.clientWidth === 0 && entry.clientHeight === 0) return true;
+        return false;
+    },
 
-    if (this.imageDownloadedNotDisplayedNumber === 0) {
-      this.score = 100
-    } else if (this.imageDownloadedNotDisplayedNumber <= 4) {
-      this.score = 50
-    } else if (this.imageDownloadedNotDisplayedNumber <= 6) {
-      this.score = 25
-    } else {
-      this.score = 0
+    check: function (measures) {
+        measures.imagesResizedInBrowser.forEach(entry => {
+            if (!this.imgAnalysed.has(entry.src) && this.isRevelant(entry)) { // Do not count two times the same picture
+                this.detailComment += chrome.i18n.getMessage("rule_ImageDownloadedNotDisplayed_DetailComment",[entry.src,`${entry.naturalWidth}x${entry.naturalHeight}`]) + '<br>';
+                this.imgAnalysed.set(entry.src);
+                this.imageDownloadedNotDisplayedNumber += 1;
+            }
+        });
+        if (this.imageDownloadedNotDisplayedNumber > 0) this.complianceLevel = 'C';
+        this.comment = chrome.i18n.getMessage("rule_ImageDownloadedNotDisplayed_Comment", String(this.imageDownloadedNotDisplayedNumber));
     }
-  }
-}, 'frameMeasuresReceived')
+}, "frameMeasuresReceived");

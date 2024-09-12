@@ -7,6 +7,7 @@ import greenItRepository from '../dataBase/greenItRepository.js'
 import bestPracticesRepository from '../dataBase/bestPracticesRepository.js'
 import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
 import tempurlsProjectRepository from '../dataBase/tempurlsProjectRepository.js'
+import loggerService from '../loggers/traces.js'
 
 class ProjectService { }
 
@@ -99,7 +100,7 @@ ProjectService.prototype.getAllProjectInformations = async function (date, sortB
       resultWithFilters.nbProjects = Object.keys(resultWithFilters.projects).length ?? 0
       resolve(sortProjects(resultWithFilters, sortBy))
     } catch (err) {
-      console.error(err)
+      loggerService.error(err)
       reject(new Error(err.message))
     }
   })
@@ -154,7 +155,7 @@ function sortProjects (resultList, sortParams) {
   } else if (scores.includes(type)) {
     sortedProjects = sortByScore(resultList.projects, type, order)
   } else {
-    console.error('Sort type does not exist, no sorting applied')
+    loggerService.error('Sort type does not exist, no sorting applied')
     return resultList
   }
 
@@ -286,7 +287,7 @@ ProjectService.prototype.deleteProject = async function (projectName) {
     await tempurlsProjectRepository.deleteProject(projectName)
     await projectsRepository.deleteProjectPerProjectName(projectName)
   } catch (error) {
-    console.error(error)
+    loggerService.error(error)
     systemError = true
   }
   return new Promise((resolve, reject) => {

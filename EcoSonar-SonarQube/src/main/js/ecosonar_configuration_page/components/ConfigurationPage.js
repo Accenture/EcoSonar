@@ -6,6 +6,7 @@ import DeleteUrlForm from './DeleteUrlForm'
 import UrlList from './UrlList'
 import errors from '../../utils/errors.json'
 import formatError from '../../format/formatError'
+import { postLauchAnalysis } from '../../services/ecoSonarService' 
 
 export default class ConfigurationPage extends React.PureComponent {
   constructor () {
@@ -118,6 +119,14 @@ export default class ConfigurationPage extends React.PureComponent {
           <div className='page-header' role='banner' aria-label='configuration page presentation'>
             <h1 className='page-title'>URL Configuration for project {this.state.projectName}</h1>
             <div className='page-actions' aria-hidden={this.state.openCreate}>
+            <button
+                className='launch-button'
+                disabled={this.state.displayCrawler}
+                type='submit' onClick={this.handleSubmit}
+              >
+                Launch analysis
+              </button>
+              
               <button
                 className='basic-button'
                 disabled={this.state.displayCrawler}
@@ -152,5 +161,9 @@ export default class ConfigurationPage extends React.PureComponent {
         </div>
       </main>
     )
+  }
+  
+  handleSubmit = async () => {
+    postLauchAnalysis(this.props.project.key);
   }
 }

@@ -6,6 +6,8 @@ import formatLighthouseAnalysis from './format/formatLighthouseAnalysis.js'
 import SystemError from '../utils/SystemError.js'
 import formatGreenItAnalysis from './format/formatGreenItAnalysis.js'
 import formatW3cAnalysis from './format/formatW3cAnalysis.js'
+import loggerService from '../loggers/traces.js'
+import configurationService from './configurationService.js'
 
 class RetrieveAnalysisService { }
 
@@ -152,7 +154,7 @@ RetrieveAnalysisService.prototype.getUrlAnalysis = async function (projectName, 
    * @returns {Object} Returns the formatted values with average score for the given project
    */
 
-RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectName) {
+RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectName, res) {
   let urlsIdKey = []
   let systemError = false
   let greenitAnalysisDeployments = []
@@ -161,6 +163,17 @@ RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectNa
   let greenitLastAnalysis = null
   let lighthouseProjectLastAnalysis = null
   let w3cProjectLastAnalysis = null
+  let allowW3cs = false;
+
+  configurationService.getConfiguration(projectName, res)
+    .then((config) => {
+      loggerService.info(`GET CONFIGURATION - Project ${projectName} retrieved`)
+      allowW3cs = config.w3c;
+    })
+    .catch((error) => {
+      loggerService.error(error)
+      loggerService.error(`GET CONFIGURATION - Get configuration for project ${projectName} encountered an error`)
+    })
 
   await urlsProjectRepository.findAll(projectName)
     .then((result) => { urlsIdKey = result.map((el) => el.idKey) })
@@ -221,7 +234,7 @@ RetrieveAnalysisService.prototype.getProjectAnalysis = async function (projectNa
       reject(new SystemError())
     } else {
       const analysis = {
-        allowW3c: process.env.ECOSONAR_ENV_ALLOW_EXTERNAL_API || 'false',
+        allowW3c: allowW3cs,
         deployments: {
           greenit: greenitAnalysisDeployments,
           lighthouse: lighthouseAnalysisDeployments,
@@ -323,7 +336,7 @@ RetrieveAnalysisService.prototype.getProjectScores = async function (projectName
           }
           ecoIndex = ecoIndex / lastAnalysis.length
         } else {
-          console.log('Greenit - no greenit analysis found for ' + projectName)
+          loggerService.info('Greenit - no greenit analysis found for ' + projectName)
         }
       })
       .catch(() => {
@@ -349,7 +362,7 @@ RetrieveAnalysisService.prototype.getProjectScores = async function (projectName
           accessScore = accessScore / lastAnalysis.length
           perfScore = perfScore / lastAnalysis.length
         } else {
-          console.log('No lighthouse Analysis found for project ' + projectName)
+          loggerService.info('No lighthouse Analysis found for project ' + projectName)
         }
       })
       .catch(() => {
@@ -368,7 +381,7 @@ RetrieveAnalysisService.prototype.getProjectScores = async function (projectName
           const w3cProjectLastAnalysis = formatW3cAnalysis.w3cLastAnalysisFormatted(lastAnalysis)
           w3cScore = w3cProjectLastAnalysis.score
         } else {
-          console.log('No W3C Analysis found for project ' + projectName)
+          loggerService.info('No W3C Analysis found for project ' + projectName)
         }
       })
       .catch(() => {
