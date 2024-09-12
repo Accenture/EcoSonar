@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
+## Version 3.7 , 12/09/2024
+
+### Changed
+
+- Update CLI greenIT analysis
+- Added a new api to view application logs from swagger directly
+- Added authentication for swagger
+- Added a button to launch analysis from sonarqube
+- Configuration table to change param dynamically
+- Encryption of password in database
+- Updated ecocode plugins
+- Swagger.js : Documentation updated
+
+---
+
 ## Version 3.6 , 04/06/2024
 
 ### Changed
