@@ -1,13 +1,16 @@
+// eslint-disable-next-line no-undef
 rulesManager.registerRule({
-    complianceLevel: 'A',
-    id: "Plugins",
-    comment: "",
-    detailComment: "",
-  
-    check: function (measures) {
-      if (measures.pluginsNumber > 0) {
-        this.complianceLevel = 'C';
-        this.comment = chrome.i18n.getMessage("rule_Plugins_Comment", String(measures.pluginsNumber));
-      }
+  id: 'Plugins',
+  pluginsNumber: 0,
+  score: 100,
+
+  check: function (measures) {
+    this.pluginsNumber = measures.pluginsNumber
+
+    if (this.pluginsNumber === 0) {
+      this.score = 100
+    } else {
+      this.score = 0
     }
-  }, "frameMeasuresReceived");
+  }
+}, 'frameMeasuresReceived')

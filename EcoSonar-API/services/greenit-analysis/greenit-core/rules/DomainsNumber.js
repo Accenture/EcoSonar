@@ -1,25 +1,38 @@
+/* eslint-disable no-undef */
+// eslint-disable-next-line no-undef
 rulesManager.registerRule({
-    complianceLevel: 'A',
-    id: "DomainsNumber",
-    comment: "",
-    detailComment: "",
+  id: 'DomainsNumber',
+  domains: '',
+  domainsNumber: 0,
+  score: 100,
 
-    check: function (measures) {
-        let domains = [];
-        if (measures.entries.length) measures.entries.forEach(entry => {
-            let domain = getDomainFromUrl(entry.request.url);
-            if (domains.indexOf(domain) === -1) {
-                domains.push(domain);
-            }
-        });
-        if (domains.length > 2) {
-            if (domains.length === 3) this.complianceLevel = 'B';
-            else this.complianceLevel = 'C';
+  check: function (measures) {
+    const domainsToAdd = []
+    if (measures.entries.length) {
+      measures.entries.forEach(entry => {
+        const domain = getDomainFromUrl(entry.request.url)
+        if (domainsToAdd.indexOf(domain) === -1) {
+          domainsToAdd.push(domain)
+          this.domains += domain + '|'
+          this.domainsNumber++
         }
-        domains.forEach(domain => {
-            this.detailComment += domain + "<br>";
-        });
-
-        this.comment = chrome.i18n.getMessage("rule_DomainsNumber_Comment", String(domains.length));
+      })
     }
-}, "harReceived");
+
+    if (this.domainsNumber <= 2) {
+      this.score = 100
+    } else if (this.domainsNumber <= 3) {
+      this.score = 75
+    } else if (this.domainsNumber <= 4) {
+      this.score = 65
+    } else if (this.domainsNumber <= 5.5) {
+      this.score = 50
+    } else if (this.domainsNumber <= 6) {
+      this.score = 35
+    } else if (this.domainsNumber <= 7) {
+      this.score = 20
+    } else {
+      this.score = 0
+    }
+  }
+}, 'harReceived')

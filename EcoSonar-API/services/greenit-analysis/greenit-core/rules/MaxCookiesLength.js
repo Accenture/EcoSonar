@@ -1,30 +1,43 @@
+/* eslint-disable no-undef */
 rulesManager.registerRule({
-    complianceLevel: 'A',
-    id: "MaxCookiesLength",
-    comment: "",
-    detailComment: "",
+  id: 'MaxCookiesLength',
+  maxCookiesLength: 0,
+  domains: '',
+  score: 100,
 
-    check: function (measures) {
-        let maxCookiesLength = 0;
-        let domains = new Map();
-        if (measures.entries.length) measures.entries.forEach(entry => {
-            const cookiesLength = getCookiesLength(entry);
-            if (cookiesLength !== 0) {
-                let domain = getDomainFromUrl(entry.request.url);
-                if (domains.has(domain)) {
-                    if (domains.get(domain) < cookiesLength) domains.set(domain, cookiesLength);
-                }
-                else domains.set(domain, cookiesLength);
-                if (cookiesLength > maxCookiesLength) maxCookiesLength = cookiesLength;
-            }
-        });
-        domains.forEach((value, key) => {
-            this.detailComment += chrome.i18n.getMessage("rule_MaxCookiesLength_DetailComment",[value,key]) + '<br>' ;
-        });
-        if (maxCookiesLength !== 0) {
-            this.comment = chrome.i18n.getMessage("rule_MaxCookiesLength_Comment", String(maxCookiesLength));
-            if (maxCookiesLength > 512) this.complianceLevel = 'B';
-            if (maxCookiesLength > 1024) this.complianceLevel = 'C';
+  check: function (measures) {
+    const domainsToCheck = new Map()
+    if (measures.entries.length) {
+      measures.entries.forEach(entry => {
+        const cookiesLength = getCookiesLength(entry)
+        if (cookiesLength !== 0) {
+          const domain = getDomainFromUrl(entry.request.url)
+          if (domainsToCheck.has(domain)) {
+            if (domainsToCheck.get(domain) < cookiesLength) domainsToCheck.set(domain, cookiesLength)
+          } else domainsToCheck.set(domain, cookiesLength)
+          if (cookiesLength > this.maxCookiesLength) this.maxCookiesLength = cookiesLength
         }
+      })
     }
-}, "harReceived");
+
+    domainsToCheck.forEach((value, key) => {
+      this.domains += value + ' ' + key + '|'
+    })
+
+    if (this.maxCookiesLength <= 13) {
+      this.score = 100
+    } else if (this.maxCookiesLength <= 56) {
+      this.score = 75
+    } else if (this.maxCookiesLength <= 82.50) {
+      this.score = 65
+    } else if (this.maxCookiesLength <= 150) {
+      this.score = 50
+    } else if (this.maxCookiesLength <= 366.50) {
+      this.score = 35
+    } else if (this.maxCookiesLength <= 800) {
+      this.score = 20
+    } else {
+      this.score = 0
+    }
+  }
+}, 'harReceived')

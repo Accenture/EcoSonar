@@ -1,21 +1,26 @@
+/* eslint-disable no-undef */
 rulesManager.registerRule({
-    complianceLevel: 'A',
-    id: "JsValidate",
-    comment: "",
-    detailComment: "",
-    errors: 0,
-    totalJsSize: 0,
+  id: 'JsValidate',
+  contents: '',
+  errors: 0,
+  totalJsSize: 0,
+  score: 100,
 
-    check: function (measures, resourceContent) {
-        if (resourceContent.type === "script") {
-            this.totalJsSize += resourceContent.content.length;
-            let errorNumber = computeNumberOfErrorsInJSCode(resourceContent.content, resourceContent.url);
-            if (errorNumber > 0) {
-                this.detailComment += (`URL ${resourceContent.url} has ${errorNumber} error(s) <br>`);
-                this.errors += errorNumber;
-                this.complianceLevel = 'C';
-                this.comment = chrome.i18n.getMessage("rule_JsValidate_Comment", String(this.errors));
-            }
-        }
+  check: function (_measures, resourceContent) {
+    if (resourceContent.type.toUpperCase() === 'SCRIPT') {
+      const errorNumber = computeNumberOfErrorsInJSCode(resourceContent.content, resourceContent.url)
+      if (errorNumber > 0) {
+        this.errors += errorNumber
+        this.contents += `URL ${resourceContent.url} has ${errorNumber} error(s)|`
+      }
     }
-}, "resourceContentReceived");
+
+    if (this.errors === 0) {
+      this.score = 100
+    } else if (this.errors <= 1) {
+      this.score = 50
+    } else {
+      this.score = 0
+    }
+  }
+}, 'resourceContentReceived')

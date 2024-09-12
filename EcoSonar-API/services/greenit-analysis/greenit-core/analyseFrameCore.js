@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 /*
  *  Copyright (C) 2016  The EcoMeter authors (https://gitlab.com/ecoconceptionweb/ecometer)
  *  Copyright (C) 2019  didierfred@gmail.com
@@ -16,114 +18,122 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function start_analyse_core() {
-    const analyseStartingTime = Date.now();
-    const dom_size = document.getElementsByTagName('*').length;
-    let pageAnalysis;
+function startAnalyseCore () {
+  const analyseStartingTime = Date.now()
+  const domSize = getDomSizeWithoutSvg()
+  const pluginsNumber = getPluginsNumber()
+  const printStyleSheetsNumber = getPrintStyleSheetsNumber()
+  const inlineStyleSheetsNumber = getInlineStyleSheetsNumber()
+  const emptySrcTagNumber = getEmptySrcTagNumber()
+  const inlineJsScript = getInlineJsScript()
+  const inlineJsScriptsNumber = getInlineJsScriptsNumber()
+  const imagesResizedInBrowser = getImagesResizedInBrowser()
 
-    if (analyseBestPractices) {
-        // test with http://www.wickham43.net/flashvideo.php
-        const pluginsNumber = getPluginsNumber();
-        const printStyleSheetsNumber = getPrintStyleSheetsNumber();
-        const inlineStyleSheetsNumber = getInlineStyleSheetsNumber();
-        const emptySrcTagNumber = getEmptySrcTagNumber();
-        const inlineJsScript = getInlineJsScript();
-        const inlineJsScriptsNumber = getInlineJsScriptsNumber();
-        const imagesResizedInBrowser = getImagesResizedInBrowser();
-
-        pageAnalysis = {
-            analyseStartingTime: analyseStartingTime,
-            url: document.URL,
-            domSize: dom_size,
-            pluginsNumber: pluginsNumber,
-            printStyleSheetsNumber: printStyleSheetsNumber,
-            inlineStyleSheetsNumber: inlineStyleSheetsNumber,
-            emptySrcTagNumber: emptySrcTagNumber,
-            inlineJsScript: inlineJsScript,
-            inlineJsScriptsNumber: inlineJsScriptsNumber,
-            imagesResizedInBrowser: imagesResizedInBrowser,
-        };
-    } else
-        pageAnalysis = {
-            analyseStartingTime: analyseStartingTime,
-            url: document.URL,
-            domSize: dom_size,
-        };
-
-    return pageAnalysis;
+  return {
+    analyseStartingTime,
+    url: document.URL,
+    domSize,
+    pluginsNumber,
+    printStyleSheetsNumber,
+    inlineStyleSheetsNumber,
+    emptySrcTagNumber,
+    inlineJsScript,
+    inlineJsScriptsNumber,
+    imagesResizedInBrowser
+  }
+}
+function getDomSizeWithoutSvg () {
+  let domSize = document.getElementsByTagName('*').length
+  const svgElements = document.getElementsByTagName('svg')
+  for (const svgElement of svgElements) {
+    domSize -= getNbChildsExcludingNestedSvg(svgElement) - 1
+  }
+  return domSize
 }
 
-function getPluginsNumber() {
-    const plugins = document.querySelectorAll('object,embed');
-    return plugins === undefined ? 0 : plugins.length;
+function getNbChildsExcludingNestedSvg (element) {
+  if (element.nodeType === Node.TEXT_NODE) return 0
+  let nbElements = 1
+  for (const childNode of element.childNodes) {
+    // deal with svg nested case
+    if (childNode.tagName !== 'svg') {
+      nbElements += getNbChildsExcludingNestedSvg(childNode)
+    } else {
+      nbElements += 1
+    }
+  }
+  return nbElements
 }
 
-function getEmptySrcTagNumber() {
-    return (
-        document.querySelectorAll('img[src=""]').length +
-        document.querySelectorAll('script[src=""]').length +
-        document.querySelectorAll('link[rel=stylesheet][href=""]').length
-    );
+function getPluginsNumber () {
+  const plugins = document.querySelectorAll('object,embed')
+  return (plugins === undefined) ? 0 : plugins.length
 }
 
-function getPrintStyleSheetsNumber() {
-    return (
-        document.querySelectorAll('link[rel=stylesheet][media~=print]').length +
-        document.querySelectorAll('style[media~=print]').length
-    );
+function getEmptySrcTagNumber () {
+  return document.querySelectorAll('img[src=""]').length +
+    document.querySelectorAll('script[src=""]').length +
+    document.querySelectorAll('link[rel=stylesheet][href=""]').length
 }
 
-function getInlineStyleSheetsNumber() {
-    let styleSheetsArray = Array.from(document.styleSheets);
-    let inlineStyleSheetsNumber = 0;
-    styleSheetsArray.forEach((styleSheet) => {
-        try {
-            if (!styleSheet.href) inlineStyleSheetsNumber++;
-        } catch (err) {
-            console.log('GREENIT-ANALYSIS ERROR ,' + err.name + ' = ' + err.message);
-            console.log('GREENIT-ANALYSIS ERROR ' + err.stack);
+function getPrintStyleSheetsNumber () {
+  return document.querySelectorAll('link[rel=stylesheet][media~=print]').length +
+    document.querySelectorAll('style[media~=print]').length
+}
+
+function getInlineStyleSheetsNumber () {
+  const styleSheetsArray = Array.from(document.styleSheets)
+  let inlineStyleSheetsNumber = 0
+  styleSheetsArray.forEach(styleSheet => {
+    try {
+      // Ignore SVG styles in count
+      const isSvgStyleSheet = (styleSheet.ownerNode instanceof SVGStyleElement)
+      if (!styleSheet.href && !isSvgStyleSheet) inlineStyleSheetsNumber++
+    } catch (err) {
+      console.log('GREENIT-ANALYSIS ERROR ,' + err.name + ' = ' + err.message)
+      console.log('GREENIT-ANALYSIS ERROR ' + err.stack)
+    }
+  })
+  return inlineStyleSheetsNumber
+}
+
+function getInlineJsScript () {
+  const scriptArray = Array.from(document.scripts)
+  let scriptText = ''
+  scriptArray.forEach(script => {
+    const isJSON = (String(script.type) === 'application/ld+json') // Exclude type="application/ld+json" from parsing js analyse
+    if ((script.text.length > 0) && (!isJSON)) scriptText += '\n' + script.text
+  })
+  return scriptText
+}
+
+function getInlineJsScriptsNumber () {
+  const scriptArray = Array.from(document.scripts)
+  let inlineScriptNumber = 0
+  scriptArray.forEach(script => {
+    const isJSON = (String(script.type) === 'application/ld+json') // Exclude type="application/ld+json" from count
+    if ((script.text.length > 0) && (!isJSON)) inlineScriptNumber++
+  })
+  return inlineScriptNumber
+}
+
+function getImagesResizedInBrowser () {
+  const imgArray = Array.from(document.querySelectorAll('img'))
+  const imagesResized = []
+  imgArray.forEach(img => {
+    if (img.clientWidth < img.naturalWidth || img.clientHeight < img.naturalHeight) {
+      // Images of one pixel are some times used ... , we exclude them
+      if (img.naturalWidth > 1) {
+        const imageMeasures = {
+          src: img.src,
+          clientWidth: img.clientWidth,
+          clientHeight: img.clientHeight,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight
         }
-    });
-    return inlineStyleSheetsNumber;
-}
-
-function getInlineJsScript() {
-    let scriptArray = Array.from(document.scripts);
-    let scriptText = '';
-    scriptArray.forEach((script) => {
-        let isJSON = String(script.type) === 'application/ld+json'; // Exclude type="application/ld+json" from parsing js analyse
-        if (script.text.length > 0 && !isJSON) scriptText += '\n' + script.text;
-    });
-    return scriptText;
-}
-
-function getInlineJsScriptsNumber() {
-    let scriptArray = Array.from(document.scripts);
-    let inlineScriptNumber = 0;
-    scriptArray.forEach((script) => {
-        let isJSON = String(script.type) === 'application/ld+json'; // Exclude type="application/ld+json" from count
-        if (script.text.length > 0 && !isJSON) inlineScriptNumber++;
-    });
-    return inlineScriptNumber;
-}
-
-function getImagesResizedInBrowser() {
-    const imgArray = Array.from(document.querySelectorAll('img'));
-    let imagesResized = [];
-    imgArray.forEach((img) => {
-        if (img.clientWidth < img.naturalWidth || img.clientHeight < img.naturalHeight) {
-            // Images of one pixel are some times used ... , we exclude them
-            if (img.naturalWidth > 1) {
-                const imageMeasures = {
-                    src: img.src,
-                    clientWidth: img.clientWidth,
-                    clientHeight: img.clientHeight,
-                    naturalWidth: img.naturalWidth,
-                    naturalHeight: img.naturalHeight,
-                };
-                imagesResized.push(imageMeasures);
-            }
-        }
-    });
-    return imagesResized;
+        imagesResized.push(imageMeasures)
+      }
+    }
+  })
+  return imagesResized
 }
