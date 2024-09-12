@@ -9,12 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- Update CLI greenIT analysis
+- Updated CLI greenIT analysis
 - Added a new api to view application logs from swagger directly
 - Added authentication for swagger
 - Added a button to launch analysis from sonarqube
-- Configuration table to change param dynamically
-- Encryption of password in database
+- Added configuration table to change param dynamically
+- Encryption of password in database for new userflow
 - Updated ecocode plugins
 - Swagger.js : Documentation updated
 
