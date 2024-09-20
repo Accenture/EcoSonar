@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
+## Version 3.7 , 12/09/2024
+
+### Added
+
+- Added a new api to view application logs from swagger directly
+- Added authentication for swagger
+- Added a button to launch analysis from sonarqube
+- Added configuration table to change param dynamically
+- Encryption of password in database for new userflow
+  
+### Changed
+
+- Updated ecocode plugins (except C#)
+- Swagger.js : Documentation updated
+---
+
 ## Version 3.6 , 04/06/2024
 
 ### Changed

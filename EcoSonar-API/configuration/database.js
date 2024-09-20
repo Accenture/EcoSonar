@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import retrievePassword from './retrieveDatabasePasswordFromCloudProvider.js'
+import loggerService from '../loggers/traces.js'
 
 mongoose.set('strictQuery', false)
 
@@ -19,8 +20,8 @@ Database.prototype.connection = async function () {
     dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
     connectionString = `mongodb://${cluster}:${port}/${dbName}`
     mongoose.connect(connectionString)
-      .then(() => console.log('Connection to MongoDB successful'))
-      .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
+      .then(() => loggerService.info('Connection to MongoDB successful'))
+      .catch((reason) => loggerService.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
   } else if (mongoDBType === 'MongoDB_Atlas') {
     // connection to dataBase MongoDB Atlas for MongoDB API
     user = process.env.ECOSONAR_ENV_USER || ''
@@ -29,8 +30,8 @@ Database.prototype.connection = async function () {
     dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
     connectionString = `mongodb+srv://${user}:${password}@${cluster}/${dbName}?retryWrites=true&w=majority`
     mongoose.connect(connectionString)
-      .then(() => console.log('Connection to MongoDB Atlas successful'))
-      .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
+      .then(() => loggerService.info('Connection to MongoDB Atlas successful'))
+      .catch((reason) => loggerService.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
   } else if (mongoDBType === 'CosmosDB') {
     // connection to dataBase Azure CosmosDB for MongoDB API
     cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
@@ -46,10 +47,10 @@ Database.prototype.connection = async function () {
       },
       retryWrites: false
     })
-      .then(() => console.log('Connection to CosmosDB successful'))
-      .catch((err) => console.error('\x1b[31m%s\x1b[0m', err))
+      .then(() => loggerService.info('Connection to CosmosDB successful'))
+      .catch((err) => loggerService.error('\x1b[31m%s\x1b[0m', err))
   } else {
-    console.log('Could not connect to any database')
+    loggerService.info('Could not connect to any database')
   }
 }
 

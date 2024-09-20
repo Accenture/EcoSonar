@@ -1,6 +1,6 @@
 {
   "name": "ecosonar-api",
-  "version": "3.5",
+  "version": "3.7",
   "description": "Ecodesign and accessibility tool to help developpers minimize carbon footprint of their web-application",
   "repository": {
     "type": "git",
@@ -20,13 +20,14 @@
   "dependencies": {
     "@azure/identity": "4.0.1",
     "@azure/keyvault-secrets": "^4.8.0",
-    "cheerio": "^1.0.0-rc.12",
+    "cheerio": "1.0.0",
     "chrome-har": "^0.13.2",
     "concat-files": "^0.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.2",
     "exceljs": "^4.4.0",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
+    "express-basic-auth": "^1.2.1",
     "express-rate-limit": "^7.2.0",
     "glob": "^10.3.10",
     "helmet": "^7.1.0",
@@ -39,7 +40,8 @@
     "puppeteer": "^22.4.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "uniqid": "^5.4.0"
+    "uniqid": "^5.4.0",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
     "@ecocode/eslint-plugin": "^1.4.0",

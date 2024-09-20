@@ -18,9 +18,13 @@ import SystemError from '../utils/SystemError.js'
 import asyncMiddleware from '../utils/AsyncMiddleware.js'
 import projectService from '../services/projectService.js'
 import bestPracticesServices from '../services/bestPracticesService.js'
+import loggerService from '../loggers/traces.js'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 const packageJson = require('../package.json')
+const basicAuth = require('express-basic-auth')
+import fs from 'node:fs';
+import { aesEncrypt, aesDecrypt } from '../services/encryptionService.js'
 
 dotenv.config()
 
@@ -30,10 +34,16 @@ app.disable('x-powered-by')
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(helmet())
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 const PORT = process.env.SWAGGER_PORT || 3002
-app.listen(PORT, () => console.log(`Swagger in progress on port ${PORT}`))
+app.listen(PORT, () => loggerService.info(`Swagger in progress on port ${PORT}`))
+const passWord = process.env.ECOSONAR_USER_PASS || 'password'
+const userName = process.env.ECOSONAR_USER_USERNAME || 'admin'
+app.use("/swagger",basicAuth({
+  users: {userName: passWord},
+  challenge: true,
+}), swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+
 
 const sonarqubeServerUrl = process.env.ECOSONAR_ENV_SONARQUBE_SERVER_URL || ''
 const whitelist = [sonarqubeServerUrl]
@@ -90,18 +100,65 @@ app.use((_req, res, next) => {
  */
 app.get('/api/all', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log('GET URLS PROJECT - retrieve all urls from project ' + projectName)
+  loggerService.info('GET URLS PROJECT - retrieve all urls from project ' + projectName)
   urlConfigurationService.getAll(projectName)
     .then((results) => {
-      console.log('GET URLS PROJECT - retrieved ' + results.length + ' urls from project ' + projectName)
+      loggerService.info('GET URLS PROJECT - retrieved ' + results.length + ' urls from project ' + projectName)
       return res.status(200).json(results)
     })
     .catch((error) => {
-      console.error(error)
-      console.error('GET URLS PROJECT - retrieve all urls encountered an error for project ' + projectName)
+      loggerService.error(error)
+      loggerService.error('GET URLS PROJECT - retrieve all urls encountered an error for project ' + projectName)
       return res.status(500).send()
     })
 }))
+
+/**
+ * @swagger
+ * /api/encrypt:
+ *   post:
+ *     tags:
+ *       - "Encryption"
+ *     summary: "Encrypt text"
+ *     description: retrieve list of URLs saved and audited by EcoSonar for the project.
+ *     parameters:
+ *       - name: projectName
+ *         in: body
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       500:
+ *         description: System error.
+ */
+app.post('/api/encrypt', (req, res) => {
+  const data = req.body.text
+  const encryptedData = aesEncrypt(data)
+  res.json({ encryptedData })
+})
+
+
+/**
+ * @swagger
+ * /api/decrypt:
+ *   post:
+ *     tags:
+ *       - "Encryption"
+ *     summary: "Decrypt text"
+ *     description: retrieve list of URLs saved and audited by EcoSonar for the project.
+ *     parameters:
+ *       - name: projectName
+ *         in: body
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       500:
+ *         description: System error.
+ */
+app.post('/api/decrypt', (req, res) => {
+  const  encryptedData  = req.body.text
+  const data = aesDecrypt(encryptedData)
+  res.json({ data })
+})
 
 /**
  * @swagger
@@ -140,19 +197,19 @@ app.get('/api/all', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlsList = req.body.urlName
-  console.log(`INSERT URLS PROJECT - insert urls into project ${projectName}`)
+  loggerService.info(`INSERT URLS PROJECT - insert urls into project ${projectName}`)
   urlConfigurationService.insert(projectName, urlsList)
     .then(() => {
-      console.log('INSERT URLS PROJECT - insert succeeded')
+      loggerService.info('INSERT URLS PROJECT - insert succeeded')
       return res.status(200).send()
     })
     .catch((error) => {
       if (error instanceof SystemError) {
-        console.error(error)
-        console.error(`INSERT URLS PROJECT - insert urls into project ${projectName} encountered an error`)
+        loggerService.error(error)
+        loggerService.error(`INSERT URLS PROJECT - insert urls into project ${projectName} encountered an error`)
         return res.status(500).send()
       }
-      console.error('INSERT URLS PROJECT - Validation failed')
+      loggerService.error('INSERT URLS PROJECT - Validation failed')
       return res.status(400).json({ error })
     })
 }))
@@ -188,16 +245,16 @@ app.post('/api/insert', asyncMiddleware(async (req, res, _next) => {
 app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlName = req.body.urlName
-  console.log('DELETE URLS PROJECT - delete url ' + urlName + ' from project ' + projectName)
+  loggerService.info('DELETE URLS PROJECT - delete url ' + urlName + ' from project ' + projectName)
   urlConfigurationService.delete(projectName, urlName)
     .then(() => {
-      console.log('DELETE URLS PROJECT - delete succeeded')
+      loggerService.info('DELETE URLS PROJECT - delete succeeded')
       return res.status(200).send()
     })
     .catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.error('DELETE URLS PROJECT - delete url ' + urlName + ' from project ' + projectName + ' encountered an error')
+        loggerService.error('DELETE URLS PROJECT - delete url ' + urlName + ' from project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
       return res.status(400).json({ error: error.message })
@@ -244,15 +301,15 @@ app.delete('/api/delete', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/login/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   const loginCredentials = req.body.login
-  console.log('INSERT LOGIN CREDENTIALS - insert credentials into project ' + projectName)
+  loggerService.info('INSERT LOGIN CREDENTIALS - insert credentials into project ' + projectName)
   loginProxyConfigurationService.insertLoginCredentials(projectName, loginCredentials)
     .then(() => {
-      console.log('INSERT LOGIN CREDENTIALS - insert succeeded')
+      loggerService.info('INSERT LOGIN CREDENTIALS - insert succeeded')
       return res.status(201).send()
     })
     .catch((error) => {
-      console.error(error)
-      console.error('INSERT LOGIN CREDENTIALS - insert credentials into project ' + projectName + ' encountered an error')
+      loggerService.error(error)
+      loggerService.error('INSERT LOGIN CREDENTIALS - insert credentials into project ' + projectName + ' encountered an error')
       if (error instanceof SystemError) {
         return res.status(500).send()
       }
@@ -298,15 +355,15 @@ app.post('/api/login/insert', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/proxy/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
   const proxyConfiguration = req.body.proxy
-  console.log('INSERT PROXY - insert proxy credentials into project ' + projectName)
+  loggerService.info('INSERT PROXY - insert proxy credentials into project ' + projectName)
   loginProxyConfigurationService.insertProxyConfiguration(projectName, proxyConfiguration)
     .then(() => {
-      console.log('INSERT PROXY CREDENTIALS - insert succeeded')
+      loggerService.info('INSERT PROXY CREDENTIALS - insert succeeded')
       return res.status(201).send()
     })
     .catch((error) => {
-      console.error(error)
-      console.error('INSERT PROXY - proxy credentials into project ' + projectName + ' encountered an error')
+      loggerService.error(error)
+      loggerService.error('INSERT PROXY - proxy credentials into project ' + projectName + ' encountered an error')
       if (error instanceof SystemError) {
         return res.status(500).send()
       }
@@ -336,19 +393,19 @@ app.post('/api/proxy/insert', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/login/find', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log('FIND LOGIN CREDENTIALS - credentials into project ' + projectName)
+  loggerService.info('FIND LOGIN CREDENTIALS - credentials into project ' + projectName)
   loginProxyConfigurationService.getLoginCredentials(projectName)
     .then((loginCredentials) => {
-      console.log('FIND LOGIN CREDENTIALS - retrieve succeeded')
+      loggerService.info('FIND LOGIN CREDENTIALS - retrieve succeeded')
       return res.status(200).json(loginCredentials)
     })
     .catch((error) => {
       if (error instanceof SystemError) {
-        console.error(error)
-        console.error('FIND LOGIN CREDENTIALS - credentials into project ' + projectName + ' encountered an error')
+        loggerService.error(error)
+        loggerService.error('FIND LOGIN CREDENTIALS - credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.warn('FIND LOGIN CREDENTIALS - credentials into project ' + projectName + ' are not saved')
+      loggerService.warn('FIND LOGIN CREDENTIALS - credentials into project ' + projectName + ' are not saved')
       return res.status(200).json({})
     })
 }))
@@ -375,19 +432,19 @@ app.get('/api/login/find', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log('FIND PROXY CONFIGURATION - credentials into project ' + projectName)
+  loggerService.info('FIND PROXY CONFIGURATION - credentials into project ' + projectName)
   loginProxyConfigurationService.getProxyConfiguration(projectName)
     .then((proxyConfiguration) => {
-      console.log('FIND PROXY CONFIGURATION - retrieve succeeded')
+      loggerService.info('FIND PROXY CONFIGURATION - retrieve succeeded')
       return res.status(200).json(proxyConfiguration)
     })
     .catch((error) => {
       if (error instanceof SystemError) {
-        console.error(error)
-        console.error('FIND PROXY CREDENTIALS - credentials into project ' + projectName + ' encountered an error')
+        loggerService.error(error)
+        loggerService.error('FIND PROXY CREDENTIALS - credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.warn('FIND PROXY CREDENTIALS - credentials into project ' + projectName + ' are not saved')
+      loggerService.warn('FIND PROXY CREDENTIALS - credentials into project ' + projectName + ' are not saved')
       return res.status(200).json({})
     })
 }))
@@ -416,16 +473,16 @@ app.get('/api/proxy/find', asyncMiddleware(async (req, res, _next) => {
  */
 app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log('DELETE LOGIN CREDENTIALS - delete credentials into project ' + projectName)
+  loggerService.info('DELETE LOGIN CREDENTIALS - delete credentials into project ' + projectName)
   loginProxyConfigurationService.deleteLoginCredentials(projectName)
     .then(() => {
-      console.log('DELETE LOGIN CREDENTIALS - succeeded')
+      loggerService.info('DELETE LOGIN CREDENTIALS - succeeded')
       return res.status(200).send()
     })
     .catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.error('DELETE LOGIN CREDENTIALS - delete credentials into project ' + projectName + ' encountered an error')
+        loggerService.error('DELETE LOGIN CREDENTIALS - delete credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
       return res.status(400).json({ error: error.message })
@@ -456,16 +513,16 @@ app.delete('/api/login', asyncMiddleware(async (req, res, _next) => {
  */
 app.delete('/api/proxy', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log('DELETE PROXY CONFIGURATION  - delete credentials into project ' + projectName)
+  loggerService.info('DELETE PROXY CONFIGURATION  - delete credentials into project ' + projectName)
   loginProxyConfigurationService.deleteProxyConfiguration(projectName)
     .then(() => {
-      console.log('DELETE PROXY CONFIGURATION  - succeeded')
+      loggerService.info('DELETE PROXY CONFIGURATION  - succeeded')
       return res.status(200).send()
     })
     .catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.error('DELETE PROXY CONFIGURATION - delete credentials into project ' + projectName + ' encountered an error')
+        loggerService.error('DELETE PROXY CONFIGURATION - delete credentials into project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
       return res.status(400).json({ error: error.message })
@@ -512,19 +569,19 @@ app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
   const url = req.body.url
   const projectName = req.body.projectName
   const userFlow = req.body.userFlow
-  console.log('INSERT USER FLOW - insert credentials for url ' + url + ' in project ' + projectName)
+  loggerService.info('INSERT USER FLOW - insert credentials for url ' + url + ' in project ' + projectName)
   userJourneyService.insertUserFlow(projectName, url, userFlow)
     .then(() => {
-      console.log('INSERT USER FLOW - insert succeeded')
+      loggerService.info('INSERT USER FLOW - insert succeeded')
       return res.status(200).send()
     })
     .catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.error('INSERT USER FLOW - insert credentials for url ' + url + ' in project ' + projectName + ' encountered an error')
+        loggerService.error('INSERT USER FLOW - insert credentials for url ' + url + ' in project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.error('INSERT USER FLOW - insertion failed')
+      loggerService.error('INSERT USER FLOW - insertion failed')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -557,19 +614,19 @@ app.post('/api/user-flow/insert', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/user-flow/find', asyncMiddleware(async (req, res, _next) => {
   const url = req.body.url
   const projectName = req.body.projectName
-  console.log('FIND USER FLOW - get flow for url ' + url + ' in project ' + projectName)
+  loggerService.info('FIND USER FLOW - get flow for url ' + url + ' in project ' + projectName)
   userJourneyService.getUserFlow(projectName, url)
     .then((userFlow) => {
-      console.log('FIND USER FLOW - retrieve succeeded')
+      loggerService.info('FIND USER FLOW - retrieve succeeded')
       return res.status(200).json(userFlow)
     })
     .catch((error) => {
       if (error instanceof SystemError) {
-        console.error(error)
-        console.log('FIND USER FLOW - get flow for url ' + url + ' in project ' + projectName + ' encountered an error')
+        loggerService.error(error)
+        loggerService.info('FIND USER FLOW - get flow for url ' + url + ' in project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
-      console.warn('FIND USER FLOW - flow for url ' + url + ' is not saved')
+      loggerService.warn('FIND USER FLOW - flow for url ' + url + ' is not saved')
       return res.status(200).json({})
     })
 }))
@@ -604,16 +661,16 @@ app.post('/api/user-flow/find', asyncMiddleware(async (req, res, _next) => {
 app.delete('/api/user-flow', asyncMiddleware(async (req, res, _next) => {
   const url = req.body.url
   const projectName = req.body.projectName
-  console.log('DELETE USER FLOW  - delete user flow into url ' + url + ' in project ' + projectName)
+  loggerService.info('DELETE USER FLOW  - delete user flow into url ' + url + ' in project ' + projectName)
   userJourneyService.deleteUserFlow(projectName, url)
     .then(() => {
-      console.log('DELETE USER FLOW - succeeded')
+      loggerService.info('DELETE USER FLOW - succeeded')
       return res.status(200).send()
     })
     .catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.error('DELETE USER FLOW - delete user flow into url ' + url + ' in project ' + projectName + ' encountered an error')
+        loggerService.error('DELETE USER FLOW - delete user flow into url ' + url + ' in project ' + projectName + ' encountered an error')
         return res.status(500).send()
       }
       return res.status(400).json({ error: error.message })
@@ -652,7 +709,7 @@ app.post('/api/greenit/insert', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const username = req.body.username
   const password = req.body.password
-  console.log('INSERT ANALYSIS - Launch analysis for project ' + projectName)
+  loggerService.info('INSERT ANALYSIS - Launch analysis for project ' + projectName)
   analysisService.insert(projectName, username, password)
   res.status(202).send()
 }))
@@ -686,15 +743,15 @@ app.post('/api/greenit/insert', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/greenit/url', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlName = req.body.urlName
-  console.log('GET ANALYSIS URL - retrieve analysis for url ' + urlName + ' in project ' + projectName)
+  loggerService.info('GET ANALYSIS URL - retrieve analysis for url ' + urlName + ' in project ' + projectName)
   retrieveAnalysisService.getUrlAnalysis(projectName, urlName)
     .then((results) => {
-      console.log('GET ANALYSIS URL - Analysis for url retrieved')
+      loggerService.info('GET ANALYSIS URL - Analysis for url retrieved')
       return res.status(200).json(results)
     })
     .catch((error) => {
-      console.log(error)
-      console.log('GET ANALYSIS URL - retrieve analysis for url ' + urlName + ' in project ' + projectName + ' encountered an error')
+      loggerService.info(error)
+      loggerService.info('GET ANALYSIS URL - retrieve analysis for url ' + urlName + ' in project ' + projectName + ' encountered an error')
       return res.status(500).send()
     })
 }))
@@ -721,14 +778,14 @@ app.post('/api/greenit/url', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/greenit/project', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log('GET ANALYSIS PROJECT - retrieve analysis for project ' + projectName)
-  retrieveAnalysisService.getProjectAnalysis(projectName)
+  loggerService.info('GET ANALYSIS PROJECT - retrieve analysis for project ' + projectName)
+  retrieveAnalysisService.getProjectAnalysis(projectName, res)
     .then((results) => {
-      console.log('GET ANALYSIS PROJECT - Analysis for project retrieved')
+      loggerService.info('GET ANALYSIS PROJECT - Analysis for project retrieved')
       return res.status(200).json(results)
     }).catch((error) => {
-      console.error(error)
-      console.error('GET ANALYSIS PROJECT - retrieve analysis for project ' + projectName + ' encountered an erro')
+      loggerService.error(error)
+      loggerService.error('GET ANALYSIS PROJECT - retrieve analysis for project ' + projectName + ' encountered an erro')
       return res.status(500).send()
     })
 }))
@@ -755,14 +812,14 @@ app.get('/api/greenit/project', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/ecosonar/scores', asyncMiddleware(async (req, res, _next) => {
   const projectNameReq = req.query.projectName
-  console.log('GET ECOSONAR PROJECT SCORES - retrieve scores for project ' + projectNameReq)
+  loggerService.info('GET ECOSONAR PROJECT SCORES - retrieve scores for project ' + projectNameReq)
   retrieveAnalysisService.getProjectScores(projectNameReq)
     .then((result) => {
-      console.log('GET ECOSONAR PROJECT SCORES - Scores for project retrieved')
+      loggerService.info('GET ECOSONAR PROJECT SCORES - Scores for project retrieved')
       return res.status(200).json(result)
     }).catch((error) => {
-      console.error(error)
-      console.error('GET ECOSONAR PROJECT SCORES - retrieve scores for project ' + projectNameReq + ' encountered an error')
+      loggerService.error(error)
+      loggerService.error('GET ECOSONAR PROJECT SCORES - retrieve scores for project ' + projectNameReq + ' encountered an error')
       return res.status(500).send()
     })
 }))
@@ -793,18 +850,18 @@ app.get('/api/ecosonar/scores', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/ecosonar/info', asyncMiddleware(async (req, res, _next) => {
   const date = req.query.date ?? null
-  console.log('GET AVERAGE PROJECT SCORE - retrieve all informations for all projects for the date defined')
+  loggerService.info('GET AVERAGE PROJECT SCORE - retrieve all informations for all projects for the date defined')
   projectService.getAllInformationsAverage(date)
     .then((result) => {
-      console.log('GET AVERAGE PROJECT SCORES - Retrieved average of scores from all projects for the date defined')
+      loggerService.info('GET AVERAGE PROJECT SCORES - Retrieved average of scores from all projects for the date defined')
       return res.status(200).json(result)
     }).catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.error('GET AVERAGE PROJECT SCORE - retrieve all informations for all projects for the date defined encountered an error')
+        loggerService.error('GET AVERAGE PROJECT SCORE - retrieve all informations for all projects for the date defined encountered an error')
         return res.status(500).send()
       }
-      console.error('GET AVERAGE PROJECT SCORES - Average of scores from all projects for the date defined could not be retrieved')
+      loggerService.error('GET AVERAGE PROJECT SCORES - Average of scores from all projects for the date defined could not be retrieved')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -888,18 +945,18 @@ app.post('/api/project/all', asyncMiddleware(async (req, res, _next) => {
   const filterName = req.query.filterName ?? null
   const sortBy = req.body.sortBy ?? null
   const filterScore = req.body.filterScore ?? null
-  console.log('GET PROJECTS SCORES - Retrieve scores for each project')
+  loggerService.info('GET PROJECTS SCORES - Retrieve scores for each project')
   projectService.getAllProjectInformations(date, sortBy, filterName, filterScore)
     .then((result) => {
-      console.log('GET PROJECTS SCORES - Average scores for each project retrieved')
+      loggerService.info('GET PROJECTS SCORES - Average scores for each project retrieved')
       return res.status(200).json(result)
     }).catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.log('GET PROJECTS SCORES - Retrieve scores for each project encountered an error')
+        loggerService.info('GET PROJECTS SCORES - Retrieve scores for each project encountered an error')
         return res.status(500).send()
       }
-      console.log('GET PROJECT SCORES - Average scores for each each project could not be retrieved')
+      loggerService.info('GET PROJECT SCORES - Average scores for each each project could not be retrieved')
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -927,15 +984,15 @@ app.post('/api/project/all', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log('GET BEST PRACTICES PROJECT - retrieve best practices analysis for project ' + projectName)
-  retrieveBestPracticesService.getProjectAnalysis(projectName)
+  loggerService.info('GET BEST PRACTICES PROJECT - retrieve best practices analysis for project ' + projectName)
+  retrieveBestPracticesService.getProjectAnalysis(projectName, res)
     .then((results) => {
-      console.log('GET BEST PRACTICES PROJECT - Best practices for project retrieved')
+      loggerService.info('GET BEST PRACTICES PROJECT - Best practices for project retrieved')
       return res.status(200).json(results)
     })
     .catch((error) => {
-      console.error(error)
-      console.error('GET BEST PRACTICES PROJECT - retrieve best practices analysis for project ' + projectName + ' encountered an error')
+      loggerService.error(error)
+      loggerService.error('GET BEST PRACTICES PROJECT - retrieve best practices analysis for project ' + projectName + ' encountered an error')
       return res.status(500).send()
     })
 }))
@@ -970,15 +1027,15 @@ app.get('/api/bestPractices/project', asyncMiddleware(async (req, res, _next) =>
 app.post('/api/bestPractices/url', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const urlName = req.body.urlName
-  console.log(`GET BEST PRACTICES URL - retrieve best practices analysis for url ${urlName} into project ${projectName}`)
+  loggerService.info(`GET BEST PRACTICES URL - retrieve best practices analysis for url ${urlName} into project ${projectName}`)
   retrieveBestPracticesService.getUrlBestPractices(projectName, urlName)
     .then((results) => {
-      console.log('GET BEST PRACTICES URL - Best practices for url retrieved')
+      loggerService.info('GET BEST PRACTICES URL - Best practices for url retrieved')
       return res.status(200).json(results)
     })
     .catch((error) => {
-      console.error(error)
-      console.log(`GET BEST PRACTICES URL - retrieve best practices analysis for url ${urlName} into project ${projectName} encountered an error`)
+      loggerService.error(error)
+      loggerService.info(`GET BEST PRACTICES URL - retrieve best practices analysis for url ${urlName} into project ${projectName} encountered an error`)
       return res.status(500).send()
     })
 }))
@@ -1020,7 +1077,7 @@ app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
   const saveUrls = req.body.saveUrls
   const username = req.body.username
   const password = req.body.password
-  console.log(`CRAWLER - Running crawler from ${mainUrl}`)
+  loggerService.info(`CRAWLER - Running crawler from ${mainUrl}`)
   crawlerService.launchCrawl(projectName, mainUrl, saveUrls, username, password)
   return res.status(202).send()
 }))
@@ -1047,15 +1104,15 @@ app.post('/api/crawl', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/crawl', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log(`CRAWLER - Retrieve all urls crawled for ${projectName}`)
+  loggerService.info(`CRAWLER - Retrieve all urls crawled for ${projectName}`)
   crawlerService.retrieveCrawledUrl(projectName)
     .then((results) => {
-      console.log(`CRAWLER - ${results.length} URLs retrieved for project ${projectName}`)
+      loggerService.info(`CRAWLER - ${results.length} URLs retrieved for project ${projectName}`)
       return res.status(200).json(results)
     })
     .catch((error) => {
-      console.error(error)
-      console.error(`CRAWLER - Retrieve all urls crawled for ${projectName} encountered an error`)
+      loggerService.error(error)
+      loggerService.error(`CRAWLER - Retrieve all urls crawled for ${projectName} encountered an error`)
       return res.status(500).send()
     })
 }))
@@ -1092,19 +1149,19 @@ app.get('/api/crawl', asyncMiddleware(async (req, res, _next) => {
 app.post('/api/procedure', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
   const selectedProcedure = req.body.selectedProcedure
-  console.log(`POST PROCEDURE - Save procedure ${selectedProcedure} for project ${projectName}`)
+  loggerService.info(`POST PROCEDURE - Save procedure ${selectedProcedure} for project ${projectName}`)
   procedureService.saveProcedure(projectName, selectedProcedure)
     .then(() => {
-      console.log(`POST PROCEDURE - Procedure for project ${projectName} saved`)
+      loggerService.info(`POST PROCEDURE - Procedure for project ${projectName} saved`)
       return res.status(200).send()
     })
     .catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.error(`POST PROCEDURE - Save procedure ${selectedProcedure} for project ${projectName} encountered an error`)
+        loggerService.error(`POST PROCEDURE - Save procedure ${selectedProcedure} for project ${projectName} encountered an error`)
         return res.status(500).send()
       }
-      console.error(`POST PROCEDURE PROJECT - Procedure for project ${projectName} could not be saved because procedure is incorrect`)
+      loggerService.error(`POST PROCEDURE PROJECT - Procedure for project ${projectName} could not be saved because procedure is incorrect`)
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -1131,34 +1188,34 @@ app.post('/api/procedure', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/procedure', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log(`GET PROCEDURE - Get Procedure for project ${projectName}`)
+  loggerService.info(`GET PROCEDURE - Get Procedure for project ${projectName}`)
   procedureService.getProcedure(projectName)
     .then((procedure) => {
-      console.log(`GET PROCEDURE - Project ${projectName} retrieved`)
+      loggerService.info(`GET PROCEDURE - Project ${projectName} retrieved`)
       return res.status(200).json(procedure)
     })
     .catch((error) => {
-      console.error(error)
-      console.error(`GET PROCEDURE - Get Procedure for project ${projectName} encountered an error`)
+      loggerService.error(error)
+      loggerService.error(`GET PROCEDURE - Get Procedure for project ${projectName} encountered an error`)
       return res.status(500).send()
     })
 }))
 
 app.post('/api/export', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.body.projectName
-  console.log(`POST EXCEL - audit for project ${projectName} to be retrieved`)
-  exportAuditService.exportAudit(projectName)
+  loggerService.info(`POST EXCEL - audit for project ${projectName} to be retrieved`)
+  exportAuditService.exportAudit(projectName, res)
     .then((auditExported) => {
-      console.log(`POST EXCEL - Excel export for project ${projectName} has been completed`)
+      loggerService.info(`POST EXCEL - Excel export for project ${projectName} has been completed`)
       return res.status(200).send(auditExported)
     })
     .catch((error) => {
-      console.error(error)
+      loggerService.error(error)
       if (error instanceof SystemError) {
-        console.log(`POST EXCEL - audit for project ${projectName} to be retrieved encountered an error`)
+        loggerService.info(`POST EXCEL - audit for project ${projectName} to be retrieved encountered an error`)
         return res.status(500).send()
       }
-      console.log(`POST EXCEL PROJECT - Excel export for project ${projectName} could not be resolved`)
+      loggerService.info(`POST EXCEL PROJECT - Excel export for project ${projectName} could not be resolved`)
       return res.status(400).json({ error: error.message })
     })
 }))
@@ -1179,10 +1236,10 @@ app.post('/api/export', asyncMiddleware(async (req, res, _next) => {
  */
 app.get('/api/version', asyncMiddleware(async (_req, res, _next) => {
   try {
-    console.log('GET VERSION - Version of Ecosonar retrieved')
+    loggerService.info('GET VERSION - Version of Ecosonar retrieved')
     return res.status(200).json({ version: packageJson.version })
   } catch (error) {
-    console.error('GET VERSION - Version of Ecosonar could not be retrieved')
+    loggerService.error('GET VERSION - Version of Ecosonar could not be retrieved')
     return res.status(400).json({ error: error.message })
   }
 }))
@@ -1202,14 +1259,14 @@ app.get('/api/version', asyncMiddleware(async (_req, res, _next) => {
  *         description: Documentation could not be retrieved.
  */
 app.get('/api/best-practices-rules', asyncMiddleware(async (req, res, _next) => {
-  console.log('GET BEST PRACTICES - Best practices rules to be retrieved')
+  loggerService.info('GET BEST PRACTICES - Best practices rules to be retrieved')
 
   try {
     const bestPracticesRules = bestPracticesServices.getAllBestPracticesRules()
-    console.log('GET BEST PRACTICES - Best practices rules has been retrieved')
+    loggerService.info('GET BEST PRACTICES - Best practices rules has been retrieved')
     return res.status(200).send(bestPracticesRules)
   } catch (error) {
-    console.error('GET BEST PRACTICES - Best practices rules could not be retrieved')
+    loggerService.error('GET BEST PRACTICES - Best practices rules could not be retrieved')
     return res.status(400).json({ error: error.message })
   }
 }))
@@ -1236,15 +1293,189 @@ app.get('/api/best-practices-rules', asyncMiddleware(async (req, res, _next) => 
  */
 app.delete('/api/project', asyncMiddleware(async (req, res, _next) => {
   const projectName = req.query.projectName
-  console.log(`DELETE PROJECT - Delete project ${projectName}`)
+  loggerService.info(`DELETE PROJECT - Delete project ${projectName}`)
   projectService.deleteProject(projectName)
     .then(() => {
-      console.log(`DELETE PROJECT - Project ${projectName} deletion succeeded`)
+      loggerService.info(`DELETE PROJECT - Project ${projectName} deletion succeeded`)
       return res.status(200).send()
     })
     .catch((error) => {
-      console.error(error)
-      console.error(`DELETE PROJECT - Delete project ${projectName} encountered an error`)
+      loggerService.error(error)
+      loggerService.error(`DELETE PROJECT - Delete project ${projectName} encountered an error`)
+      return res.status(500).send()
+    })
+}))
+
+/**
+ * @swagger
+ * /api/logs:
+ *   get:
+ *     tags:
+ *       - "EcoSonar logs"
+ *     summary: "Get logs of Ecosonar"
+ *     description: Retrieve the logs of Ecosonar server.
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       500:
+ *         description: Error retrieving logs.
+ */
+app.get('/api/logs', (req, res) => { 
+  loggerService.query({ order: 'desc', limit: 100 },  
+  (err, result) => { 
+      if (err) { 
+          res.status(500).send({  
+              error: 'Error retrieving logs' 
+             }); 
+      } else { 
+        
+    fs.readFile('\app.log', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log(data);
+      res.send(data);
+    });
+           
+      } 
+  }); 
+});
+
+// API CONFIGURATION
+/**
+ * @swagger
+ * /api/configuration:
+ *   post:
+ *     tags:
+ *       - "Project Configuration"
+ *     summary: "Add configuration for project"
+ *     description: Update the different modules/analysis to be used
+ *     parameters:
+ *       - name: projectName
+ *         in: body
+ *         description: The name of the project
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            w3c:
+ *              type: string
+ *            carbon:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Procedure could not be updated.
+ *       500:
+ *         description: System Error.
+ */
+app.post('/api/configuration', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.body.projectName
+  const w3c = req.body.w3c
+  const carbon = req.body.carbon
+  loggerService.info(`POST configuration - Insert configuration for project ${projectName}`)
+  configurationService.saveConfiguration(projectName, w3c, carbon)
+    .then(() => {
+      loggerService.info(`POST configuration - configuration for project ${projectName} saved`)
+      return res.status(200).send()
+    })
+    .catch((error) => {
+      loggerService.error(error)
+      if (error instanceof SystemError) {
+        loggerService.error(`POST configuration - Save configuration for project ${projectName} encountered an error`)
+        return res.status(500).send()
+      }
+      loggerService.error(`POST configuration PROJECT - configuration for project ${projectName} could not be saved because procedure is incorrect`)
+      return res.status(400).json({ error: error.message })
+    })
+}))
+
+/**
+ * @swagger
+ * /api/configuration:
+ *   put:
+ *     tags:
+ *       - "Project Configuration"
+ *     summary: "Add configuration for project"
+ *     description: Update the different modules/analysis to be used
+ *     parameters:
+ *       - name: projectName
+ *         in: body
+ *         description: The name of the project
+ *         required: true
+ *         schema:
+ *          type: object
+ *          properties:
+ *            projectName:
+ *              type: string
+ *            w3c:
+ *              type: string
+ *            carbon:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       400:
+ *         description: Procedure could not be updated.
+ *       500:
+ *         description: System Error.
+ */
+app.put('/api/configuration', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.body.projectName
+  const w3c = req.body.w3c
+  const carbon = req.body.carbon
+  loggerService.info(`PUT configuration - Modify configuration for project ${projectName}`)
+  configurationService.updateConfiguration(res, projectName, w3c, carbon)
+    .then(() => {
+      loggerService.info(`PUT configuration - configuration for project ${projectName} saved`)
+      return res.status(200).send()
+    })
+    .catch((error) => {
+      loggerService.error(error)
+      if (error instanceof SystemError) {
+        loggerService.error(`PUT configuration - Modify configuration for project ${projectName} encountered an error`)
+        return res.status(500).send()
+      }
+      loggerService.error(`PUT configuration PROJECT - Modify configuration for project ${projectName} could not be saved because procedure is incorrect`)
+      return res.status(400).json({ error: error.message })
+    })
+}))
+
+/**
+ * @swagger
+ * /api/configuration:
+ *   get:
+ *     tags:
+ *       - "Project Configuration"
+ *     summary: "Get configuration for project"
+ *     description: Retrieve the configuration for a given project.
+ *     parameters:
+ *       - name: projectName
+ *         in: query
+ *         description: The name of the project
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Success.
+ *       500:
+ *         description: System Error.
+ */
+app.get('/api/configuration', asyncMiddleware(async (req, res, _next) => {
+  const projectName = req.query.projectName
+  loggerService.info(`GET CONFIGURATION - Get configuration for project ${projectName}`)
+  configurationService.getConfiguration(projectName, res)
+    .then((config) => {
+      loggerService.info(`GET CONFIGURATION - Project ${projectName} retrieved`)
+      return res.status(200).json(config)
+    })
+    .catch((error) => {
+      loggerService.error(error)
+      loggerService.error(`GET CONFIGURATION - Get configuration for project ${projectName} encountered an error`)
       return res.status(500).send()
     })
 }))

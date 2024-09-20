@@ -1,4 +1,5 @@
 import formatCompliance from './formatCompliance.js'
+import loggerService from '../../loggers/traces.js'
 
 class FormatLighthouseAnalysis {}
 
@@ -41,8 +42,8 @@ FormatLighthouseAnalysis.prototype.lighthouseUrlAnalysisFormatted = function (an
       }
     }
   } catch (err) {
-    console.error(err)
-    console.error('LIGHTHOUSE - error during the formatting of project analysis')
+    loggerService.error(err)
+    loggerService.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
   return formattedAnalysis
 }
@@ -147,8 +148,8 @@ FormatLighthouseAnalysis.prototype.lighthouseProjectLastAnalysisFormatted = func
       }
     }
   } catch (err) {
-    console.error(err)
-    console.error('LIGHTHOUSE - error during the formatting of project analysis')
+    loggerService.error(err)
+    loggerService.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
   return analysis
 
@@ -176,8 +177,8 @@ FormatLighthouseAnalysis.prototype.lighthouseAnalysisFormattedDeployments = func
     })
     deployments = this.formatDeploymentsForGraphs(deployments)
   } catch (err) {
-    console.error(err)
-    console.error('LIGHTHOUSE - error during the formatting of project analysis')
+    loggerService.error(err)
+    loggerService.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
   return deployments
 }
@@ -235,8 +236,8 @@ FormatLighthouseAnalysis.prototype.formatDeploymentsForGraphs = function (deploy
       delete i.numberOfValues
     }
   } catch (err) {
-    console.error(err)
-    console.error('LIGHTHOUSE - error during the formatting of project analysis')
+    loggerService.error(err)
+    loggerService.error('LIGHTHOUSE - error during the formatting of project analysis')
   }
 
   return finalDeployment

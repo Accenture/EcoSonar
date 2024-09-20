@@ -1,11 +1,12 @@
 import { startFlow } from 'lighthouse'
-import lighthouse from 'lighthouse'
 import { setTimeout } from "timers/promises";
 import PuppeteerHar from '../utils/PuppeteerHar.js'
 import { clickOnElement, waitForSelectors, applyChange } from '../utils/playSelectors.js'
 import urlsProjectRepository from '../dataBase/urlsProjectRepository.js'
 import viewPortParams from '../utils/viewportParams.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
+import { aesEncrypt, aesDecrypt } from '../services/encryptionService.js'
 
 class UserJourneyService { }
 
@@ -59,8 +60,8 @@ UserJourneyService.prototype.playUserJourney = async function (url, browser, use
           break
       }
     } catch (error) {
-      console.error('USER JOURNEY : An error occured when launching user flow for url ' + url + ' in step ' + step.type)
-      console.error(error)
+      loggerService.error('USER JOURNEY : An error occured when launching user flow for url ' + url + ' in step ' + step.type)
+      loggerService.error(error)
     }
   }
   // await page.waitForNavigation()
@@ -123,6 +124,7 @@ UserJourneyService.prototype.insertUserFlow = async function (projectName, url, 
   if (!systemError && urlProject === null) {
     return Promise.reject(new Error('Url not found'))
   } else if (!systemError) {
+    findElementAndEncrypt(userFlow.steps, "selectors", "pass")
     await urlsProjectRepository.insertUserFlow(urlProject, userFlow)
       .catch(() => {
         systemError = true
@@ -137,14 +139,37 @@ UserJourneyService.prototype.insertUserFlow = async function (projectName, url, 
   })
 }
 
+function findElementAndEncrypt(arr, propName, propValue) {
+  for (var i=0; i < arr.length; i++) {
+    if ((arr[i][propName].toString()).includes(propValue)) { 
+      arr[i].value = '***encrypt***'+aesEncrypt(arr[i].value)
+    }
+  }    
+  // will return undefined if not found; you could return a default instead
+}
+
+function findElementAndDecrypt(arr, propName, propValue) {
+  var test = arr.steps
+  for (var i=0; i < test.length; i++) {
+    if ((test[i][propName].toString()).includes(propValue)) { 
+      if (test[i].value.includes('***encrypt***')) {
+      let newText = test[i].value.replace('***encrypt***', '');
+      test[i].value = aesDecrypt(newText)
+      }
+    }
+  }  
+  // will return undefined if not found; you could return a default instead
+}
+
 UserJourneyService.prototype.getUserFlow = async function (projectName, url) {
   return new Promise((resolve, reject) => {
     urlsProjectRepository.getUserFlow(projectName, url)
       .then((result) => {
         if (result === null || result.userFlow === undefined) {
-          console.log('GET USER FLOW - Url flow not found')
+          loggerService.info('GET USER FLOW - Url flow not found')
           reject(new Error('The page to audit does not have any user flow saved into database.'))
         } else {
+          findElementAndDecrypt(Object.fromEntries(result.userFlow), "selectors", "pass")
           resolve(Object.fromEntries(result.userFlow))
         }
       })
@@ -183,7 +208,7 @@ UserJourneyService.prototype.deleteUserFlow = async function (projectName, url) 
 }
 
 UserJourneyService.prototype.scrollUntil = async function (page, distancePercentage, selectors = null) {
-  console.log('AUTOSCROLL - autoscroll has started')
+  loggerService.log('AUTOSCROLL - autoscroll has started')
   if (distancePercentage) {
     await page.evaluate(async (percentage) => {
       await new Promise((resolve, _reject) => {
@@ -207,7 +232,7 @@ UserJourneyService.prototype.scrollUntil = async function (page, distancePercent
       window.scrollTo({ top: y - 100 })
     }, selectors)
   }
-  console.log('AUTOSCROLL - Autoscroll has ended ')
+  loggerService.log('AUTOSCROLL - Autoscroll has ended ')
 }
 
 const userJourneyService = new UserJourneyService()

@@ -3,6 +3,7 @@ import path from 'path'
 import PuppeteerHar from '../../utils/PuppeteerHar.js'
 import userJourneyService from '../userJourneyService.js'
 import viewPortParams from '../../utils/viewportParams.js'
+import loggerService from '../../loggers/traces.js'
 
 export default async function createGreenITReports (browser, projectName, urlList, autoscroll) {
   // Concurent tab
@@ -96,20 +97,21 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
       .then((result) => {
         userJourney = result
       }).catch((error) => {
-        console.log(error.message)
+        loggerService.info(error.message)
       })
     if (userJourney) {
       ({ page, harObj } = await userJourneyService.playUserJourney(url, browser, userJourney))
-      console.log('GREENIT Analysis - Page requires user journey')
+      loggerService.info('GREENIT Analysis - Page requires user journey')
     } else {
       ({ page, harObj } = await launchPageWithoutUserJourney(browser, url, autoscroll))
     }
-
+    
     try {
       // get ressources
       const client = await page.target().createCDPSession()
       await client.send('Page.enable')
       const ressourceTree = await client.send('Page.getResourceTree')
+      loggerService.info('Starting to pickup Resources')
       ressourceTree.frameTree.resources = await Promise.all(
         ressourceTree.frameTree.resources.map(async function (resource) {
           try {
@@ -119,12 +121,14 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
             })
             resource.content = contentScript.content
           } catch (error) {
-            console.error('\x1b[33m%s\x1b[0m', resource.url)
-            console.error('\x1b[33m%s\x1b[0m', error.message)
+            loggerService.error('Error catched while getting page resources')
+            loggerService.error('An error occured with this url : ', resource.url)
+            loggerService.error('Error message : ', error)
           }
           return resource
         })
       )
+      loggerService.info('Resources picked up for greenIT : ', ressourceTree.frameTree.resources)
       await client.detach()
 
       // get rid of chrome.i18n.getMessage not declared
@@ -147,18 +151,19 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
       await page.evaluate((x) => (har = x), harObj.log)
       await page.evaluate((x) => (resources = x), ressourceTree.frameTree.resources)
       // launch analyse
-      console.log('Launch GreenIT analysis for url ' + url)
+      loggerService.info('Launch GreenIT analysis for url ' + url)
       result = await page.evaluate(async () => await launchAnalyse())
-      console.log('GreenIT analysis ended for url ' + url)
+      loggerService.info('GreenIT analysis ended for url ' + url)
       page.close()
       result.success = true
     } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', 'Error on URL ' + url)
-      console.error('\x1b[31m%s\x1b[0m', error)
+      loggerService.error('Error catched while getting anlysing page with greenIT')
+      loggerService.error('Error on URL : ' + url)
+      loggerService.error('Error 1', error)
       result.success = false
     }
   } catch (error) {
-    console.error('\x1b[31m%s\x1b[0m', error)
+    loggerService.error('Error 2 :', error)
     result.success = false
   } finally {
     result.url = url
@@ -170,7 +175,8 @@ async function analyseURL (browser, projectName, url, options, autoscroll) {
 
 async function launchPageWithoutUserJourney (browser, url, autoscroll) {
   const page = await browser.newPage()
-
+  const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36';
+  page.setUserAgent(ua);
   await page.setViewport(viewPortParams)
 
   // disabling cache

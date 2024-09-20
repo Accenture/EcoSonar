@@ -53,10 +53,11 @@ services:
       - ./EcoSonar-SonarQube/target/:/opt/sonarqube/extensions/plugins/
       - ./EcoSonar-SonarQube/ecocode/ecocode-android-1.1.0.jar:/opt/sonarqube/extensions/plugins/ecocode-android-1.1.0.jar
       - ./EcoSonar-SonarQube/ecocode/ecocode-ios-1.1.0.jar:/opt/sonarqube/extensions/plugins/ecocode-ios-1.1.0.jar:ro
-      - ./EcoSonar-SonarQube/ecocode/ecocode-java-plugin-1.6.1.jar:/opt/sonarqube/extensions/plugins/ecocode-java-plugin-1.6.1.jar:ro
+      - ./EcoSonar-SonarQube/ecocode/ecocode-java-plugin-1.6.2.jar:/opt/sonarqube/extensions/plugins/ecocode-java-plugin-1.6.2.jar:ro
       - ./EcoSonar-SonarQube/ecocode/ecocode-javascript-plugin-1.5.0.jar:/opt/sonarqube/extensions/plugins/ecocode-javascript-plugin-1.5.0.jar:ro
-      - ./EcoSonar-SonarQube/ecocode/ecocode-php-plugin-1.4.3.jar:/opt/sonarqube/extensions/plugins/ecocode-php-plugin-1.4.3.jar:ro
-      - ./EcoSonar-SonarQube/ecocode/ecocode-python-plugin-1.4.3.jar:/opt/sonarqube/extensions/plugins/ecocode-python-plugin-1.4.3.jar:ro
+      - ./EcoSonar-SonarQube/ecocode/ecocode-php-plugin-1.5.1.jar:/opt/sonarqube/extensions/plugins/ecocode-php-plugin-1.5.1.jar:ro
+      - ./EcoSonar-SonarQube/ecocode/ecocode-python-plugin-1.4.4.jar:/opt/sonarqube/extensions/plugins/ecocode-python-plugin-1.4.4.jar:ro
+      - ./EcoSonar-SonarQube/ecocode/ecocode-csharp-plugin-1.1.0.jar:/opt/sonarqube/extensions/plugins/ecocode-csharp-plugin-1.1.0.jar:ro
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_data:/opt/sonarqube/data

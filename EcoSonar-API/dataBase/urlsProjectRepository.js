@@ -2,6 +2,7 @@ import uniqid from 'uniqid'
 import escapeRegExp from 'lodash/escapeRegExp.js'
 import urlsprojects from './models/urlsprojects.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
 
 const UrlsProjectRepository = function () {
   /**
@@ -22,7 +23,7 @@ const UrlsProjectRepository = function () {
       urlsprojects.insertMany(urlsProjects)
         .then(() => { resolve() })
         .catch((err) => {
-          console.error('\x1b[31m%s\x1b[0m', err)
+          loggerService.error('\x1b[31m%s\x1b[0m', err)
           if (err._message === 'urlsprojects validation failed') {
             const indexError = urlList.indexOf(err.errors.urlName.properties.value)
             const errors = []
@@ -51,11 +52,11 @@ const UrlsProjectRepository = function () {
     return new Promise((resolve, reject) => {
       urlsprojects.deleteOne({ urlName: url[0].urlName })
         .then((result) => {
-          console.log(`DELETE URL - On URL PROJECT ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URL - On URL PROJECT ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -69,11 +70,11 @@ const UrlsProjectRepository = function () {
     return new Promise((resolve, reject) => {
       urlsprojects.deleteMany({ idKey: { $in: urlIdKeyList } })
         .then((result) => {
-          console.log(`DELETE URLS PROJECT - On urlsprojects ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URLS PROJECT - On urlsprojects ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -90,7 +91,7 @@ const UrlsProjectRepository = function () {
           resolve(result)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -107,7 +108,7 @@ const UrlsProjectRepository = function () {
       urlsprojects.updateOne({ idKey: urlObject.idKey, projectName: urlObject.projectName, urlName: urlObject.urlName }, { userFlow: userflowMap })
         .then(() => { resolve() })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -126,11 +127,12 @@ const UrlsProjectRepository = function () {
           resolve(result)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
   }
+
 
   /**
    * Deletion of user flow for a specified url in a project
@@ -142,7 +144,7 @@ const UrlsProjectRepository = function () {
       urlsprojects.updateOne({ projectName: { $eq: projectName }, urlName: { $eq: urlName } }, { $unset: { userFlow: '' } })
         .then(() => { resolve() })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -153,7 +155,7 @@ const UrlsProjectRepository = function () {
       urlsprojects.find({ projectName: { $eq: projectName }, urlName: { $eq: urlName } }, { idKey: 1 })
         .then((result) => { resolve(result) })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -174,7 +176,26 @@ const UrlsProjectRepository = function () {
           resolve(res)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
+          reject(new SystemError())
+        })
+    })
+  }
+
+  /**
+   * find project given the projectName
+   * @param {string} projectName project name
+   * @returns project
+   */
+  this.getUrlProject = async function (projectName) {
+    return new Promise((resolve, reject) => {
+      urlsprojects.findOne({ projectName: { $eq: projectName } }, {urlName: 1, idKey: 1, projectName: 1, urlName: 1, userFlow: 1 })
+        .then((result) => {
+          resolve(result)
+        })
+        .catch((error) => {
+          console.log(error);
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })

@@ -1,6 +1,7 @@
 import greenits from './models/greenits.js'
 import urlsprojects from './models/urlsprojects.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
 
 const GreenItRepository = function () {
   /**
@@ -18,13 +19,13 @@ const GreenItRepository = function () {
             resolve()
           })
           .catch((error) => {
-            console.error('\x1b[31m%s\x1b[0m', error)
-            console.log('GREENIT - error during insertion of analysis')
+            loggerService.error('\x1b[31m%s\x1b[0m', error)
+            loggerService.info('GREENIT - error during insertion of analysis')
             const systemError = new SystemError()
             reject(systemError)
           })
       } else {
-        console.log('GREENIT - None of the urls analysed could be inserted')
+        loggerService.info('GREENIT - None of the urls analysed could be inserted')
         reject(new Error('GREENIT - None of the urls analysed could be inserted'))
       }
     })
@@ -41,7 +42,7 @@ const GreenItRepository = function () {
           resolve(res)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -61,7 +62,7 @@ const GreenItRepository = function () {
           resolve(result)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -78,7 +79,7 @@ const GreenItRepository = function () {
         .sort({ dateGreenAnalysis: 1 })
         .then((result) => { resolve(result) })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -95,7 +96,7 @@ const GreenItRepository = function () {
         .sort({ dateGreenAnalysis: 1 })
         .then((result) => { resolve(result) })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -109,11 +110,11 @@ const GreenItRepository = function () {
     return new Promise((resolve, reject) => {
       greenits.deleteMany({ idUrlGreen: url[0].idKey })
         .then((result) => {
-          console.log(`DELETE URL - On GreenIt ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URL - On GreenIt ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -127,11 +128,11 @@ const GreenItRepository = function () {
     return new Promise((resolve, reject) => {
       greenits.deleteMany({ idUrlGreen: { $in: urlIdKeyList } })
         .then((result) => {
-          console.log(`DELETE URLS PROJECT - On GreenIt ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URLS PROJECT - On GreenIt ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -151,10 +152,10 @@ async function checkValues (arrayToInsert) {
     } else {
       await urlsprojects.find({ idKey: analysis.idUrlGreen })
         .then((result) => {
-          console.warn(`GREENIT INSERT - Url  ${result[0].urlName} cannot be inserted due to presence of NaN or undefined values`)
+          loggerService.warn(`GREENIT INSERT - Url  ${result[0].urlName} cannot be inserted due to presence of NaN or undefined values`)
         })
         .catch((error) => {
-          console.error(error)
+          loggerService.error(error)
         })
     }
   }

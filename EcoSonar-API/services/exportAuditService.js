@@ -2,10 +2,11 @@ import exceljs from 'exceljs'
 import retrieveAnalysisService from './retrieveAnalysisService.js'
 import urlConfigurationService from './urlConfigurationService.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
 
 class ExportAuditService { }
 
-ExportAuditService.prototype.exportAudit = async function (projectName) {
+ExportAuditService.prototype.exportAudit = async function (projectName, res) {
   let urls = []
   let analysis = null
 
@@ -17,7 +18,7 @@ ExportAuditService.prototype.exportAudit = async function (projectName) {
       return new SystemError()
     })
 
-  await retrieveAnalysisService.getProjectAnalysis(projectName)
+  await retrieveAnalysisService.getProjectAnalysis(projectName, res)
     .then((results) => {
       analysis = results
     }).catch(() => {
@@ -118,12 +119,12 @@ ExportAuditService.prototype.exportAudit = async function (projectName) {
           formatExcelSheet(url, index + 1, workbook, projectName, analysisForUrl, dateLastAnalysis)
         })
         .catch(() => {
-          console.error('Analysis for URL ' + url + ' could not be resolved ')
+          loggerService.error('Analysis for URL ' + url + ' could not be resolved ')
         })
     }
     return workbook.xlsx.writeBuffer()
   } catch (err) {
-    console.error(err)
+    loggerService.error(err)
     return new Error('Could not export Audit to Excel for projet ' + projectName)
   }
 }

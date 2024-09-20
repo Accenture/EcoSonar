@@ -1,3 +1,5 @@
+import loggerService from '../loggers/traces.js'
+
 async function clickOnElement (element, step) {
   if (step.offsetX && step.offsetY) {
     await element.click({
@@ -22,7 +24,7 @@ async function waitForSelectors (selectors, frame, options) {
         return await waitForSelector([selector], frame, options)
       }
     } catch (err) {
-      console.error(err.message)
+      loggerService.error(err.message)
     }
   }
   throw new Error('Could not find element for selectors: ' + JSON.stringify(selectors))
@@ -33,8 +35,7 @@ async function waitForSelector (selector, frame, options) {
   const firstSelector = selector[0]
   if (selector.length === 1  && firstSelector.indexOf('#') === 0) {
       const idStartsWith = firstSelector.replace('#', '')
-      const selectorPicker = `[id="${idStartsWith}"]`
-      console.log('Selector being picked '+ idStartsWith)
+      loggerService.info('Selector being picked '+ idStartsWith)
       return await frame.waitForSelector(firstSelector)
     }
 

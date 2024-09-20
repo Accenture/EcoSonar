@@ -1,5 +1,6 @@
 import lighthouses from './models/lighthouses.js'
 import SystemError from '../utils/SystemError.js'
+import loggerService from '../loggers/traces.js'
 
 const LighthouseRepository = function () {
   /**
@@ -15,11 +16,11 @@ const LighthouseRepository = function () {
             resolve()
           })
           .catch((err) => {
-            console.error('\x1b[31m%s\x1b[0m', err)
+            loggerService.error('\x1b[31m%s\x1b[0m', err)
             reject(new SystemError())
           })
       } else {
-        console.log('LIGHTHOUSE - None of the urls analysed could be inserted')
+        loggerService.info('LIGHTHOUSE - None of the urls analysed could be inserted')
         reject(
           new Error('LIGHTHOUSE - None of the urls analysed could be inserted')
         )
@@ -43,7 +44,7 @@ const LighthouseRepository = function () {
           resolve(res)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -76,7 +77,7 @@ const LighthouseRepository = function () {
           resolve(result)
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -107,7 +108,7 @@ const LighthouseRepository = function () {
         .sort({ dateLighthouseAnalysis: 1 })
         .then((result) => { resolve(result) })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -132,7 +133,7 @@ const LighthouseRepository = function () {
         .sort({ dateLighthouseAnalysis: 1 })
         .then((result) => { resolve(result) })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -146,11 +147,11 @@ const LighthouseRepository = function () {
     return new Promise((resolve, reject) => {
       lighthouses.deleteMany({ idUrlLighthouse: url[0].idKey })
         .then((result) => {
-          console.log(`DELETE URL - On Lighthouse ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URL - On Lighthouse ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })
@@ -164,11 +165,11 @@ const LighthouseRepository = function () {
     return new Promise((resolve, reject) => {
       lighthouses.deleteMany({ idUrlLighthouse: { $in: urlIdKeyList } })
         .then((result) => {
-          console.log(`DELETE URLS PROJECT - On Lighthouse ${result.deletedCount} objects removed`)
+          loggerService.info(`DELETE URLS PROJECT - On Lighthouse ${result.deletedCount} objects removed`)
           resolve()
         })
         .catch((error) => {
-          console.error('\x1b[31m%s\x1b[0m', error)
+          loggerService.error('\x1b[31m%s\x1b[0m', error)
           reject(new SystemError())
         })
     })

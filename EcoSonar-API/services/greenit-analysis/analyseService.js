@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer'
 import createGreenITReports from './greenit-analysis.js'
 import authenticationService from '../authenticationService.js'
 import viewPortParams from '../../utils/viewportParams.js'
+import loggerService from '../../loggers/traces.js'
 
 export default async function analyse (urlList, projectName, username, password, autoscroll) {
   let reports = []
@@ -14,18 +15,18 @@ export default async function analyse (urlList, projectName, username, password,
   ]
 
   const proxyConfiguration = await authenticationService.useProxyIfNeeded(projectName)
-  console.log('Get proxy successful');
+  loggerService.info('Get proxy successful');
   if (proxyConfiguration) {
     browserArgs.push(proxyConfiguration)
   }
 
   const userJourneyEnabled = process.env.ECOSONAR_ENV_USER_JOURNEY_ENABLED || 'false'
-  console.log('Finished retrieving variable ECOSONAR_ENV_USER_JOURNEY_ENABLED');
+  loggerService.info('Finished retrieving variable ECOSONAR_ENV_USER_JOURNEY_ENABLED');
   if (userJourneyEnabled === 'true') {
-    console.log('Your EcoSonar project is using user journey to audit your website, GreenIT analysis will be made into different Chromium browser for right cookies configuration')
+    loggerService.info('Your EcoSonar project is using user journey to audit your website, GreenIT analysis will be made into different Chromium browser for right cookies configuration')
     reports = await launchAllAnalysisOnDifferentBrowser(browserArgs, urlList, projectName, username, password, autoscroll)
   } else {
-  console.log('launchAllAnalysisOnSameBrowser');
+  loggerService.info('launchAllAnalysisOnSameBrowser');
     reports = await launchAllAnalysisOnSameBrowser(browserArgs, urlList, projectName, username, password, autoscroll)
   }
   return reports
@@ -51,10 +52,10 @@ async function launchAllAnalysisOnDifferentBrowser (browserArgs, urlList, projec
         report = await createGreenITReports(browser, projectName, [url], autoscroll)
         reports = reports.concat(report)
       } else {
-        console.warn('Could not log in, audit for greenit-analysis is skipped')
+        loggerService.warn('Could not log in, audit for greenit-analysis is skipped')
       }
     } catch (error) {
-      console.error('\x1b[31m%s\x1b[0m', error)
+      loggerService.error('\x1b[31m%s\x1b[0m', error)
     } finally {
       await closeBrowser(browser)
     }
@@ -81,12 +82,12 @@ async function launchAllAnalysisOnSameBrowser (browserArgs, urlList, projectName
       // analyse each page
       reports = await createGreenITReports(browser, projectName, urlList, autoscroll)
     } else {
-      console.warn('Could not log in, audit for greenit-analysis is skipped')
+      loggerService.warn('Could not log in, audit for greenit-analysis is skipped')
     }
   } catch (error) {
-    console.error('\x1b[31m%s\x1b[0m', error)
+    loggerService.error('\x1b[31m%s\x1b[0m', error)
   } finally {
-    console.log('Closing browser for launchAllAnalysisOnSameBrowser');
+    loggerService.info('Closing browser for launchAllAnalysisOnSameBrowser');
     await closeBrowser(browser)
   }
   return reports
@@ -100,6 +101,6 @@ async function closeBrowser (browser) {
     } else {
       return Promise.resolve()
     }
-  })).catch((error) => console.error('\x1b[31m%s\x1b[0m', error))
+  })).catch((error) => loggerService.error('\x1b[31m%s\x1b[0m', error))
   await browser.close()
 }

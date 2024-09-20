@@ -23,6 +23,8 @@ Then, the API can allow you to retrieve pre-formatted audit results using json f
     - [CORS Setup](#cors)
     - [Enable W3C validator Analysis](#w3c-validator)
     - [Setup User flow](#user-flow)
+    - [Password encryption](#encryption)
+    - [Swagger Authentication](#authentication)
   - [API: option 1 - Node.js](#nodejs)
     - [Prerequisites](#prerequisites-node)
     - [Installation](#installation-node)
@@ -222,7 +224,26 @@ If your projects require to set up a user flow to access some of your web pages,
 ```
 ECOSONAR_ENV_USER_JOURNEY_ENABLED = `true`or `false`
 ```
+<a name="encryption"></a>
 
+### Setup User flow
+
+The back end now requires additional settings for the ecryption of the passwords for the user-flow. However, if you do not add any settings for the password, it will still encrypt the password but with a default encryption key. Please note that the encryption Key must be 256 bits (32 characters) e.g xfn9P8L9rIpKtWKj68IZ3G865WfdYXNX
+
+```
+ENCRYPTION_KEY = `xfn9P8L9rIpKtWKj68IZ3G865WfdYXNX`
+```
+
+<a name="authentication"></a>
+
+### Swagger Authentication
+
+To set up the authentication settings for the swagger of ecosonar the following settings need to be added in the .env file.
+
+```
+ECOSONAR_USER_USERNAME = 'XXXXX'
+ECOSONAR_USER_PASSWORD = 'XXXXX'
+```
 
 <a name="nodejs"></a>
 

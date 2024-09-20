@@ -1,5 +1,6 @@
 import ecoIndexCalculationService from '../ecoIndexCalculationService.js'
 import formatCompliance from './formatCompliance.js'
+import loggerService from '../../loggers/traces.js'
 
 class FormatGreenItAnalysis {}
 
@@ -14,8 +15,8 @@ FormatGreenItAnalysis.prototype.greenItUrlAnalysisFormatted = function (analysis
       grade: analysis.grade
     }
   } catch (err) {
-    console.error(err)
-    console.error('GREENIT - error during the formatting of project analysis')
+    loggerService.error(err)
+    loggerService.error('GREENIT - error during the formatting of project analysis')
   }
   return formattedAnalysis
 }
@@ -54,8 +55,8 @@ FormatGreenItAnalysis.prototype.greenItProjectLastAnalysisFormatted = function (
       grade: formatCompliance.getEcodesignGrade(ecoIndex / count)
     }
   } catch (err) {
-    console.error(err)
-    console.error('GREENIT - error during the formatting of project analysis')
+    loggerService.error(err)
+    loggerService.error('GREENIT - error during the formatting of project analysis')
   }
   return analysis
 }
@@ -99,8 +100,8 @@ FormatGreenItAnalysis.prototype.formatDeploymentsForGraphs = function (deploymen
       delete i.numberOfValues
     }
   } catch (error) {
-    console.error(error)
-    console.error('GREENIT - error during the formatting of project analysis')
+    loggerService.error(error)
+    loggerService.error('GREENIT - error during the formatting of project analysis')
   }
 
   return finalDeployment
