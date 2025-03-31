@@ -2,8 +2,6 @@
 
 # EcoSonar, the eco-design audit tool
 
-Our official website : https://ecosonar.org
-
 User guide: https://github.com/Accenture/EcoSonar/blob/main/USER_GUIDE.md
 
 ## Main objectives of EcoSonar:
