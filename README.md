@@ -171,7 +171,7 @@ GitHub Link: https://github.com/green-code-initiative
 
 ## About
 
-To get more info on EcoSonar, you can contact ecosonar-team@accenture.com and have a look at our new website : https://ecosonar.org.
+To get more info on EcoSonar, you can contact ecosonar-team@accenture.com.
 
 EcoSonar has been conceived with respect of the licensing rights of the following repository :
 
