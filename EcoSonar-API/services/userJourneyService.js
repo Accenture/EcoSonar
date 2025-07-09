@@ -141,7 +141,7 @@ UserJourneyService.prototype.insertUserFlow = async function (projectName, url, 
 
 function findElementAndEncrypt(arr, propName, propValue) {
   for (var i=0; i < arr.length; i++) {
-    if ((arr[i][propName].toString()).includes(propValue)) { 
+    if ((String(arr[i][propName])).includes(propValue) && arr[i].type.includes("change")) { 
       arr[i].value = '***encrypt***'+aesEncrypt(arr[i].value)
     }
   }    
@@ -151,9 +151,10 @@ function findElementAndEncrypt(arr, propName, propValue) {
 function findElementAndDecrypt(arr, propName, propValue) {
   var test = arr.steps
   for (var i=0; i < test.length; i++) {
-    if ((test[i][propName].toString()).includes(propValue)) { 
-      if (test[i].value.includes('***encrypt***')) {
-      let newText = test[i].value.replace('***encrypt***', '');
+    if ((String(test[i][propName])).includes(propValue) && test[i].type.includes("change")) { 
+      let value = String(test[i].value)
+      if (value.includes('***encrypt***')) {
+      let newText = value.replace('***encrypt***', '');
       test[i].value = aesDecrypt(newText)
       }
     }

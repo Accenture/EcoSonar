@@ -37,12 +37,13 @@ app.use(helmet())
 
 const PORT = process.env.SWAGGER_PORT || 3002
 app.listen(PORT, () => loggerService.info(`Swagger in progress on port ${PORT}`))
-const passWord = process.env.ECOSONAR_USER_PASS || 'password'
-const userName = process.env.ECOSONAR_USER_USERNAME || 'admin'
-app.use("/swagger",basicAuth({
-  users: {userName: passWord},
+const passWord = process.env.ECOSONAR_USER_PASS || 'password';
+const userName = process.env.ECOSONAR_USER_USERNAME || 'admin';
+
+app.use("/swagger", basicAuth({
+  users: { [userName]: passWord },  // Correct: userName as key, passWord as value
   challenge: true,
-}), swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+}), swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 const sonarqubeServerUrl = process.env.ECOSONAR_ENV_SONARQUBE_SERVER_URL || ''
