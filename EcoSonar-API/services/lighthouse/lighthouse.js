@@ -62,14 +62,7 @@ export default async function lighthouseAnalysis (urlList, projectName, username
             })
           if (userJourney) {
             authenticatedPage = await userJourneyService.playUserFlowLighthouse(url, browserLight, userJourney)
-          } else {
-            // Wait for Lighthouse to open url, then inject our stylesheet.
-            browserLight.on('targetchanged', async target => {
-              if (page && page.url() === url) {
-                await page.addStyleTag({ content: '* {color: red}' })
-              }
-            })
-          }
+          } 
           //If the url requires an authentication
           if (authenticatedPage) {
             loggerService.info('Light house analysis with authentication in progress for the url '+ authenticatedPage.url());

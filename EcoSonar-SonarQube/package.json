@@ -1,6 +1,6 @@
 {
   "name": "ecosonar-plugin",
-  "version": "3.6",
+  "version": "3.8",
   "description": "Ecodesign and accessibility tool to help developpers minimize carbon footprint of their web-application",
   "main": "index.js",
   "scripts": {
